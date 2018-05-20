@@ -1,0 +1,8 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    ports:
+        - "6001:5432"
+    environment:
+        - POSTGRES_PASSWORD=password12!
