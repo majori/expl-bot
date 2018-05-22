@@ -12,7 +12,7 @@ export const up = async (knex: Knex) => {
 
     t.integer('tg_user_id');
     t.integer('tg_message_id');
-    t.integer('tg_chat_id');
+    t.bigInteger('tg_chat_id');
 
     t.integer('echo_count')
       .defaultTo(0)
@@ -25,7 +25,7 @@ export const up = async (knex: Knex) => {
     t.increments('id')
       .primary();
     t.integer('tg_user_id');
-    t.integer('tg_chat_id');
+    t.bigInteger('tg_chat_id');
 
     t.unique(['tg_user_id', 'tg_chat_id']);
   });
