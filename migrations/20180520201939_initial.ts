@@ -1,4 +1,4 @@
-import Knex from 'knex';
+import * as Knex from 'knex';
 
 export const up = async (knex: Knex) => {
   await knex.schema.createTable('expls', (t) => {
@@ -26,6 +26,8 @@ export const up = async (knex: Knex) => {
       .primary();
     t.integer('tg_user_id');
     t.integer('tg_chat_id');
+
+    t.unique(['tg_user_id', 'tg_chat_id']);
   });
 
 };
