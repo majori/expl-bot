@@ -6,7 +6,7 @@ declare module 'telegraf' {
     telegram: Telegram;
     options: {
       username: string;
-    }
+    };
   }
 
   interface Telegram {
@@ -14,4 +14,9 @@ declare module 'telegraf' {
   }
 }
 
-export interface Context extends Telegraf.ContextMessageUpdate {}
+export interface Context extends Telegraf.ContextMessageUpdate {
+  state: {
+    user: number;
+    chat: number;
+  };
+}

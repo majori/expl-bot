@@ -1,8 +1,11 @@
 import * as Knex from 'knex';
 import * as _ from 'lodash';
 import config from './config';
+import Logger from './logger';
 
-export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
+const logger = new Logger(__filename);
+
+const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
 export const createExpl = async (user: number, chat: number, key: string, message: string | number) => {
   const expl: Partial<Table.Expl> = {
@@ -19,6 +22,8 @@ export const createExpl = async (user: number, chat: number, key: string, messag
 
   await knex('expls')
     .insert(expl);
+
+  logger.debug('Created expl', { key });
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
@@ -48,16 +53,24 @@ export const getRandomExpl = async (user: number) => {
 
 export const searchExpl = async (user: number, searchTerm: string) => {
   return getExplsForUser(user)
-    .select('key')
-    .andWhere('key', 'like', `%${searchTerm}%`); // TODO: Test if we have to escape this
+    .select('expls.key')
+    .andWhere('expls.key', 'like', `%${searchTerm}%`); // TODO: Test if we have to escape this
 };
 
 export const addUserToChat = async (user: number, chat: number) => {
-  return knex('auth')
+  try {
+    await knex('auth')
     .insert({
       tg_user_id: user,
       tg_chat_id: chat,
     });
+    logger.debug('User added to chat', { user, chat });
+    return true;
+  } catch (err) {
+    logger.error(err);
+    logger.debug('User already in chat', { user, chat });
+    return false;
+  }
 };
 
 const getExplsForUser = (user: number) => knex
@@ -70,10 +83,14 @@ const getExplsForUser = (user: number) => knex
   });
 
 const updateExpl = async (expl: Table.Expl) => {
-  await knex('expls')
-    .where({ id: expl.id })
-    .increment('echo_count', 1)
-    .update('last_echo', new Date().toISOString());
+  await knex.raw(`
+    UPDATE expls
+    SET
+      "echo_count" = "echo_count" + 1,
+      "last_echo" = ?
+    WHERE "id" = ?
+  `, [new Date().toISOString(), expl.id]);
 
+  logger.debug('Expl updated', { key: expl.key });
   return expl;
 };
