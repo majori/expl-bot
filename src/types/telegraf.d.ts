@@ -11,6 +11,8 @@ declare module 'telegraf' {
 
   interface Telegram {
     getMe(): Promise<{ username: string }>;
+    setWebhook(url: string): Promise<any>;
+    deleteWebhook(): Promise<any>;
   }
 }
 
