@@ -30,3 +30,16 @@ export const joinGroup = async (ctx: Context) => {
     `${ctx.chat!.title ? `group *${ctx.chat!.title}*` : 'the group'}!`;
   return ctx.replyWithMarkdown(msg);
 };
+
+export const searchExpl = async (ctx: Context) => {
+  const expls = await db.searchExpl(ctx.state.user, ctx.inlineQuery!.query);
+  const results = expls.map((expl: Partial<Table.Expl>) => ({
+    type: 'article',
+    id: expl.id,
+    title: expl.key,
+    input_message_content: {
+      message_text: `?? ${expl.key}`,
+    },
+  }));
+  return ctx.answerInlineQuery(results);
+};

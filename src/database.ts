@@ -53,7 +53,7 @@ export const getRandomExpl = async (user: number) => {
 
 export const searchExpl = async (user: number, searchTerm: string) => {
   return getExplsForUser(user)
-    .select('expls.key')
+    .select(['expls.key', 'expls.id'])
     .andWhere('expls.key', 'like', `%${searchTerm}%`); // TODO: Test if we have to escape this
 };
 

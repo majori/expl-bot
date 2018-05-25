@@ -28,35 +28,7 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.command('/join', commands.joinGroup);
 
-  bot.on('inline_query', async (ctx) => {
-    const results = [
-      {
-        type: 'article',
-        id: 'addi1',
-        title: 'addi1',
-        input_message_content: {
-          message_text: '?? addi1',
-        },
-      },
-      {
-        type: 'article',
-        id: 'addi2',
-        title: 'addi2',
-        input_message_content: {
-          message_text: '?? addi2',
-        },
-      },
-      {
-        type: 'article',
-        id: 'addi3',
-        title: 'addi3',
-        input_message_content: {
-          message_text: '?? addi3',
-        },
-      },
-    ];
-    return ctx.answerInlineQuery(results);
-  });
+  bot.on('inline_query', commands.searchExpl);
 
   return bot;
 };
