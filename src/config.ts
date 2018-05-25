@@ -10,7 +10,7 @@ namespace Config {
   export const tg = {
     token: process.env.TELEGRAM_TOKEN,
     webhook: process.env.WEBHOOK_DOMAIN,
-    port: parseInt(process.env.PORT as string, 10) || 6000,
+    port: parseInt(process.env.PORT!, 10) || 6000,
   };
 
   export const logging = {
