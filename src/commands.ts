@@ -2,12 +2,27 @@ import * as db from './database';
 import { Context } from './types/telegraf';
 
 export const getExpl = async (ctx: Context) => {
-  const expl = await db.getExpl(ctx.state.user, 'key');
+  const words = ctx.message!.text!.split(' ');
+
+  if (words.length < 2 || words[1].length < 1) {
+    return null;
+  }
+
+  const expl = await db.getExpl(ctx.state.user, words[1]);
+
   if (!expl) {
     return ctx.reply('Expl not found.');
   }
 
-  return ctx.reply(JSON.stringify(expl, null, 2));
+  if (expl.value) {
+    return ctx.reply(`${expl.key}: ${expl.value}`);
+  }
+
+  if (expl.tg_message_id) {
+    return ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id);
+  }
+
+  return null;
 };
 
 export const getRandomExpl = async (ctx: Context) => {
@@ -38,7 +53,7 @@ export const searchExpl = async (ctx: Context) => {
     id: expl.id,
     title: expl.key,
     input_message_content: {
-      message_text: `?? ${expl.key}`,
+      message_text: `/expl ${expl.key}`,
     },
   }));
   return ctx.answerInlineQuery(results);

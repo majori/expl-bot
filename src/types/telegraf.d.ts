@@ -13,6 +13,7 @@ declare module 'telegraf' {
     getMe(): Promise<{ username: string }>;
     setWebhook(url: string): Promise<any>;
     deleteWebhook(): Promise<any>;
+    forwardMessage(chatId: string | number, fromChatId: string | number, messageId: number): Promise<any>;
   }
 }
 
