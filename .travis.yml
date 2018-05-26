@@ -1,10 +1,15 @@
 language: node_js
 node_js:
   - "8"
+services:
+  - postgresql
+  - docker
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t majori/expl-bot .
+  - docker push majori/expl-bot
 
 notifications:
   email:
   - antti.kivimaki@futurice.com
-
-services:
-  - postgresql
