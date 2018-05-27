@@ -7,8 +7,10 @@ services:
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build -t majori/expl-bot .
-  - docker push majori/expl-bot
+  - export REPO=$DOCKER_USERNAME/expl-bot
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -t $REPO:$TAG .
+  - docker push $REPO
 
 notifications:
   email:
