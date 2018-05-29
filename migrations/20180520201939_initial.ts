@@ -24,8 +24,8 @@ export const up = async (knex: Knex) => {
 
   await knex.schema.raw(`
     ALTER TABLE expls
-    ADD CONSTRAINT value_or_message_exists
-    CHECK (value IS NOT NULL OR tg_message_id IS NOT NULL)
+    ADD CONSTRAINT value_xor_message_exists
+    CHECK ((value IS NOT NULL AND tg_message_id is NULL) OR (tg_message_id IS NOT NULL AND value is NULL))
   `);
 
   await knex.schema.createTable('auth', (t) => {
