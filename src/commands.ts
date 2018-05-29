@@ -14,15 +14,10 @@ export const getExpl = async (ctx: Context) => {
     return ctx.reply('Expl not found.');
   }
 
-  if (expl.value) {
-    return ctx.reply(`${expl.key}: ${expl.value}`);
-  }
+  return expl.value ?
+    ctx.reply(`${expl.key}: ${expl.value}`) :
+    ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id!);
 
-  if (expl.tg_message_id) {
-    return ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id);
-  }
-
-  return null;
 };
 
 export const getRandomExpl = async (ctx: Context) => {

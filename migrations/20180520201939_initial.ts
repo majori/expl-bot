@@ -21,6 +21,13 @@ export const up = async (knex: Knex) => {
       .nullable()
       .comment('Last time this expl was echoed somewhere');
   });
+
+  await knex.schema.raw(`
+    ALTER TABLE expls
+    ADD CONSTRAINT value_or_message_exists
+    CHECK (value IS NOT NULL OR tg_message_id IS NOT NULL)
+  `);
+
   await knex.schema.createTable('auth', (t) => {
     t.increments('id')
       .primary();
