@@ -20,7 +20,7 @@ export default async (bot: Telegraf<Context>) => {
   bot.hears(/^(\?\? ).*$/, commands.getExpl);
 
   bot.command('/rexpl', commands.getRandomExpl);
-  bot.hears(/^(\?\! ).*$/, commands.getRandomExpl);
+  bot.hears(/^(\?\!).*$/, commands.getRandomExpl);
 
   bot.command('/add', commands.createExpl);
   bot.hears(/^(\!add ).*$/, commands.createExpl);

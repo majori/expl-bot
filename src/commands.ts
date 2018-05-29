@@ -1,11 +1,12 @@
+import * as _ from 'lodash';
 import * as db from './database';
 import { Context } from './types/telegraf';
 
 export const getExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
-  if (words.length < 2 || words[1].length < 1) {
-    return null;
+  if (words.length < 2 || _.isEmpty(words[1])) {
+    return ctx.replyWithMarkdown(`Try \`${_.first(words)} key\``);
   }
 
   const expl = await db.getExpl(ctx.state.user, words[1]);
@@ -26,7 +27,32 @@ export const getRandomExpl = async (ctx: Context) => {
 };
 
 export const createExpl = async (ctx: Context) => {
-  await db.createExpl(ctx.state.user, ctx.state.chat, 'key', 'MESSAGE');
+  const words = ctx.message!.text!.split(' ');
+
+  const errorMessage = `Try \`${_.first(words)} [key] [value]\` ` +
+    `or reply to any message with \`${_.first(words)} [key]\``;
+
+  if (words.length < 2 || _.isEmpty(words[1])) {
+    return ctx.replyWithMarkdown(errorMessage);
+  }
+
+  const key = words[1];
+  let value: number | string;
+
+  // Expl value is normal text
+  if (words.length >= 3 && !ctx.message!.reply_to_message) {
+    value = _(words).drop(2).join(' ');
+
+  // Expl value is reply to other message
+  } else if (ctx.message!.reply_to_message) {
+    value = ctx.message!.reply_to_message!.message_id;
+
+  // Unknown format, send error message
+  } else {
+    return ctx.replyWithMarkdown(errorMessage);
+  }
+
+  await db.createExpl(ctx.state.user, ctx.state.chat, key, value);
   return ctx.reply('Expl created!');
 };
 
@@ -43,7 +69,7 @@ export const joinGroup = async (ctx: Context) => {
 
 export const searchExpl = async (ctx: Context) => {
   const expls = await db.searchExpl(ctx.state.user, ctx.inlineQuery!.query);
-  const results = expls.map((expl: Partial<Table.Expl>) => ({
+  const results = _.map(expls, (expl) => ({
     type: 'article',
     id: expl.id,
     title: expl.key,
@@ -51,5 +77,5 @@ export const searchExpl = async (ctx: Context) => {
       message_text: `/expl ${expl.key}`,
     },
   }));
-  return ctx.answerInlineQuery(results);
+  return ctx.answerInlineQuery(results as any);
 };
