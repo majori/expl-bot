@@ -6,7 +6,7 @@ import Logger from './logger';
 const logger = new Logger(__filename);
 
 async function start() {
-  const options = { webhookReply: false };
+  const options = { telegram: { webhookReply: false } };
   const bot = await createBot(new (Telegraf as any)(config.tg.token!, options));
 
   // Setup webhook if production
