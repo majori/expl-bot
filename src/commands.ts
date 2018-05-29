@@ -25,7 +25,7 @@ export const getRandomExpl = async (ctx: Context) => {
   const expl = await db.getRandomExpl(ctx.state.user);
 
   if (!expl) {
-    return ctx.reply('Can\t find any expl for you :/');
+    return ctx.reply('Can\'t find any expl for you :/');
   }
 
   return expl.value ?
