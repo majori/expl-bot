@@ -23,7 +23,14 @@ export const getExpl = async (ctx: Context) => {
 
 export const getRandomExpl = async (ctx: Context) => {
   const expl = await db.getRandomExpl(ctx.state.user);
-  return ctx.reply(JSON.stringify(expl, null, 2));
+
+  if (!expl) {
+    return ctx.reply('Can\t find any expl for you :/');
+  }
+
+  return expl.value ?
+    ctx.reply(`${expl.key}: ${expl.value}`) :
+    ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id!);
 };
 
 export const createExpl = async (ctx: Context) => {

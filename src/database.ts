@@ -5,7 +5,7 @@ import Logger from './logger';
 
 const logger = new Logger(__filename);
 
-const knex = Knex(config.env.prod ? config.db.production : config.db.development);
+export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
 export const createExpl = async (user: number, chat: number, key: string, message: string | number) => {
   const expl: Partial<Table.Expl> = {
@@ -47,6 +47,10 @@ export const getRandomExpl = async (user: number) => {
   const results: Table.Expl[] = await getExplsForUser(user)
     .limit(1)
     .offset(_.random(count - 1));
+
+  if (_.isEmpty(results)) {
+    return null;
+  }
 
   return updateExpl(_.first(results)!);
 };
