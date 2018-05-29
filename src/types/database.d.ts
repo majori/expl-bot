@@ -5,6 +5,7 @@ declare namespace Table {
     key: string;
     value: string | null;
     tg_user_id: number;
+    tg_username: string;
     tg_message_id: number | null;
     tg_chat_id: number;
     echo_count: number;

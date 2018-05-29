@@ -59,8 +59,15 @@ export const createExpl = async (ctx: Context) => {
     return ctx.replyWithMarkdown(errorMessage);
   }
 
-  await db.createExpl(ctx.state.user, ctx.state.chat, key, value);
-  return ctx.reply('Expl created!');
+  const successful = await db.createExpl({
+    userId: ctx.state.user,
+    chatId: ctx.state.chat,
+    username: ctx.from!.username || ctx.from!.first_name,
+    key,
+    message: value,
+  });
+
+  return ctx.reply(successful ? 'Expl created!' : `You have already an expl with the key "${key}".`);
 };
 
 export const joinGroup = async (ctx: Context) => {

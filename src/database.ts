@@ -7,23 +7,33 @@ const logger = new Logger(__filename);
 
 export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
-export const createExpl = async (user: number, chat: number, key: string, message: string | number) => {
+type ExplOptions = { userId: number; chatId: number; username: string; key: string; message: string | number; };
+export const createExpl = async (options: ExplOptions) => {
   const expl: Partial<Table.Expl> = {
-    key,
-    tg_user_id: user,
-    tg_chat_id: chat,
+    key: options.key,
+    tg_user_id: options.userId,
+    tg_chat_id: options.chatId,
+    tg_username: options.username,
   };
 
-  if (_.isString(message)) {
-    expl.value = message;
+  if (_.isString(options.message)) {
+    expl.value = options.message;
   } else {
-    expl.tg_message_id = message;
+    expl.tg_message_id = options.message;
   }
 
-  await knex('expls')
-    .insert(expl);
+  try {
+    await knex('expls')
+      .insert(expl);
+  } catch (err) {
+    if (err.constraint === 'expls_tg_user_id_key_unique') {
+      return false;
+    }
+    throw err;
+  }
 
-  logger.debug('Created expl', { key });
+  logger.debug('Created expl', { key: options.key });
+  return true;
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
@@ -58,7 +68,7 @@ export const getRandomExpl = async (user: number) => {
 export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${searchTerm}%`); // TODO: Test if we have to escape this
+    .andWhere('expls.key', 'like', `%${searchTerm}%`);
 };
 
 export const addUserToChat = async (user: number, chat: number) => {

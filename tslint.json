@@ -12,7 +12,8 @@
     "object-literal-sort-keys": false,
     "linebreak-style": [true, "lf"],
     "arrow-parens": false,
-    "no-unused-expression": false
+    "no-unused-expression": false,
+    "interface-over-type-literal": false
   },
   "rulesDirectory": []
 }
