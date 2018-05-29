@@ -80,12 +80,16 @@ export const addUserToChat = async (user: number, chat: number) => {
 const getExplsForUser = (user: number) => knex
   .from('expls')
   .where(function() {
-    this.whereIn('tg_chat_id', function() {
+    this.whereIn('tg_user_id', function() {
       this.from('auth')
-        .select('tg_chat_id')
-        .where({ tg_user_id: user });
+        .select('tg_user_id')
+        .whereIn('tg_chat_id', function() {
+          this.from('auth')
+            .select('tg_chat_id')
+            .where({ tg_user_id: user });
+        });
     })
-    .orWhere('tg_chat_id', user);
+    .orWhere('tg_user_id', user);
   });
 
 const updateExpl = async (expl: Table.Expl) => {
