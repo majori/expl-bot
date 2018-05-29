@@ -6,7 +6,8 @@ import Logger from './logger';
 const logger = new Logger(__filename);
 
 async function start() {
-  const bot = await createBot(new (Telegraf as any)(config.tg.token!));
+  const options = { webhookReply: false };
+  const bot = await createBot(new (Telegraf as any)(config.tg.token!, options));
 
   // Setup webhook if production
   if (config.env.prod) {
