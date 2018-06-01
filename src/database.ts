@@ -7,26 +7,37 @@ const logger = new Logger(__filename);
 
 export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
-type ExplOptions = { userId: number; chatId: number; username: string; key: string; message: string | number; };
 export const createExpl = async (options: ExplOptions) => {
   const expl: Partial<Table.Expl> = {
+    user_id: options.userId,
     key: options.key,
-    tg_user_id: options.userId,
-    tg_chat_id: options.chatId,
-    tg_username: options.username,
   };
 
-  if (_.isString(options.message)) {
+  if (options.message) {
     expl.value = options.message;
-  } else {
-    expl.tg_message_id = options.message;
+  }
+
+  let tgContent: Partial<Table.TgContents>;
+  if (!_.isEmpty(options.telegram)) {
+    tgContent = _.mapKeys(options.telegram, (value, key) => `${key}_id`);
   }
 
   try {
-    await knex('expls')
-      .insert(expl);
+    await knex.transaction(async (trx) => {
+      if (tgContent) {
+        const ids = await knex('tg_contents')
+          .transacting(trx)
+          .insert(tgContent)
+          .returning('content_id');
+        expl.tg_content = _.first(ids);
+      }
+
+      await knex('expls')
+        .transacting(trx)
+        .insert(expl);
+    });
   } catch (err) {
-    if (err.constraint === 'expls_tg_user_id_key_unique') {
+    if (err.constraint === 'expls_creator_id_key_unique') {
       return false;
     }
     throw err;
@@ -37,7 +48,7 @@ export const createExpl = async (options: ExplOptions) => {
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
-  const results: Table.Expl[] = await getExplsForUser(user)
+  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .andWhere({ 'expls.key': key });
 
   if (_.isEmpty(results)) {
@@ -48,21 +59,22 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
     results[_.clamp(offset, 0, _.size(results))] :
     _.first(results)!;
 
-  return updateExpl(selected);
+  const nested = createNestedExpl(selected);
+  return updateExpl(nested);
 };
 
 export const getRandomExpl = async (user: number) => {
   const count: number = await getExplsForUser(user)
     .count();
-  const results: Table.Expl[] = await getExplsForUser(user)
+  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .limit(1)
     .offset(_.random(count - 1));
 
   if (_.isEmpty(results)) {
     return null;
   }
-
-  return updateExpl(_.first(results)!);
+  const nested = createNestedExpl(_.first(results)!);
+  return updateExpl(nested);
 };
 
 export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
@@ -75,8 +87,8 @@ export const addUserToChat = async (user: number, chat: number) => {
   try {
     await knex('auth')
     .insert({
-      tg_user_id: user,
-      tg_chat_id: chat,
+      user_id: user,
+      chat_id: chat,
     });
     logger.debug('User added to chat', { user, chat });
     return true;
@@ -89,17 +101,18 @@ export const addUserToChat = async (user: number, chat: number) => {
 
 const getExplsForUser = (user: number) => knex
   .from('expls')
+  .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
   .where(function() {
-    this.whereIn('tg_user_id', function() {
+    this.whereIn('user_id', function() {
       this.from('auth')
-        .select('tg_user_id')
-        .whereIn('tg_chat_id', function() {
+        .select('user_id')
+        .whereIn('chat_id', function() {
           this.from('auth')
-            .select('tg_chat_id')
-            .where({ tg_user_id: user });
+            .select('chat_id')
+            .where({ user_id: user });
         });
     })
-    .orWhere('tg_user_id', user);
+    .orWhere('user_id', user);
   });
 
 const updateExpl = async (expl: Table.Expl) => {
@@ -113,4 +126,13 @@ const updateExpl = async (expl: Table.Expl) => {
 
   logger.debug('Expl updated', { key: expl.key });
   return expl;
+};
+
+const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
+  // Telegram content columns
+  const columns = ['content_id', 'message_id', 'chat_id', 'sticker_id', 'audio_id', 'photo_id', 'video_id'];
+  return {
+    ..._.omit(expl, columns) as any,
+    tg_content: _.pick(expl, columns),
+  };
 };

@@ -10,15 +10,7 @@ export const getExpl = async (ctx: Context) => {
   }
 
   const expl = await db.getExpl(ctx.state.user, words[1]);
-
-  if (!expl) {
-    return ctx.reply('Expl not found.');
-  }
-
-  return expl.value ?
-    ctx.reply(`${expl.key}: ${expl.value}`) :
-    ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id!);
-
+  await sendExpl(ctx, expl);
 };
 
 export const getRandomExpl = async (ctx: Context) => {
@@ -28,9 +20,7 @@ export const getRandomExpl = async (ctx: Context) => {
     return ctx.reply('Can\'t find any expl for you :/');
   }
 
-  return expl.value ?
-    ctx.reply(`${expl.key}: ${expl.value}`) :
-    ctx.telegram.forwardMessage(ctx.state.chat, expl.tg_chat_id, expl.tg_message_id!);
+  await sendExpl(ctx, expl);
 };
 
 export const createExpl = async (ctx: Context) => {
@@ -44,28 +34,28 @@ export const createExpl = async (ctx: Context) => {
   }
 
   const key = words[1];
-  let value: number | string;
+  const expl: ExplOptions = {
+    userId: ctx.state.user,
+    key,
+  };
 
   // Expl value is normal text
   if (words.length >= 3 && !ctx.message!.reply_to_message) {
-    value = _(words).drop(2).join(' ');
+    expl.message = _(words).drop(2).join(' ');
 
   // Expl value is reply to other message
   } else if (ctx.message!.reply_to_message) {
-    value = ctx.message!.reply_to_message!.message_id;
+    expl.telegram = {
+      message: ctx.message!.reply_to_message!.message_id,
+      chat: ctx.message!.chat.id,
+    };
 
   // Unknown format, send error message
   } else {
     return ctx.replyWithMarkdown(errorMessage);
   }
 
-  const successful = await db.createExpl({
-    userId: ctx.state.user,
-    chatId: ctx.state.chat,
-    username: ctx.from!.username || ctx.from!.first_name,
-    key,
-    message: value,
-  });
+  const successful = await db.createExpl(expl);
 
   return ctx.reply(successful ? 'Expl created!' : `You have already an expl with the key "${key}".`);
 };
@@ -92,4 +82,21 @@ export const searchExpl = async (ctx: Context) => {
     },
   }));
   return ctx.answerInlineQuery(results as any);
+};
+
+const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
+  if (!expl) {
+    return ctx.reply('Expl not found.');
+  }
+
+  if (expl.value) {
+    return ctx.reply(`${expl.key}: ${expl.value}`);
+  }
+
+  if (expl.tg_content) {
+    const content = expl.tg_content;
+    if (content.message_id && content.chat_id) {
+      return ctx.telegram.forwardMessage(ctx.state.chat, content.chat_id, content.message_id);
+    }
+  }
 };
