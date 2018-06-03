@@ -53,8 +53,10 @@ export const up = async (knex: Knex) => {
   await knex.schema.createTable('auth', (t) => {
     t.increments('id')
       .primary();
-    t.integer('user_id');
-    t.bigInteger('chat_id');
+    t.integer('user_id')
+      .notNullable();
+    t.bigInteger('chat_id')
+      .notNullable();
 
     t.unique(['user_id', 'chat_id']);
   });
