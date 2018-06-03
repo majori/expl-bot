@@ -99,6 +99,15 @@ export const addUserToChat = async (user: number, chat: number) => {
   }
 };
 
+export const deleteExpl = async (user: number, key: string) => {
+  const count: number = await knex('expls')
+    .where({ user_id: user, key })
+    .del();
+
+  logger.debug(`Expl ${key} deleted`, { user });
+  return count;
+};
+
 const getExplsForUser = (user: number) => knex
   .from('expls')
   .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')

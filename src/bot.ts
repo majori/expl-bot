@@ -25,6 +25,9 @@ export default async (bot: Telegraf<Context>) => {
   bot.command('/add', commands.createExpl);
   bot.hears(/^(\!add ).*$/, commands.createExpl);
 
+  bot.command('/remove', commands.removeExpl);
+  bot.hears(/^(\!rm ).*$/, commands.removeExpl);
+
   bot.command('/join', commands.joinGroup);
 
   bot.on('inline_query', commands.searchExpl);

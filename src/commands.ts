@@ -84,6 +84,20 @@ export const searchExpl = async (ctx: Context) => {
   return ctx.answerInlineQuery(results as any);
 };
 
+export const removeExpl = async (ctx: Context) => {
+  const words = ctx.message!.text!.split(' ');
+
+  if (words.length < 2 || _.isEmpty(words[1])) {
+    return ctx.replyWithMarkdown(`Try \`${_.first(words)} [key]\``);
+  }
+  const key = words[1];
+  const count = await db.deleteExpl(ctx.state.user, key);
+
+  return (count > 0) ?
+    ctx.reply(`Expl "${key}" removed.`) :
+    ctx.reply(`Expl "${key}" not found.`);
+};
+
 const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
   if (!expl) {
     return ctx.reply('Expl not found.');
