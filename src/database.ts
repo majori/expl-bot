@@ -64,8 +64,7 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
 };
 
 export const getRandomExpl = async (user: number) => {
-  const count: number = await getExplsForUser(user)
-    .count();
+  const count: number = +_.get(await getExplsForUser(user).count(), [0, 'count'], 0);
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .limit(1)
     .offset(_.random(count - 1));
