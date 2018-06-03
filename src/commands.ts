@@ -110,7 +110,13 @@ const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
   if (expl.tg_content) {
     const content = expl.tg_content;
     if (content.message_id && content.chat_id) {
-      return ctx.telegram.forwardMessage(ctx.state.chat, content.chat_id, content.message_id);
+      try {
+        await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
+      } catch (err) {
+        if (err.code === 400 && err.description === 'Bad Request: chat not found') {
+          return ctx.reply('Expl cannot be shown since the user or the chat has blocked the bot 😢');
+        }
+      }
     }
   }
 };
