@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "8"
+services:
+  - postgresql
+  - docker
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - export REPO=$DOCKER_USERNAME/expl-bot
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -t $REPO:$TAG .
+  - docker push $REPO
+
+notifications:
+  email:
+  - antti.kivimaki@futurice.com
