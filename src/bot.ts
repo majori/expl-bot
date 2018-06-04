@@ -9,6 +9,13 @@ export default async (bot: Telegraf<Context>) => {
   bot.options.username = info.username;
 
   bot.use((ctx, next) => {
+    // HACK: Reject "mobi" chat because of reasons
+    if (_.get(ctx, 'chat.id') !== -8573374) {
+      (next as any)();
+    }
+  });
+
+  bot.use((ctx, next) => {
     ctx.state = {
       user: _.get(ctx, 'from.id'),
       chat: _.get(ctx, 'chat.id'),
