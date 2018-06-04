@@ -49,7 +49,9 @@ export const createExpl = async (options: ExplOptions) => {
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
-    .andWhere({ 'expls.key': key });
+    .andWhere({ 'expls.key': key })
+    .orderBy('created_at', 'asc')
+    .groupBy('id', 'content_id');
 
   if (_.isEmpty(results)) {
     return null;
@@ -121,9 +123,7 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  })
-  .orderBy('created_at', 'asc')
-  .groupBy('id', 'content_id');
+  });
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`
