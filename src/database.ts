@@ -37,7 +37,7 @@ export const createExpl = async (options: ExplOptions) => {
         .insert(expl);
     });
   } catch (err) {
-    if (err.constraint === 'expls_creator_id_key_unique') {
+    if (err.constraint === 'expls_user_id_key_unique') {
       return false;
     }
     throw err;
@@ -55,9 +55,9 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
     return null;
   }
 
-  const selected = offset ?
-    results[_.clamp(offset, 0, _.size(results))] :
-    _.first(results)!;
+  const selected = offset && offset !== 0 ?
+    results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
+    _.last(results)!;
 
   const nested = createNestedExpl(selected);
   return updateExpl(nested);
@@ -121,7 +121,9 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  });
+  })
+  .orderBy('created_at', 'asc')
+  .groupBy('id', 'content_id');
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`

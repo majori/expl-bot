@@ -8,8 +8,9 @@ export const getExpl = async (ctx: Context) => {
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(`Try \`${_.first(words)} key\``);
   }
+  const offset = _.chain(words).get([2], 0).toNumber().value() || 0;
 
-  const expl = await db.getExpl(ctx.state.user, words[1]);
+  const expl = await db.getExpl(ctx.state.user, words[1], offset);
   await sendExpl(ctx, expl);
 };
 
