@@ -81,7 +81,8 @@ export const getRandomExpl = async (user: number) => {
 export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${searchTerm}%`);
+    .andWhere('expls.key', 'like', `%${searchTerm}%`)
+    .limit(15); // TODO: Use pagination
 };
 
 export const addUserToChat = async (user: number, chat: number) => {
