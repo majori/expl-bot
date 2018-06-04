@@ -33,7 +33,8 @@ export const up = async (knex: Knex) => {
     t.integer('tg_content')
       .unsigned()
       .references('content_id')
-      .inTable('tg_contents');
+      .inTable('tg_contents')
+      .onDelete('CASCADE');
 
     t.integer('echo_count')
       .defaultTo(0)
