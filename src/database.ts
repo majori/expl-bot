@@ -49,7 +49,9 @@ export const createExpl = async (options: ExplOptions) => {
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
-    .andWhere({ 'expls.key': key });
+    .andWhere({ 'expls.key': key })
+    .orderBy('created_at', 'asc')
+    .groupBy('id', 'content_id');
 
   if (_.isEmpty(results)) {
     return null;
@@ -79,7 +81,8 @@ export const getRandomExpl = async (user: number) => {
 export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${searchTerm}%`);
+    .andWhere('expls.key', 'like', `%${searchTerm}%`)
+    .limit(15); // TODO: Use pagination
 };
 
 export const addUserToChat = async (user: number, chat: number) => {
@@ -121,9 +124,7 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  })
-  .orderBy('created_at', 'asc')
-  .groupBy('id', 'content_id');
+  });
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`
