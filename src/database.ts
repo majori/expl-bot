@@ -85,6 +85,11 @@ export const searchExpl = async (user: number, searchTerm: string): Promise<Arra
     .limit(15); // TODO: Use pagination
 };
 
+export const searchRexpls = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
+  return getExplsForUser(user)
+    .whereNotNull('tg_contents.photo_id');
+};
+
 export const addUserToChat = async (user: number, chat: number) => {
   try {
     await knex('auth')

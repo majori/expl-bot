@@ -46,10 +46,19 @@ export const createExpl = async (ctx: Context) => {
 
   // Expl value is reply to other message
   } else if (ctx.message!.reply_to_message) {
+    const replyTo: any = ctx.message!.reply_to_message!;
     expl.telegram = {
-      message: ctx.message!.reply_to_message!.message_id,
+      message: replyTo.message_id,
       chat: ctx.message!.chat.id,
     };
+
+    if (replyTo.photo) {
+      expl.telegram.photo = replyTo.photo[0].file_id;
+    } else if (replyTo.audio) {
+      expl.telegram.audio = replyTo.audio.file_id;
+    } else if (replyTo.sticker) {
+      expl.telegram.sticker = replyTo.sticker.file_id;
+    }
 
   // Unknown format, send error message
   } else {
@@ -73,15 +82,17 @@ export const joinGroup = async (ctx: Context) => {
 };
 
 export const searchExpl = async (ctx: Context) => {
-  const expls = await db.searchExpl(ctx.state.user, ctx.inlineQuery!.query);
-  const results = _.map(expls, (expl) => ({
-    type: 'article',
-    id: expl.id,
-    title: expl.key,
-    input_message_content: {
-      message_text: `/expl ${expl.key}`,
-    },
-  }));
+  const query = ctx.inlineQuery!.query;
+  let results: any;
+
+  if (_.isEmpty(query)) {
+    const rexpls = await db.searchRexpls(ctx.state.user, query);
+    results = _.map(rexpls, expl => getInlineResult(expl));
+  } else {
+    const expls = await db.searchExpl(ctx.state.user, query);
+    results = _.map(expls, expl => getInlineResult(expl));
+  }
+
   return ctx.answerInlineQuery(results as any);
 };
 
@@ -120,4 +131,27 @@ const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
       }
     }
   }
+};
+
+const getInlineResult = (expl: Partial<Table.Expl> & Partial<Table.TgContents>) => {
+  if (expl.photo_id) {
+    return {
+      type: 'photo',
+      title: expl.key,
+      id: expl.id,
+      photo_file_id: expl.photo_id,
+      input_message_content: {
+        message_text: `/expl ${expl.key}`,
+      },
+    };
+  }
+
+  return {
+    type: 'article',
+    id: expl.id,
+    title: expl.key,
+    input_message_content: {
+      message_text: `/expl ${expl.key}`,
+    },
+  };
 };
