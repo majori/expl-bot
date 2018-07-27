@@ -10,7 +10,7 @@ export const knex = Knex(config.env.prod ? config.db.production : config.db.deve
 export const createExpl = async (options: ExplOptions) => {
   const expl: Partial<Table.Expl> = {
     user_id: options.userId,
-    key: options.key,
+    key: _.toLower(options.key),
   };
 
   if (options.message) {
@@ -49,8 +49,7 @@ export const createExpl = async (options: ExplOptions) => {
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
-    .andWhere({ 'expls.key': key })
-    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
+    .andWhere({ 'expls.key': _.toLower(key) })
     .orderBy('created_at', 'asc')
     .groupBy('id', 'content_id');
 
@@ -82,11 +81,11 @@ export const getRandomExpl = async (user: number) => {
 export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${searchTerm}%`)
+    .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`)
     .limit(15); // TODO: Use pagination
 };
 
-export const searchRexpls = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
+export const searchRexpls = async (user: number): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
     .whereNotNull('tg_contents.photo_id');
 };
@@ -112,6 +111,7 @@ export const addUserToChat = async (user: number, chat: number) => {
 
 export const deleteExpl = async (user: number, key: string) => {
   const count: number = await knex('expls')
+    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
     .where({ user_id: user, key })
     .del();
 
@@ -133,7 +133,8 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  });
+  })
+  .andWhere('expls.created_at', '>', '2018-06-04'); // HACK: We can't show all expls because of BorisBot migration
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`

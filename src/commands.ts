@@ -86,7 +86,7 @@ export const searchExpl = async (ctx: Context) => {
   let results: any;
 
   if (_.isEmpty(query)) {
-    const rexpls = await db.searchRexpls(ctx.state.user, query);
+    const rexpls = await db.searchRexpls(ctx.state.user);
     results = _.map(rexpls, expl => getInlineResult(expl));
   } else {
     const expls = await db.searchExpl(ctx.state.user, query);
