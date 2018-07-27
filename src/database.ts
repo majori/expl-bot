@@ -50,6 +50,7 @@ export const createExpl = async (options: ExplOptions) => {
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .andWhere({ 'expls.key': key })
+    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
     .orderBy('created_at', 'asc')
     .groupBy('id', 'content_id');
 
@@ -57,7 +58,7 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
     return null;
   }
 
-  const selected = offset && offset !== 0 ?
+  const selected = offset && offset > 0 ?
     results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
     _.last(results)!;
 
@@ -85,6 +86,11 @@ export const searchExpl = async (user: number, searchTerm: string): Promise<Arra
     .limit(15); // TODO: Use pagination
 };
 
+export const searchRexpls = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
+  return getExplsForUser(user)
+    .whereNotNull('tg_contents.photo_id');
+};
+
 export const addUserToChat = async (user: number, chat: number) => {
   try {
     await knex('auth')
@@ -95,9 +101,12 @@ export const addUserToChat = async (user: number, chat: number) => {
     logger.debug('User added to chat', { user, chat });
     return true;
   } catch (err) {
+    if (err.constraint === 'auth_user_id_chat_id_unique') {
+      logger.debug('User already in chat', { user, chat });
+      return false;
+    }
     logger.error(err);
-    logger.debug('User already in chat', { user, chat });
-    return false;
+    throw err;
   }
 };
 
@@ -135,7 +144,7 @@ const updateExpl = async (expl: Table.Expl) => {
     WHERE "id" = ?
   `, [new Date().toISOString(), expl.id]);
 
-  logger.debug('Expl updated', { key: expl.key });
+  logger.debug('Expl updated', { id: expl.id, key: expl.key });
   return expl;
 };
 
