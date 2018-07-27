@@ -50,7 +50,6 @@ export const createExpl = async (options: ExplOptions) => {
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .andWhere({ 'expls.key': key })
-    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
     .orderBy('created_at', 'asc')
     .groupBy('id', 'content_id');
 
@@ -112,6 +111,7 @@ export const addUserToChat = async (user: number, chat: number) => {
 
 export const deleteExpl = async (user: number, key: string) => {
   const count: number = await knex('expls')
+    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
     .where({ user_id: user, key })
     .del();
 
@@ -133,7 +133,8 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  });
+  })
+  .andWhere('expls.created_at', '>', '2018-06-04'); // HACK: We can't show all expls because of BorisBot migration
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`
