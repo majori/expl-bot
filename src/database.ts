@@ -50,6 +50,7 @@ export const createExpl = async (options: ExplOptions) => {
 export const getExpl = async (user: number, key: string, offset?: number) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
     .andWhere({ 'expls.key': key })
+    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
     .orderBy('created_at', 'asc')
     .groupBy('id', 'content_id');
 
