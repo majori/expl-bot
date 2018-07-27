@@ -1,18 +1,23 @@
 import * as _ from 'lodash';
 import { Telegraf } from 'telegraf';
 import { Context } from './types/telegraf';
-import config from './config';
 import * as commands from './commands';
+import * as db from './database';
 
 export default async (bot: Telegraf<Context>) => {
   const info = await bot.telegram.getMe();
   bot.options.username = info.username;
 
-  bot.use((ctx, next) => {
+  bot.use(async (ctx, next) => {
     ctx.state = {
       user: _.get(ctx, 'from.id'),
       chat: _.get(ctx, 'chat.id'),
     };
+
+    if (ctx.from && ctx.chat!.type !== 'private') {
+      await db.addUserToChat(ctx.state.user, ctx.state.chat);
+    }
+
     next!();
   });
 
