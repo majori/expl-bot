@@ -100,9 +100,12 @@ export const addUserToChat = async (user: number, chat: number) => {
     logger.debug('User added to chat', { user, chat });
     return true;
   } catch (err) {
+    if (err.constraint === 'auth_user_id_chat_id_unique') {
+      logger.debug('User already in chat', { user, chat });
+      return false;
+    }
     logger.error(err);
-    logger.debug('User already in chat', { user, chat });
-    return false;
+    throw err;
   }
 };
 
@@ -140,7 +143,7 @@ const updateExpl = async (expl: Table.Expl) => {
     WHERE "id" = ?
   `, [new Date().toISOString(), expl.id]);
 
-  logger.debug('Expl updated', { key: expl.key });
+  logger.debug('Expl updated', { id: expl.id, key: expl.key });
   return expl;
 };
 
