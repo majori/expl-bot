@@ -57,7 +57,7 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
     return null;
   }
 
-  const selected = offset && offset !== 0 ?
+  const selected = offset && offset > 0 ?
     results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
     _.last(results)!;
 
