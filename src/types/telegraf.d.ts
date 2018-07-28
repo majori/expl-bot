@@ -19,7 +19,7 @@ declare module 'telegraf' {
 
 export interface Context extends Telegraf.ContextMessageUpdate {
   session: {
-    [id: string]: boolean;
+    joined: boolean;
   };
   state: {
     user: number;
