@@ -121,6 +121,32 @@ export const deleteExpl = async (user: number, key: string) => {
   return count;
 };
 
+export const deleteUser = async (user: number) => {
+  return knex.transaction(async (trx) => {
+    try {
+      const explCount = await knex('expls')
+        .transacting(trx)
+        .where('user_id', user)
+        .del();
+
+      const chatCount = await knex('auth')
+        .transacting(trx)
+        .where('user_id', user)
+        .del();
+
+      logger.debug(`User ${user} deleted`, { explCount, chatCount });
+
+      await trx.commit({
+        expls: explCount,
+        chats: chatCount,
+      });
+    } catch (err) {
+      logger.error('Deleting user failed', err);
+      await trx.rollback(err);
+    }
+  });
+};
+
 const getExplsForUser = (user: number) => knex
   .from('expls')
   .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
