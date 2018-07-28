@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { Telegraf } from 'telegraf';
+import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import * as commands from './commands';
 import * as db from './database';
@@ -8,14 +9,16 @@ export default async (bot: Telegraf<Context>) => {
   const info = await bot.telegram.getMe();
   bot.options.username = info.username;
 
+  bot.use(session());
   bot.use(async (ctx, next) => {
     ctx.state = {
       user: _.get(ctx, 'from.id'),
       chat: _.get(ctx, 'chat.id'),
     };
 
-    if (ctx.from && ctx.chat!.type !== 'private') {
-      await db.addUserToChat(ctx.state.user, ctx.state.chat);
+    // Autojoin user to the group if not joined already
+    if (ctx.from && ctx.chat!.type !== 'private' && !ctx.session[ctx.state.user]) {
+      ctx.session[ctx.state.user] = (await db.addUserToChat(ctx.state.user, ctx.state.chat)) || true;
     }
 
     next!();
