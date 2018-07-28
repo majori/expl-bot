@@ -14,6 +14,9 @@ export const createExpl = async (options: ExplOptions) => {
   };
 
   if (options.message) {
+    if (_.size(options.message) > 500) {
+      throw new Error('value_too_long');
+    }
     expl.value = options.message;
   }
 
@@ -38,13 +41,12 @@ export const createExpl = async (options: ExplOptions) => {
     });
   } catch (err) {
     if (err.constraint === 'expls_user_id_key_unique') {
-      return false;
+      throw new Error('already_exists');
     }
     throw err;
   }
 
   logger.debug('Created expl', { key: options.key });
-  return true;
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {

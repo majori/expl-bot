@@ -1,6 +1,9 @@
 import * as _ from 'lodash';
 import * as db from './database';
 import { Context } from './types/telegraf';
+import Logger from './logger';
+
+const logger = new Logger(__filename);
 
 export const getExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
@@ -64,10 +67,24 @@ export const createExpl = async (ctx: Context) => {
   } else {
     return ctx.replyWithMarkdown(errorMessage);
   }
+  try {
+    await db.createExpl(expl);
+    ctx.reply('Expl created!');
+  } catch (err) {
+    let msg = 'Unknown error occurred :/';
+    switch (err.message) {
+      case 'already_exists':
+        msg = `You already have expl with the key "${key}".`;
+        break;
+      case 'value_too_long':
+        msg = 'Message has to be less than 500 characters.';
+        break;
+      default:
+        logger.error(err);
+    }
 
-  const successful = await db.createExpl(expl);
-
-  return ctx.reply(successful ? 'Expl created!' : `You have already an expl with the key "${key}".`);
+    ctx.reply(msg);
+  }
 };
 
 export const joinGroup = async (ctx: Context) => {
