@@ -87,17 +87,6 @@ export const createExpl = async (ctx: Context) => {
   }
 };
 
-export const joinGroup = async (ctx: Context) => {
-  if (ctx.chat!.type === 'private') {
-    return ctx.reply('Use this command from group chats!');
-  }
-
-  const joined = await db.addUserToChat(ctx.state.user, ctx.state.chat);
-  const msg = `You ${ joined ? 'successfully joined' : 'are already in' } ` +
-    `${ctx.chat!.title ? `group *${ctx.chat!.title}*` : 'the group'}!`;
-  return ctx.replyWithMarkdown(msg);
-};
-
 export const searchExpl = async (ctx: Context) => {
   const query = ctx.inlineQuery!.query;
   let results: any;
