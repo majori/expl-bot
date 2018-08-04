@@ -37,8 +37,10 @@ export default async (bot: Telegraf<Context>) => {
   bot.command('/remove', commands.removeExpl);
   bot.hears(/^(\!rm ).*$/, commands.removeExpl);
 
+  // bot.command('/list', commands.searchExpls);
+  // bot.hears(/^(\!ls ).*$/, commands.searchExpls);
 
-  bot.on('inline_query', commands.searchExpl);
+  bot.on('inline_query', commands.handleInlineQuery);
 
   return bot;
 };

@@ -87,19 +87,8 @@ export const createExpl = async (ctx: Context) => {
   }
 };
 
-export const searchExpl = async (ctx: Context) => {
-  const query = ctx.inlineQuery!.query;
-  let results: any;
-
-  if (_.isEmpty(query)) {
-    const rexpls = await db.searchRexpls(ctx.state.user);
-    results = _.map(rexpls, expl => getInlineResult(expl));
-  } else {
-    const expls = await db.searchExpl(ctx.state.user, query);
-    results = _.map(expls, expl => getInlineResult(expl));
-  }
-
-  return ctx.answerInlineQuery(results as any);
+export const searchExpls = async (ctx: Context) => {
+  // WIP
 };
 
 export const removeExpl = async (ctx: Context) => {
@@ -114,6 +103,18 @@ export const removeExpl = async (ctx: Context) => {
   return (count > 0) ?
     ctx.reply(`Expl "${key}" removed.`) :
     ctx.reply(`Expl "${key}" not found.`);
+};
+
+export const handleInlineQuery = async (ctx: Context) => {
+  const query = ctx.inlineQuery!.query;
+
+  const expls = await (_.isEmpty(query) ?
+    db.searchRexpls(ctx.state.user) :
+    db.searchExpl(ctx.state.user, query)
+  );
+  const results = _.map(expls, expl => getInlineResult(expl));
+
+  return ctx.answerInlineQuery(results as any);
 };
 
 const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
