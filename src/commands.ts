@@ -88,7 +88,32 @@ export const createExpl = async (ctx: Context) => {
 };
 
 export const searchExpls = async (ctx: Context) => {
-  // WIP
+  const words = ctx.message!.text!.split(' ');
+  if (words.length < 2 || _.isEmpty(words[1])) {
+    return ctx.replyWithMarkdown(`Try \`${_.first(words)} [key]\``);
+  }
+
+  const searchTerm = words[1];
+  const result = await db.searchExpls(ctx.state.user, searchTerm);
+
+  if (_.isEmpty(result)) {
+    return ctx.reply(`No expls found with key like "${searchTerm}".`);
+  }
+
+  const uniqueKeys = _.groupBy(result, 'key');
+  if (_.size(uniqueKeys) > 100) {
+    return ctx.reply(`Found over 100 expls with key like "${searchTerm}". Try to narrow it down.`);
+  }
+
+  const keys = _.reduce(
+    uniqueKeys,
+    (memo: string[], rows, key) => {
+      memo.push(key + (_.size(rows) > 1 ? ` \`[${_.size(rows)}]\`` : ''));
+      return memo;
+    }, [],
+  );
+
+  return ctx.replyWithMarkdown(_.join(keys, ', '));
 };
 
 export const removeExpl = async (ctx: Context) => {
@@ -110,7 +135,7 @@ export const handleInlineQuery = async (ctx: Context) => {
 
   const expls = await (_.isEmpty(query) ?
     db.searchRexpls(ctx.state.user) :
-    db.searchExpl(ctx.state.user, query)
+    db.searchExpls(ctx.state.user, query, 15)
   );
   const results = _.map(expls, expl => getInlineResult(expl));
 

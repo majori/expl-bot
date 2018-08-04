@@ -80,11 +80,17 @@ export const getRandomExpl = async (user: number) => {
   return updateExpl(nested);
 };
 
-export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
-  return getExplsForUser(user)
+type SearchExpls = (user: number, searchTerm: string, limit?: number) => Promise<Array<Partial<Table.Expl>>>;
+export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
+  const query = getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`)
-    .limit(15); // TODO: Use pagination
+    .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`);
+
+  if (limit) {
+    query.limit(limit);
+  }
+
+  return query;
 };
 
 export const searchRexpls = async (user: number): Promise<Array<Partial<Table.Expl>>> => {
