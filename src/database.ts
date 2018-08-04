@@ -112,10 +112,15 @@ export const addUserToChat = async (user: number, chat: number) => {
 };
 
 export const deleteExpl = async (user: number, key: string) => {
-  const count: number = await knex('expls')
-    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
-    .where({ user_id: user, key })
-    .del();
+  const query = knex('expls')
+    .where({ user_id: user, key });
+
+  // HACK: We can't show all expls because of BorisBot migration
+  if (!config.isBorisBot) {
+    query.andWhere('expls.created_at', '>', '2018-06-04');
+  }
+
+  const count: number = await query.del();
 
   logger.debug(`Expl ${key} deleted`, { user });
   return count;
@@ -147,8 +152,8 @@ export const deleteUser = async (user: number) => {
   });
 };
 
-const getExplsForUser = (user: number) => knex
-  .from('expls')
+const getExplsForUser = (user: number) => {
+  const query = knex.from('expls')
   .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
   .where(function() {
     this.whereIn('user_id', function() {
@@ -161,8 +166,15 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  })
-  .andWhere('expls.created_at', '>', '2018-06-04'); // HACK: We can't show all expls because of BorisBot migration
+  });
+
+  if (!config.isBorisBot) {
+    // HACK: We can't show all expls because of BorisBot migration
+    query.andWhere('expls.created_at', '>', '2018-06-04');
+  }
+
+  return query;
+};
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`

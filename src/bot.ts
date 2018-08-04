@@ -4,6 +4,7 @@ import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import * as commands from './commands';
 import * as db from './database';
+import config from './config';
 
 export default async (bot: Telegraf<Context>) => {
   const info = await bot.telegram.getMe();
@@ -24,6 +25,29 @@ export default async (bot: Telegraf<Context>) => {
 
     next!();
   });
+
+  if (config.isBorisBot) {
+    bot.command([
+      '/kahvutti',
+      '/sumppi',
+      '/kahvi',
+      '/tee',
+      '/kahvit',
+      '/kippis',
+      '/kalja',
+      '/juoma',
+      '/viina',
+      '/kaljoja',
+      '/virvokkeita',
+      '/otinko',
+      '/kumpi',
+      '/cam',
+      '/webcam',
+    ], async (ctx: Context) => {
+      const words = ctx.message!.text!.split(' ');
+      ctx.replyWithMarkdown(`Command \`${_.first(words)}\` is having a much deserved vacation. More info TBA.`);
+    });
+  }
 
   bot.command('/expl', commands.getExpl);
   bot.hears(/^(\?\? ).*$/, commands.getExpl);
