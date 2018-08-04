@@ -108,12 +108,12 @@ export const searchExpls = async (ctx: Context) => {
   const keys = _.reduce(
     uniqueKeys,
     (memo: string[], rows, key) => {
-      memo.push(key + (_.size(rows) > 1 ? ` \`[${_.size(rows)}]\`` : ''));
+      memo.push(key + (_.size(rows) > 1 ? ` [${_.size(rows)}]` : ''));
       return memo;
     }, [],
   );
 
-  return ctx.replyWithMarkdown(_.join(keys, ', '));
+  return ctx.reply(_.join(keys, ', '));
 };
 
 export const removeExpl = async (ctx: Context) => {
