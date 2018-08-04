@@ -1,6 +1,9 @@
 import * as _ from 'lodash';
 import * as db from './database';
 import { Context } from './types/telegraf';
+import Logger from './logger';
+
+const logger = new Logger(__filename);
 
 export const getExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
@@ -64,36 +67,53 @@ export const createExpl = async (ctx: Context) => {
   } else {
     return ctx.replyWithMarkdown(errorMessage);
   }
+  try {
+    await db.createExpl(expl);
+    ctx.reply('Expl created!');
+  } catch (err) {
+    let msg = 'Unknown error occurred :/';
+    switch (err.message) {
+      case 'already_exists':
+        msg = `You already have expl with the key "${key}".`;
+        break;
+      case 'value_too_long':
+        msg = 'Message has to be less than 500 characters.';
+        break;
+      default:
+        logger.error(err);
+    }
 
-  const successful = await db.createExpl(expl);
-
-  return ctx.reply(successful ? 'Expl created!' : `You have already an expl with the key "${key}".`);
+    ctx.reply(msg);
+  }
 };
 
-export const joinGroup = async (ctx: Context) => {
-  if (ctx.chat!.type === 'private') {
-    return ctx.reply('Use this command from group chats!');
+export const searchExpls = async (ctx: Context) => {
+  const words = ctx.message!.text!.split(' ');
+  if (words.length < 2 || _.isEmpty(words[1])) {
+    return ctx.replyWithMarkdown(`Try \`${_.first(words)} [key]\``);
   }
 
-  const joined = await db.addUserToChat(ctx.state.user, ctx.state.chat);
-  const msg = `You ${ joined ? 'successfully joined' : 'are already in' } ` +
-    `${ctx.chat!.title ? `group *${ctx.chat!.title}*` : 'the group'}!`;
-  return ctx.replyWithMarkdown(msg);
-};
+  const searchTerm = words[1];
+  const result = await db.searchExpls(ctx.state.user, searchTerm);
 
-export const searchExpl = async (ctx: Context) => {
-  const query = ctx.inlineQuery!.query;
-  let results: any;
-
-  if (_.isEmpty(query)) {
-    const rexpls = await db.searchRexpls(ctx.state.user);
-    results = _.map(rexpls, expl => getInlineResult(expl));
-  } else {
-    const expls = await db.searchExpl(ctx.state.user, query);
-    results = _.map(expls, expl => getInlineResult(expl));
+  if (_.isEmpty(result)) {
+    return ctx.reply(`No expls found with key like "${searchTerm}".`);
   }
 
-  return ctx.answerInlineQuery(results as any);
+  const uniqueKeys = _.groupBy(result, 'key');
+  if (_.size(uniqueKeys) > 100) {
+    return ctx.reply(`Found over 100 expls with key like "${searchTerm}". Try to narrow it down.`);
+  }
+
+  const keys = _.reduce(
+    uniqueKeys,
+    (memo: string[], rows, key) => {
+      memo.push(key + (_.size(rows) > 1 ? ` [${_.size(rows)}]` : ''));
+      return memo;
+    }, [],
+  );
+
+  return ctx.reply(_.join(keys, ', '));
 };
 
 export const removeExpl = async (ctx: Context) => {
@@ -108,6 +128,18 @@ export const removeExpl = async (ctx: Context) => {
   return (count > 0) ?
     ctx.reply(`Expl "${key}" removed.`) :
     ctx.reply(`Expl "${key}" not found.`);
+};
+
+export const handleInlineQuery = async (ctx: Context) => {
+  const query = ctx.inlineQuery!.query;
+
+  const expls = await (_.isEmpty(query) ?
+    db.searchRexpls(ctx.state.user) :
+    db.searchExpls(ctx.state.user, query, 15)
+  );
+  const results = _.map(expls, expl => getInlineResult(expl));
+
+  return ctx.answerInlineQuery(results as any);
 };
 
 const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {

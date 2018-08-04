@@ -14,6 +14,9 @@ export const createExpl = async (options: ExplOptions) => {
   };
 
   if (options.message) {
+    if (_.size(options.message) > 500) {
+      throw new Error('value_too_long');
+    }
     expl.value = options.message;
   }
 
@@ -38,13 +41,12 @@ export const createExpl = async (options: ExplOptions) => {
     });
   } catch (err) {
     if (err.constraint === 'expls_user_id_key_unique') {
-      return false;
+      throw new Error('already_exists');
     }
     throw err;
   }
 
   logger.debug('Created expl', { key: options.key });
-  return true;
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
@@ -78,11 +80,17 @@ export const getRandomExpl = async (user: number) => {
   return updateExpl(nested);
 };
 
-export const searchExpl = async (user: number, searchTerm: string): Promise<Array<Partial<Table.Expl>>> => {
-  return getExplsForUser(user)
+type SearchExpls = (user: number, searchTerm: string, limit?: number) => Promise<Array<Partial<Table.Expl>>>;
+export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
+  const query = getExplsForUser(user)
     .select(['expls.key', 'expls.id'])
-    .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`)
-    .limit(15); // TODO: Use pagination
+    .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`);
+
+  if (limit) {
+    query.limit(limit);
+  }
+
+  return query;
 };
 
 export const searchRexpls = async (user: number): Promise<Array<Partial<Table.Expl>>> => {
@@ -110,17 +118,48 @@ export const addUserToChat = async (user: number, chat: number) => {
 };
 
 export const deleteExpl = async (user: number, key: string) => {
-  const count: number = await knex('expls')
-    .andWhere('expls.created_at', '>', '2018-06-04') // HACK: We can't show all expls because of BorisBot migration
-    .where({ user_id: user, key })
-    .del();
+  const query = knex('expls')
+    .where({ user_id: user, key });
+
+  // HACK: We can't show all expls because of BorisBot migration
+  if (!config.isBorisBot) {
+    query.andWhere('expls.created_at', '>', '2018-06-04');
+  }
+
+  const count: number = await query.del();
 
   logger.debug(`Expl ${key} deleted`, { user });
   return count;
 };
 
-const getExplsForUser = (user: number) => knex
-  .from('expls')
+export const deleteUser = async (user: number) => {
+  return knex.transaction(async (trx) => {
+    try {
+      const explCount = await knex('expls')
+        .transacting(trx)
+        .where('user_id', user)
+        .del();
+
+      const chatCount = await knex('auth')
+        .transacting(trx)
+        .where('user_id', user)
+        .del();
+
+      logger.debug(`User ${user} deleted`, { explCount, chatCount });
+
+      await trx.commit({
+        expls: explCount,
+        chats: chatCount,
+      });
+    } catch (err) {
+      logger.error('Deleting user failed', err);
+      await trx.rollback(err);
+    }
+  });
+};
+
+const getExplsForUser = (user: number) => {
+  const query = knex.from('expls')
   .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
   .where(function() {
     this.whereIn('user_id', function() {
@@ -133,8 +172,15 @@ const getExplsForUser = (user: number) => knex
         });
     })
     .orWhere('user_id', user);
-  })
-  .andWhere('expls.created_at', '>', '2018-06-04'); // HACK: We can't show all expls because of BorisBot migration
+  });
+
+  if (!config.isBorisBot) {
+    // HACK: We can't show all expls because of BorisBot migration
+    query.andWhere('expls.created_at', '>', '2018-06-04');
+  }
+
+  return query;
+};
 
 const updateExpl = async (expl: Table.Expl) => {
   await knex.raw(`
