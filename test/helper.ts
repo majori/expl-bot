@@ -1,6 +1,11 @@
+import * as path from 'path';
 import * as sinon from 'sinon';
 import * as Telegraf from 'telegraf';
+import * as Knex from 'knex';
 import createBot from '../src/bot';
+import config from '../src/config';
+
+export const knex = Knex(config.db.test);
 
 export const botInfo = {
   id: 123456789,
@@ -18,11 +23,15 @@ export async function createTestableBot() {
   return createBot(bot);
 }
 
-export function contextBuilder() {
-  return {
-    state: {
-      username: 'user',
-    },
-    reply: sinon.spy(),
-  };
+export async function migrateAllDown(): Promise<void> {
+  const version = await knex.migrate.currentVersion();
+  if (version !== 'none') {
+    await knex.migrate.rollback();
+    return migrateAllDown();
+  }
 }
+
+export const clearDb = async () => {
+  await migrateAllDown();
+  await knex.migrate.latest(config.db.test.migrations);
+};

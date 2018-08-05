@@ -8,8 +8,8 @@
     "build": "tsc --listEmittedFiles",
     "build:test": "tsc --noEmit",
     "dev": "nodemon --inspect -r dotenv/config -r ts-node/register src/index.ts",
-    "mocha": "mocha test/**/*_spec.ts",
-    "mocha:watch": "mocha -w --inspect test/**/*_spec.ts",
+    "mocha": "mocha test/**/*.test.ts",
+    "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
     "lint": "tslint -p tsconfig.json",
     "migrate": "knex migrate:latest",
     "test": "npm run lint && npm run build:test && npm run mocha"
@@ -30,9 +30,9 @@
     "knex": "^0.14.6",
     "lodash": "^4.17.10",
     "pg": "^7.4.3",
-    "telegraf": "^3.21.1",
+    "telegraf": "^3.22.1",
     "ts-node": "^6.0.3",
-    "typescript": "^2.8.3",
+    "typescript": "^3.0.1",
     "winston": "^2.4.2"
   },
   "devDependencies": {
@@ -40,12 +40,12 @@
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.2",
-    "@types/sinon": "^4.3.3",
+    "@types/sinon": "^5.0.1",
     "chai": "^4.1.2",
     "dotenv": "^5.0.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.4",
-    "sinon": "^5.0.7",
+    "sinon": "^6.1.4",
     "tslint": "^5.10.0"
   }
 }
