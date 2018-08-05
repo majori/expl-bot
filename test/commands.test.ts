@@ -1,7 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
-import config from '../src/config';
 import * as commands from '../src/commands';
 import { message, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
@@ -50,7 +49,10 @@ describe('Commands', () => {
         user_id: users[num],
       }));
 
-      await knex('expls').insert(expls);
+      // Insert each expl individually so they have different created_at timestamps
+      for (const expl of expls) {
+        await knex('expls').insert(expl);
+      }
 
       for (const index of _.times(4)) {
         const ctx = message(`?? ${KEY} ${index + 1}`);
