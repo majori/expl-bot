@@ -40,7 +40,8 @@ export const createExpl = async (options: ExplOptions) => {
         .insert(expl);
     });
   } catch (err) {
-    if (err.constraint === 'expls_user_id_key_unique') {
+    // UNIQUE VIOLATION
+    if (err.code === '23505') {
       throw new Error('already_exists');
     }
     throw err;
