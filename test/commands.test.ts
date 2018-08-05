@@ -11,7 +11,7 @@ describe('Commands', () => {
 
   describe('/expl', () => {
     it('respond with error if expl not found', async () => {
-      const ctx = message('?? NOT_FOUND');
+      const ctx = message('/expl NOT_FOUND');
       await commands.getExpl(ctx);
       expect(ctx.reply.lastArg).to.equal('Expl not found.');
     });
@@ -22,7 +22,7 @@ describe('Commands', () => {
         value: 'value',
       };
 
-      const ctx = message(`?? ${expl.key}`);
+      const ctx = message(`/expl ${expl.key}`);
       await knex('expls').insert({
         ...expl,
         user_id: ctx.message.from.id,
@@ -55,7 +55,7 @@ describe('Commands', () => {
       }
 
       for (const index of _.times(4)) {
-        const ctx = message(`?? ${KEY} ${index + 1}`);
+        const ctx = message(`/expl ${KEY} ${index + 1}`);
         await commands.getExpl(ctx);
 
         expect(ctx.reply.lastArg).to.equal(`${KEY}: ${index}`);
@@ -64,7 +64,89 @@ describe('Commands', () => {
   });
 
   describe('/add', () => {
-    it('creates expl');
-    it('prevents user to create multiple expls with same key');
+    it('creates expl', async () => {
+      const expl = {
+        key: 'key',
+        value: 'value',
+      };
+      const ctx = message(`/add ${expl.key} ${expl.value}`);
+      await commands.createExpl(ctx);
+
+      const expls = await knex('expls');
+
+      expect(expls).to.have.length(1);
+      expect(ctx.reply.lastArg).to.equal('Expl created!');
+      expect(_.first(expls)).to.have.property('key', expl.key);
+      expect(_.first(expls)).to.have.property('value', expl.value);
+    });
+
+    it('prevents user to create multiple expls with same key', async () => {
+      const expl = {
+        key: 'key',
+        value: 'value',
+      };
+
+      const ctx = message(`/add ${expl.key} ${expl.value}`);
+      await commands.createExpl(ctx);
+      await commands.createExpl(ctx);
+
+      expect(await knex('expls')).to.have.length(1);
+      expect(ctx.reply.lastArg).to.equal(`You already have expl with the key "${expl.key}".`);
+    });
+  });
+
+  describe('/remove', () => {
+    it('removes expl', async () => {
+      const expl = {
+        key: 'key',
+        value: 'value',
+      };
+
+      await knex('expls').insert({
+        ...expl,
+        user_id: USER_ID,
+      });
+
+      const ctx = message(`/remove ${expl.key}`);
+      await commands.removeExpl(ctx);
+
+      expect(await knex('expls')).to.be.empty;
+    });
+
+    it('responds with error if key does not exist', async () => {
+      const KEY = 'key';
+      const ctx = message(`/remove ${KEY}`);
+      await commands.removeExpl(ctx);
+
+      expect(ctx.reply.lastArg).to.equal(`Expl "${KEY}" not found.`);
+    });
+
+    it('removes only own expls', async () => {
+      const expl = {
+        key: 'key',
+        value: 'value',
+      };
+
+      await knex('expls').insert({
+        ...expl,
+        user_id: USER_ID,
+      });
+
+      // Other user's expl
+      await knex('expls').insert({
+        ...expl,
+        user_id: 987654321,
+      });
+
+      const ctx = message(`/remove ${expl.key}`);
+
+      await commands.removeExpl(ctx);
+      expect(await knex('expls')).to.have.length(1);
+
+      await commands.removeExpl(ctx);
+      expect(await knex('expls')).to.have.length(1);
+      expect(ctx.reply.lastArg).to.equal(`Expl "${expl.key}" not found.`);
+    });
+
   });
 });
