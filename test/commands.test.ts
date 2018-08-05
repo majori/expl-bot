@@ -7,6 +7,7 @@ import { knex, clearDb } from './helper';
 
 describe('Commands', () => {
   beforeEach(clearDb);
+  after(async () => knex.destroy());
 
   describe('/expl', () => {
     it('will respond with error if expl not found', async () => {
