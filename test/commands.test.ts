@@ -23,7 +23,7 @@ describe('Commands', () => {
         value: 'value',
       };
 
-      const ctx = message('?? key');
+      const ctx = message(`?? ${expl.key}`);
       await knex('expls').insert({
         ...expl,
         user_id: ctx.message.from.id,
@@ -52,7 +52,7 @@ describe('Commands', () => {
 
       await knex('expls').insert(expls);
 
-      for (const [index, user] of users.entries()) {
+      for (const index of _.times(4)) {
         const ctx = message(`?? ${KEY} ${index + 1}`);
         await commands.getExpl(ctx);
 

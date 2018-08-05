@@ -9,8 +9,8 @@ export const knex = Knex(config.db.test);
 export const botInfo = {
   id: 123456789,
   is_bot: true,
-  first_name: 'test_piikki_tg_bot',
-  username: 'test_piikki_tg_bot',
+  first_name: 'test_expl_tg_bot',
+  username: 'test_expl_tg_bot',
 };
 
 export async function createTestableBot() {
