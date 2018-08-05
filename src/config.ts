@@ -27,9 +27,6 @@ namespace Config {
         min: 2,
         max: 10,
       },
-      migrations: {
-        tableName: 'knex_migrations',
-      },
     },
 
     development: {
@@ -45,9 +42,6 @@ namespace Config {
         min: 2,
         max: 10,
       },
-      migrations: {
-        tableName: 'knex_migrations',
-      },
     },
 
     test: {
@@ -56,9 +50,6 @@ namespace Config {
       pool: {
         min: 2,
         max: 10,
-      },
-      migrations: {
-        tableName: 'knex_migrations',
       },
     },
   };

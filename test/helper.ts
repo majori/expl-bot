@@ -32,5 +32,5 @@ export async function migrateAllDown(): Promise<void> {
 
 export const clearDb = async () => {
   await migrateAllDown();
-  await knex.migrate.latest(config.db.test.migrations);
+  await knex.migrate.latest();
 };
