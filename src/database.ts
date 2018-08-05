@@ -61,7 +61,7 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
 
   const selected = offset && offset > 0 ?
     results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
-    _.last(results)!;
+    _.sample(results)!;
 
   const nested = createNestedExpl(selected);
   return updateExpl(nested);
@@ -80,11 +80,21 @@ export const getRandomExpl = async (user: number) => {
   return updateExpl(nested);
 };
 
-type SearchExpls = (user: number, searchTerm: string, limit?: number) => Promise<Array<Partial<Table.Expl>>>;
-export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
+type SearchExpls = (
+  user: number,
+  searchTerm: string,
+  limit?: number,
+  uniq?: boolean,
+) => Promise<Array<Partial<Table.Expl>>>;
+
+export const searchExpls: SearchExpls = async (user, searchTerm, limit?, uniq?) => {
   const query = getExplsForUser(user)
-    .select(['expls.key', 'expls.id'])
+    .select('expls.key')
     .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`);
+
+  if (uniq) {
+    query.groupBy('expls.key');
+  }
 
   if (limit) {
     query.limit(limit);
@@ -95,7 +105,10 @@ export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
 
 export const searchRexpls = async (user: number): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
-    .whereNotNull('tg_contents.photo_id');
+    .whereNotNull('tg_contents.photo_id')
+    .orWhereNotNull('tg_contents.sticker_id')
+    .orWhereNotNull('tg_contents.video_id')
+    .orderBy('created_at', 'desc');
 };
 
 export const addUserToChat = async (user: number, chat: number) => {
