@@ -25,7 +25,7 @@ describe('Commands', () => {
       const ctx = message(`/expl ${expl.key}`);
       await knex('expls').insert({
         ...expl,
-        user_id: ctx.message.from.id,
+        user_id: USER_ID,
       });
 
       await commands.getExpl(ctx);
@@ -33,6 +33,7 @@ describe('Commands', () => {
     });
 
     it('correctly gets indexed expl', async () => {
+      const KEY = 'key';
       const users = [USER_ID, 223456789, 323456789, 423456789];
 
       // Make user to be in the same group
@@ -42,7 +43,6 @@ describe('Commands', () => {
           chat_id: -123456789,
         })));
 
-      const KEY = 'key';
       const expls = _.times(4, (num) => ({
         key: KEY,
         value: num.toString(),
@@ -60,6 +60,27 @@ describe('Commands', () => {
 
         expect(ctx.reply.lastArg).to.equal(`${KEY}: ${index}`);
       }
+    });
+
+    it('updates echo_count and last_echo after sending expl', async () => {
+      const KEY = 'key';
+
+      await knex('expls').insert({
+        key: KEY,
+        value: 'value',
+        user_id: USER_ID,
+      });
+
+      await commands.getExpl(message(`/expl ${KEY}`));
+
+      const expl1 = await knex('expls').where('key', KEY).first();
+      expect(expl1.echo_count).to.equal(1);
+      expect(expl1.last_echo).to.be.not.null;
+
+      await commands.getExpl(message(`/expl ${KEY}`));
+      const expl2 = await knex('expls').where('key', KEY).first();
+      expect(expl2.echo_count).to.equal(2);
+      expect(expl2.last_echo).to.not.equal(expl1.last_echo);
     });
   });
 
@@ -79,6 +100,8 @@ describe('Commands', () => {
       expect(_.first(expls)).to.have.property('key', expl.key);
       expect(_.first(expls)).to.have.property('value', expl.value);
     });
+
+    it('creates expl with Telegram content');
 
     it('prevents user to create multiple expls with same key', async () => {
       const expl = {
@@ -147,6 +170,12 @@ describe('Commands', () => {
       expect(await knex('expls')).to.have.length(1);
       expect(ctx.reply.lastArg).to.equal(`Expl "${expl.key}" not found.`);
     });
+  });
 
+  describe('/list', () => {
+    it('searches keys with given search term');
+    it('shows amount of duplicate keys found');
+    it('responds with error if no keys found');
+    it('responds with error if search results contains over 100 keys');
   });
 });

@@ -1,5 +1,4 @@
 import * as sinon from 'sinon';
-import * as Telegraf from 'telegraf';
 
 const baseContext = (state?: any) => {
   return {
