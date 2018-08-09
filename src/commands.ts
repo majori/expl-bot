@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as db from './database';
 import { Context } from './types/telegraf';
 import Logger from './logger';
+import * as messages from './constants/messages';
 
 const logger = new Logger(__filename);
 
@@ -10,29 +11,28 @@ export const getExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
-    return ctx.replyWithMarkdown(`Try \`${_.first(words)} key\``);
+    return ctx.replyWithMarkdown(messages.get.invalidSyntax(_.first(words)));
   }
   const offset = _.chain(words).get([2], 0).toNumber().value() || 0;
 
   const expl = await db.getExpl(ctx.state.user, words[1], offset);
-  await sendExpl(ctx, expl);
+  await sendExpl(ctx, words[1], expl);
 };
 
 export const getRandomExpl = async (ctx: Context) => {
   const expl = await db.getRandomExpl(ctx.state.user);
 
   if (!expl) {
-    return ctx.reply('Can\'t find any expl for you :/');
+    return ctx.reply(messages.get.noExpls());
   }
 
-  await sendExpl(ctx, expl);
+  await sendExpl(ctx, expl.key, expl);
 };
 
 export const createExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
-  const errorMessage = `Try \`${_.first(words)} [key] [value]\` ` +
-    `or reply to any message with \`${_.first(words)} [key]\``;
+  const errorMessage = messages.add.invalidSyntax(_.first(words));
 
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(errorMessage);
@@ -70,15 +70,15 @@ export const createExpl = async (ctx: Context) => {
   }
   try {
     await db.createExpl(expl);
-    ctx.reply('Expl created!');
+    ctx.reply(messages.add.successful());
   } catch (err) {
-    let msg = 'Unknown error occurred :/';
+    let msg = messages.errors.unknownError();
     switch (err.message) {
       case 'already_exists':
-        msg = `You already have expl with the key "${key}".`;
+        msg = messages.add.duplicate(key);
         break;
       case 'value_too_long':
-        msg = 'Message has to be less than 500 characters.';
+        msg = messages.add.tooLong(500);
         break;
       default:
         logger.error(err);
@@ -91,19 +91,19 @@ export const createExpl = async (ctx: Context) => {
 export const searchExpls = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
   if (words.length < 2 || _.isEmpty(words[1])) {
-    return ctx.replyWithMarkdown(`Try \`${_.first(words)} [key]\``);
+    return ctx.replyWithMarkdown(messages.list.invalidSyntax(_.first(words)));
   }
 
   const searchTerm = words[1];
   const result = await db.searchExpls(ctx.state.user, searchTerm);
 
   if (_.isEmpty(result)) {
-    return ctx.reply(`No expls found with key like "${searchTerm}".`);
+    return ctx.reply(messages.list.notFound(searchTerm));
   }
 
   const uniqueKeys = _.groupBy(result, 'key');
   if (_.size(uniqueKeys) > 100) {
-    return ctx.reply(`Found over 100 expls with key like "${searchTerm}". Try to narrow it down.`);
+    return ctx.reply(messages.list.tooMany(searchTerm));
   }
 
   const keys = _.reduce(
@@ -121,14 +121,14 @@ export const removeExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
-    return ctx.replyWithMarkdown(`Try \`${_.first(words)} [key]\``);
+    return ctx.replyWithMarkdown(messages.remove.invalidSyntax(_.first(words)));
   }
   const key = words[1];
   const count = await db.deleteExpl(ctx.state.user, key);
 
   return (count > 0) ?
-    ctx.reply(`Expl "${key}" removed.`) :
-    ctx.reply(`Expl "${key}" not found.`);
+    ctx.reply(messages.remove.successful(key)) :
+    ctx.reply(messages.errors.notFound(key));
 };
 
 export const handleInlineQuery = async (ctx: Context) => {
@@ -143,9 +143,9 @@ export const handleInlineQuery = async (ctx: Context) => {
   return ctx.answerInlineQuery(results as any);
 };
 
-const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
+const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | null) => {
   if (!expl) {
-    return ctx.reply('Expl not found.');
+    return ctx.reply(messages.errors.notFound(key));
   }
 
   if (expl.value) {
@@ -159,7 +159,7 @@ const sendExpl = async (ctx: Context, expl: Table.Expl | null) => {
         await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
       } catch (err) {
         if (err.code === 400 && err.description === 'Bad Request: chat not found') {
-          return ctx.reply('Expl cannot be shown since the user or the chat has blocked the bot 😢');
+          return ctx.reply(messages.get.forbidden());
         }
       }
     }

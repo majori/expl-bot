@@ -2,6 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as commands from '../src/commands';
+import * as messages from '../src/constants/messages';
 import { message, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
 
@@ -11,9 +12,10 @@ describe('Commands', () => {
 
   describe('/expl', () => {
     it('respond with error if expl not found', async () => {
-      const ctx = message('/expl NOT_FOUND');
+      const KEY = 'NOT_FOUND';
+      const ctx = message(`/expl ${KEY}`);
       await commands.getExpl(ctx);
-      expect(ctx.reply.lastArg).to.equal('Expl not found.');
+      expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
     });
 
     it('get an existing expl', async () => {
@@ -96,7 +98,7 @@ describe('Commands', () => {
       const expls = await knex('expls');
 
       expect(expls).to.have.length(1);
-      expect(ctx.reply.lastArg).to.equal('Expl created!');
+      expect(ctx.reply.lastArg).to.equal(messages.add.successful());
       expect(_.first(expls)).to.have.property('key', expl.key);
       expect(_.first(expls)).to.have.property('value', expl.value);
     });
@@ -114,7 +116,7 @@ describe('Commands', () => {
       await commands.createExpl(ctx);
 
       expect(await knex('expls')).to.have.length(1);
-      expect(ctx.reply.lastArg).to.equal(`You already have expl with the key "${expl.key}".`);
+      expect(ctx.reply.lastArg).to.equal(messages.add.duplicate(expl.key));
     });
   });
 
@@ -141,7 +143,7 @@ describe('Commands', () => {
       const ctx = message(`/remove ${KEY}`);
       await commands.removeExpl(ctx);
 
-      expect(ctx.reply.lastArg).to.equal(`Expl "${KEY}" not found.`);
+      expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
     });
 
     it('removes only own expls', async () => {
@@ -168,7 +170,7 @@ describe('Commands', () => {
 
       await commands.removeExpl(ctx);
       expect(await knex('expls')).to.have.length(1);
-      expect(ctx.reply.lastArg).to.equal(`Expl "${expl.key}" not found.`);
+      expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(expl.key));
     });
   });
 
