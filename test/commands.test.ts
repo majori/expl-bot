@@ -1,7 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
-import * as commands from '../src/commands';
+import commands from '../src/commands';
 import * as messages from '../src/constants/messages';
 import { message, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
@@ -14,7 +14,7 @@ describe('Commands', () => {
     it('respond with error if expl not found', async () => {
       const KEY = 'NOT_FOUND';
       const ctx = message(`/expl ${KEY}`);
-      await commands.getExpl(ctx);
+      await commands.expl(ctx);
       expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
     });
 
@@ -30,7 +30,7 @@ describe('Commands', () => {
         user_id: USER_ID,
       });
 
-      await commands.getExpl(ctx);
+      await commands.expl(ctx);
       expect(ctx.reply.lastArg).to.equal(`${expl.key}: ${expl.value}`);
     });
 
@@ -58,7 +58,7 @@ describe('Commands', () => {
 
       for (const index of _.times(4)) {
         const ctx = message(`/expl ${KEY} ${index + 1}`);
-        await commands.getExpl(ctx);
+        await commands.expl(ctx);
 
         expect(ctx.reply.lastArg).to.equal(`${KEY}: ${index}`);
       }
@@ -73,13 +73,13 @@ describe('Commands', () => {
         user_id: USER_ID,
       });
 
-      await commands.getExpl(message(`/expl ${KEY}`));
+      await commands.expl(message(`/expl ${KEY}`));
 
       const expl1 = await knex('expls').where('key', KEY).first();
       expect(expl1.echo_count).to.equal(1);
       expect(expl1.last_echo).to.be.not.null;
 
-      await commands.getExpl(message(`/expl ${KEY}`));
+      await commands.expl(message(`/expl ${KEY}`));
       const expl2 = await knex('expls').where('key', KEY).first();
       expect(expl2.echo_count).to.equal(2);
       expect(expl2.last_echo).to.not.equal(expl1.last_echo);
@@ -93,7 +93,7 @@ describe('Commands', () => {
         value: 'value',
       };
       const ctx = message(`/add ${expl.key} ${expl.value}`);
-      await commands.createExpl(ctx);
+      await commands.add(ctx);
 
       const expls = await knex('expls');
 
@@ -112,8 +112,8 @@ describe('Commands', () => {
       };
 
       const ctx = message(`/add ${expl.key} ${expl.value}`);
-      await commands.createExpl(ctx);
-      await commands.createExpl(ctx);
+      await commands.add(ctx);
+      await commands.add(ctx);
 
       expect(await knex('expls')).to.have.length(1);
       expect(ctx.reply.lastArg).to.equal(messages.add.duplicate(expl.key));
@@ -133,7 +133,7 @@ describe('Commands', () => {
       });
 
       const ctx = message(`/remove ${expl.key}`);
-      await commands.removeExpl(ctx);
+      await commands.remove(ctx);
 
       expect(await knex('expls')).to.be.empty;
     });
@@ -141,7 +141,7 @@ describe('Commands', () => {
     it('responds with error if key does not exist', async () => {
       const KEY = 'key';
       const ctx = message(`/remove ${KEY}`);
-      await commands.removeExpl(ctx);
+      await commands.remove(ctx);
 
       expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
     });
@@ -165,10 +165,10 @@ describe('Commands', () => {
 
       const ctx = message(`/remove ${expl.key}`);
 
-      await commands.removeExpl(ctx);
+      await commands.remove(ctx);
       expect(await knex('expls')).to.have.length(1);
 
-      await commands.removeExpl(ctx);
+      await commands.remove(ctx);
       expect(await knex('expls')).to.have.length(1);
       expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(expl.key));
     });

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Telegraf } from 'telegraf';
 import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
-import * as commands from './commands';
+import commands from './commands';
 import * as messages from './constants/messages';
 import * as db from './database';
 import config from './config';
@@ -53,22 +53,22 @@ export default async (bot: Telegraf<Context>) => {
   bot.help((ctx) => ctx.replyWithMarkdown(messages.help()));
   bot.hears(/^(\!h)/, (ctx) => ctx.replyWithMarkdown(messages.help()));
 
-  bot.command('/expl', commands.getExpl);
-  bot.hears(/^(\?\? ).*$/, commands.getExpl);
+  bot.command('/expl', commands.expl);
+  bot.hears(/^(\?\? ).*$/, commands.expl);
 
-  bot.command('/rexpl', commands.getRandomExpl);
-  bot.hears(/^(\?\!).*$/, commands.getRandomExpl);
+  bot.command('/rexpl', commands.rexpl);
+  bot.hears(/^(\?\!).*$/, commands.rexpl);
 
-  bot.command('/add', commands.createExpl);
-  bot.hears(/^(\!add ).*$/, commands.createExpl);
+  bot.command('/add', commands.add);
+  bot.hears(/^(\!add ).*$/, commands.add);
 
-  bot.command('/remove', commands.removeExpl);
-  bot.hears(/^(\!rm ).*$/, commands.removeExpl);
+  bot.command('/remove', commands.remove);
+  bot.hears(/^(\!rm ).*$/, commands.remove);
 
-  bot.command('/list', commands.searchExpls);
-  bot.hears(/^(\!ls ).*$/, commands.searchExpls);
+  bot.command('/list', commands.list);
+  bot.hears(/^(\!ls ).*$/, commands.list);
 
-  bot.on('inline_query', commands.handleInlineQuery);
+  bot.on('inline_query', commands.inlineQuery);
 
   return bot;
 };
