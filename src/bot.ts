@@ -50,8 +50,9 @@ export default async (bot: Telegraf<Context>) => {
     });
   }
 
-  bot.help((ctx) => ctx.replyWithMarkdown(messages.help()));
-  bot.hears(/^(\!h)/, (ctx) => ctx.replyWithMarkdown(messages.help()));
+  bot.start(commands.help);
+  bot.help(commands.help);
+  bot.hears(/^(\!h)/, commands.help);
 
   bot.command('/expl', commands.expl);
   bot.hears(/^(\?\? ).*$/, commands.expl);
