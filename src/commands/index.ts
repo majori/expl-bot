@@ -3,7 +3,7 @@ import { expl, rexpl } from './get';
 import inlineQuery from './inline-query';
 import list from './list';
 import remove from './remove';
-import help from './help',
+import help from './help';
 
 export default {
   add,

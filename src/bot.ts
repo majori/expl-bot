@@ -3,7 +3,6 @@ import { Telegraf } from 'telegraf';
 import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import commands from './commands';
-import * as messages from './constants/messages';
 import * as db from './database';
 import config from './config';
 
@@ -27,6 +26,8 @@ export default async (bot: Telegraf<Context>) => {
     next!();
   });
 
+  // We migrated an old bot to use this bot, so
+  // we notify user that we deprecated some commands
   if (config.isBorisBot) {
     bot.command([
       '/kahvutti',
