@@ -158,9 +158,13 @@ const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | null) => {
       try {
         await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
       } catch (err) {
-        logger.error(err);
-        if (err.code === 400 && err.description === 'Bad Request: chat not found') {
-          return ctx.reply(messages.get.forbidden());
+        switch (err.description) {
+          case 'Bad Request: chat not found':
+          case 'Bad Request: message to forward not found':
+            return ctx.reply(messages.get.forbidden());
+          default:
+            logger.error(err);
+            return ctx.reply(messages.errors.unknownError());
         }
       }
     }
