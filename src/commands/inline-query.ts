@@ -3,12 +3,14 @@ import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
 
+export const RESULT_LIMIT = 15;
+
 const handleInlineQuery = async (ctx: Context) => {
   const query = ctx.inlineQuery!.query;
 
   const expls = await (_.isEmpty(query) ?
     db.searchRexpls(ctx.state.user) :
-    db.searchExpls(ctx.state.user, query, 15, true)
+    db.searchExpls(ctx.state.user, query, RESULT_LIMIT, true)
   );
   const results = _.map(expls, expl => getInlineResult(expl));
 

@@ -17,7 +17,7 @@ const getExpl = async (ctx: Context) => {
   await sendExpl(ctx, words[1], foundExpl);
 };
 
-export const getRandomExpl = async (ctx: Context) => {
+const getRandomExpl = async (ctx: Context) => {
   const foundExpl = await db.getRandomExpl(ctx.state.user);
 
   if (!foundExpl) {

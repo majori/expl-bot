@@ -1,35 +1,36 @@
-import * as str from 'string-template/compile';
+import * as template from 'string-template/compile';
+import { constant } from 'lodash';
 
 export const errors = {
-  notFound: str('Expl "{0}" not found.'),
-  unknownError: str('Unknown error occurred :/'),
+  notFound: template('Expl "{0}" not found.'),
+  unknownError: constant('Unknown error occurred :/'),
 };
 
 export const add = {
-  successful: str('Expl created!'),
-  tooLong: str('Message has to be less than {0} characters.'),
-  duplicate: str('You already have expl with the key "{0}".'),
-  invalidSyntax: str('Try `{0} [key] [value]` or reply to any message with `{0} [key]`'),
+  successful: constant('Expl created!'),
+  tooLong: template('Message has to be less than {0} characters.'),
+  duplicate: template('You already have expl with the key "{0}".'),
+  invalidSyntax: template('Try `{0} [key] [value]` or reply to any message with `{0} [key]`'),
 };
 
 export const list = {
-  invalidSyntax: str('Try `{0} [key]`'),
-  notFound: str('No expls found with key like "{0}".'),
-  tooMany: str('Found over 100 expls with key like "{0}". Try to narrow it down.'),
+  invalidSyntax: template('Try `{0} [key]`'),
+  notFound: template('No expls found with key like "{0}".'),
+  tooMany: template('Found over 100 expls with key like "{0}". Try to narrow it down.'),
 };
 
 export const remove = {
-  successful: str('Expl "{0}" removed.'),
-  invalidSyntax: str('Try `{0} [key]`'),
+  successful: template('Expl "{0}" removed.'),
+  invalidSyntax: template('Try `{0} [key]`'),
 };
 
 export const get = {
-  forbidden: str('Expl cannot be shown since the user or the chat has blocked the bot 😢'),
-  invalidSyntax: str('Try `{0} [key]`'),
-  noExpls: str('Can\'t find any expl for you :/'),
+  forbidden: constant('Expl cannot be shown since the user or the chat has blocked the bot 😢'),
+  invalidSyntax: template('Try `{0} [key]`'),
+  noExpls: constant('Can\'t find any expl for you :/'),
 };
 
-export const help = str(`
+export const help = constant(`
 /expl or ?? \`[key]\`
   - Get a expl with the given key
 /rexpl or ?!

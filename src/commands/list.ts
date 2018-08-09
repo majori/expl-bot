@@ -4,7 +4,7 @@ import * as db from '../database';
 import { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 
-export const searchExpls = async (ctx: Context) => {
+const searchExpls = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.list.invalidSyntax(_.first(words)));
