@@ -17,6 +17,14 @@ const baseContext = (state?: any) => {
 export const USER_ID = 123456789;
 export const GROUP_ID = -1001184985530;
 
+const user = {
+  id: USER_ID,
+  is_bot: false,
+  first_name: 'Test',
+  last_name: 'User',
+  username: 'testuser',
+};
+
 export const message = (msg: string, fromGroup?: boolean): any => {
   const chat = fromGroup ?
     {
@@ -38,16 +46,24 @@ export const message = (msg: string, fromGroup?: boolean): any => {
     }),
     message: {
       message_id: 1234,
-      from: {
-        id: USER_ID,
-        is_bot: false,
-        first_name: 'Test',
-        last_name: 'User',
-        username: 'testuser',
-      },
+      from: user,
       chat,
       date: Date.now(),
       text: msg,
     },
+  };
+};
+
+export const inlineQuery = (query?: string): any => {
+  return {
+    inlineQuery: {
+      id: 'INLINE_QUERY_ID',
+      from: user,
+      query,
+      offset: '',
+    },
+    ...baseContext({
+      user: USER_ID,
+    }),
   };
 };
