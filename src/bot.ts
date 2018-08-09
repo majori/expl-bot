@@ -3,6 +3,7 @@ import { Telegraf } from 'telegraf';
 import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import * as commands from './commands';
+import * as messages from './constants/messages';
 import * as db from './database';
 import config from './config';
 
@@ -48,6 +49,9 @@ export default async (bot: Telegraf<Context>) => {
       ctx.replyWithMarkdown(`Command \`${_.first(words)}\` is having a much deserved vacation. More info TBA.`);
     });
   }
+
+  bot.help((ctx) => ctx.replyWithMarkdown(messages.help()));
+  bot.hears(/^(\!h)/, (ctx) => ctx.replyWithMarkdown(messages.help()));
 
   bot.command('/expl', commands.getExpl);
   bot.hears(/^(\?\? ).*$/, commands.getExpl);
