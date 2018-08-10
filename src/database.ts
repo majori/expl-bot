@@ -64,8 +64,7 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
     results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
     _.sample(results)!;
 
-  const nested = createNestedExpl(selected);
-  return updateExpl(nested);
+  return createNestedExpl(selected);
 };
 
 export const getRandomExpl = async (user: number) => {
@@ -77,8 +76,7 @@ export const getRandomExpl = async (user: number) => {
   if (_.isEmpty(results)) {
     return null;
   }
-  const nested = createNestedExpl(_.first(results)!);
-  return updateExpl(nested);
+  return createNestedExpl(_.first(results)!);
 };
 
 type SearchExpls = (
@@ -196,14 +194,25 @@ const getExplsForUser = (user: number) => {
   return query;
 };
 
-const updateExpl = async (expl: Table.Expl) => {
-  await knex.raw(`
-    UPDATE expls
-    SET
-      "echo_count" = "echo_count" + 1,
-      "last_echo" = ?
-    WHERE "id" = ?
-  `, [new Date().toISOString(), expl.id]);
+export const updateExpl = async (expl: Table.Expl, from: { chat: number; user: number }) => {
+  await knex.transaction(async (trx) => {
+    await trx.raw(`
+        UPDATE expls
+        SET
+          "echo_count" = "echo_count" + 1,
+          "last_echo" = ?
+        WHERE "id" = ?
+      `, [new Date().toISOString(), expl.id]);
+
+    await trx.from('echo_history')
+      .insert({
+        expl_id: expl.id,
+        user_id: from.user,
+        chat_id: from.chat,
+      });
+
+    await trx.commit();
+  });
 
   logger.debug('Expl updated', { id: expl.id, key: expl.key });
   return expl;

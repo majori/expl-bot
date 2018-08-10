@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { Context } from './types/telegraf';
 import Logger from './logger';
 import * as messages from './constants/messages';
+import { updateExpl } from './database';
 
 const logger = new Logger(__filename);
 
@@ -9,6 +10,8 @@ export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | nul
   if (!expl) {
     return ctx.reply(messages.errors.notFound(key));
   }
+
+  await updateExpl(expl, ctx.state);
 
   if (expl.value) {
     return ctx.reply(`${expl.key}: ${expl.value}`);
