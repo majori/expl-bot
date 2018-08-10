@@ -22,8 +22,10 @@ const createExpl = async (ctx: Context) => {
     key,
   };
 
+  const isExplWithValue = words.length > 2 && !ctx.message!.reply_to_message;
+
   // Expl value is normal text
-  if (words.length >= 3 && !ctx.message!.reply_to_message) {
+  if (isExplWithValue) {
     expl.message = _(words).drop(2).join(' ');
 
   // Expl value is reply to other message
@@ -48,7 +50,11 @@ const createExpl = async (ctx: Context) => {
   }
   try {
     await db.createExpl(expl);
-    ctx.reply(messages.add.successful());
+
+    return (isExplWithValue || words.length <= 2) ?
+      ctx.reply(messages.add.successful()) :
+      ctx.reply(messages.add.successfulWithDisclaimer(key));
+
   } catch (err) {
     let msg = messages.errors.unknownError();
     switch (err.message) {
