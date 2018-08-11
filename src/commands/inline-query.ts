@@ -1,6 +1,7 @@
 
 import * as _ from 'lodash';
 import * as db from '../database';
+import config from '../config';
 import { Context } from '../types/telegraf';
 
 export const RESULT_LIMIT = 15;
@@ -14,7 +15,12 @@ const handleInlineQuery = async (ctx: Context) => {
   );
   const results = _.map(expls, expl => getInlineResult(expl));
 
-  return ctx.answerInlineQuery(results as any);
+  return ctx.answerInlineQuery(results as any, {
+    switch_pm_text: _.isEmpty(query) ? 'Bot commands' : undefined,
+    switch_pm_parameter: _.isEmpty(query) ? 'commands' : undefined,
+    is_personal: true,
+    cache_time: config.env.prod ? undefined : 0, // Cache only in production
+  });
 };
 
 const getInlineResult = (expl: Partial<Table.Expl> & Partial<Table.TgContents>) => {

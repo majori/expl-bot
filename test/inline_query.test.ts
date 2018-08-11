@@ -27,7 +27,7 @@ describe('Inline query', () => {
 
     const ctx = inlineQuery('');
     await commands.inlineQuery(ctx);
-    expect(ctx.answerInlineQuery.lastArg).to.have.length(EXPL_COUNT);
+    expect(ctx.answerInlineQuery.args[0][0]).to.have.length(EXPL_COUNT);
   });
 
   it('searches expls if query contains text', async () => {
@@ -51,14 +51,14 @@ describe('Inline query', () => {
 
     let ctx = inlineQuery('wanted');
     await commands.inlineQuery(ctx);
-    expect(ctx.answerInlineQuery.lastArg).to.have.length(EXPL_COUNT);
+    expect(ctx.answerInlineQuery.args[0][0]).to.have.length(EXPL_COUNT);
 
     ctx = inlineQuery('key');
     await commands.inlineQuery(ctx);
-    expect(ctx.answerInlineQuery.lastArg).to.have.length(_.clamp(EXPL_COUNT * 2, RESULT_LIMIT));
+    expect(ctx.answerInlineQuery.args[0][0]).to.have.length(_.clamp(EXPL_COUNT * 2, RESULT_LIMIT));
 
     ctx = inlineQuery('404');
     await commands.inlineQuery(ctx);
-    expect(ctx.answerInlineQuery.lastArg).to.have.length(0);
+    expect(ctx.answerInlineQuery.args[0][0]).to.have.length(0);
   });
 });

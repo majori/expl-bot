@@ -2,6 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import commands from '../src/commands';
+import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
 import * as messages from '../src/constants/messages';
 import { message, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
@@ -73,12 +74,12 @@ describe('Commands', () => {
       });
 
       await commands.expl(message(`/expl ${KEY}`));
-
       const history1 = await knex('echo_history')
         .join('expls', 'expls.id', 'echo_history.expl_id')
         .where('key', KEY);
       expect(history1).to.have.length(1);
       expect(history1[0].echoed_at).to.be.not.null;
+      expect(history1[0].was_random).to.be.false;
 
       await commands.expl(message(`/expl ${KEY}`));
       const history2 = await knex('echo_history')
@@ -86,6 +87,30 @@ describe('Commands', () => {
         .where('key', KEY);
       expect(history2).to.have.length(2);
       expect(history2[1].echoed_at).to.be.not.null;
+      expect(history2[1].was_random).to.be.false;
+
+      await commands.rexpl(message('/rexpl'));
+      const history3 = await knex('echo_history')
+        .join('expls', 'expls.id', 'echo_history.expl_id')
+        .where('key', KEY);
+      expect(history3).to.have.length(3);
+      expect(history3[2].echoed_at).to.be.not.null;
+      expect(history3[2].was_random).to.be.true;
+    });
+  });
+
+  describe('/rexpl', () => {
+    it('gets a random expl', async () => {
+      const KEY = 'key';
+      await knex('expls').insert(_.times(20, (i) => ({
+        key: `${KEY}_${i}`,
+        value: 'value',
+        user_id: USER_ID,
+      })));
+
+      const ctx = message('/rexpl');
+      await commands.rexpl(ctx);
+      expect(ctx.reply.lastArg).to.contain(KEY);
     });
   });
 
@@ -178,9 +203,75 @@ describe('Commands', () => {
   });
 
   describe('/list', () => {
-    it('searches keys with given search term');
-    it('shows amount of duplicate keys found');
-    it('responds with error if no keys found');
-    it('responds with error if search results contains over 100 keys');
+    it('searches keys with given search term', async () => {
+      const COUNT = 3;
+
+      await knex('expls').insert(_.times(COUNT, (i) => ({
+        key: `like_key_${i}`,
+        value: 'value',
+        user_id: USER_ID,
+      })));
+
+      const ctx1 = message(`/list key`);
+      await commands.list(ctx1);
+      expect(_.split(ctx1.reply.args[0][0], ', ')).to.have.length(COUNT);
+
+      const ctx2 = message(`/list like`);
+      await commands.list(ctx2);
+      expect(_.split(ctx2.reply.args[0][0], ', ')).to.have.length(COUNT);
+
+      const ctx3 = message(`/list 1`);
+      await commands.list(ctx3);
+      expect(_.split(ctx3.reply.args[0][0], ', ')).to.have.length(1);
+
+    });
+
+    it('shows amount of duplicate keys found', async () => {
+      const COUNT = 3;
+
+      await knex('expls').insert(_.times(COUNT, (i) => ({
+        key: `same_key`,
+        value: 'value',
+        user_id: i,
+      })));
+
+      await knex('auth').insert(_.flatten([
+        _.times(COUNT, (i) => ({
+          user_id: i,
+          chat_id: -1,
+        })),
+        {
+          user_id: USER_ID,
+          chat_id: -1,
+        },
+      ]));
+
+      const ctx = message(`/list key`);
+      await commands.list(ctx);
+      expect(ctx.reply.args[0][0]).to.contain(`[${COUNT}]`);
+    });
+
+    it('responds with error if no keys found', async () => {
+      const KEY = 'key';
+
+      const ctx = message(`/list ${KEY}`);
+      await commands.list(ctx);
+      expect(ctx.reply.args[0][0]).to.equal(messages.list.notFound(KEY));
+    });
+
+    it(`responds with error if search results contains over ${MAX_LIST_COUNT} keys`, async () => {
+      const COUNT = MAX_LIST_COUNT + 10;
+      const KEY = 'key';
+
+      await knex('expls').insert(_.times(COUNT, (i) => ({
+        key: `like_${KEY}_${i}`,
+        value: 'value',
+        user_id: USER_ID,
+      })));
+
+      const ctx = message(`/list ${KEY}`);
+      await commands.list(ctx);
+      expect(ctx.reply.args[0][0]).to.equal(messages.list.tooMany(KEY));
+    });
   });
 });
