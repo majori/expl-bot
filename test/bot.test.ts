@@ -6,9 +6,8 @@ import { createTestableBot, botInfo } from './helper';
 describe('Bot', () => {
   let bot: any;
 
-  before(async () => {
-    bot = await createTestableBot();
-  });
+  before(async () => bot = await createTestableBot());
+  after((done) => bot.stop(done));
 
   it('will fetch it\'s name with getMe()', () => {
     expect(bot.telegram.getMe.called).to.be.true;

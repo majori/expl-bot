@@ -20,6 +20,15 @@ namespace Config {
   };
 
   export const db = {
+    production: {
+      client: 'pg',
+      connection: process.env.DATABASE_URL,
+      pool: {
+        min: 2,
+        max: 10,
+      },
+    },
+
     development: {
       client: 'pg',
       connection: process.env.DATABASE_URL || {
@@ -33,20 +42,14 @@ namespace Config {
         min: 2,
         max: 10,
       },
-      migrations: {
-        tableName: 'knex_migrations',
-      },
     },
 
-    production: {
+    test: {
       client: 'pg',
       connection: process.env.DATABASE_URL,
       pool: {
         min: 2,
         max: 10,
-      },
-      migrations: {
-        tableName: 'knex_migrations',
       },
     },
   };

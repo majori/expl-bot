@@ -40,7 +40,8 @@ export const createExpl = async (options: ExplOptions) => {
         .insert(expl);
     });
   } catch (err) {
-    if (err.constraint === 'expls_user_id_key_unique') {
+    // UNIQUE VIOLATION
+    if (err.code === '23505') {
       throw new Error('already_exists');
     }
     throw err;
@@ -61,10 +62,9 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
 
   const selected = offset && offset > 0 ?
     results[_.clamp(offset - 1, 0, _.size(results) - 1)] :
-    _.last(results)!;
+    _.sample(results)!;
 
-  const nested = createNestedExpl(selected);
-  return updateExpl(nested);
+  return createNestedExpl(selected);
 };
 
 export const getRandomExpl = async (user: number) => {
@@ -76,15 +76,24 @@ export const getRandomExpl = async (user: number) => {
   if (_.isEmpty(results)) {
     return null;
   }
-  const nested = createNestedExpl(_.first(results)!);
-  return updateExpl(nested);
+  return createNestedExpl(_.first(results)!);
 };
 
-type SearchExpls = (user: number, searchTerm: string, limit?: number) => Promise<Array<Partial<Table.Expl>>>;
-export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
+type SearchExpls = (
+  user: number,
+  searchTerm: string,
+  limit?: number,
+  uniq?: boolean,
+) => Promise<Array<Partial<Table.Expl>>>;
+
+export const searchExpls: SearchExpls = async (user, searchTerm, limit?, uniq?) => {
   const query = getExplsForUser(user)
-    .select(['expls.key', 'expls.id'])
+    .select('expls.key')
     .andWhere('expls.key', 'like', `%${_.toLower(searchTerm)}%`);
+
+  if (uniq) {
+    query.groupBy('expls.key');
+  }
 
   if (limit) {
     query.limit(limit);
@@ -95,7 +104,10 @@ export const searchExpls: SearchExpls = async (user, searchTerm, limit?) => {
 
 export const searchRexpls = async (user: number): Promise<Array<Partial<Table.Expl>>> => {
   return getExplsForUser(user)
-    .whereNotNull('tg_contents.photo_id');
+    .whereNotNull('tg_contents.photo_id')
+    .orWhereNotNull('tg_contents.sticker_id')
+    .orWhereNotNull('tg_contents.video_id')
+    .orderBy('created_at', 'desc');
 };
 
 export const addUserToChat = async (user: number, chat: number) => {
@@ -182,14 +194,25 @@ const getExplsForUser = (user: number) => {
   return query;
 };
 
-const updateExpl = async (expl: Table.Expl) => {
-  await knex.raw(`
-    UPDATE expls
-    SET
-      "echo_count" = "echo_count" + 1,
-      "last_echo" = ?
-    WHERE "id" = ?
-  `, [new Date().toISOString(), expl.id]);
+export const updateExpl = async (expl: Table.Expl, from: { chat: number; user: number }) => {
+  await knex.transaction(async (trx) => {
+    await trx.raw(`
+        UPDATE expls
+        SET
+          "echo_count" = "echo_count" + 1,
+          "last_echo" = ?
+        WHERE "id" = ?
+      `, [new Date().toISOString(), expl.id]);
+
+    await trx.from('echo_history')
+      .insert({
+        expl_id: expl.id,
+        user_id: from.user,
+        chat_id: from.chat,
+      });
+
+    await trx.commit();
+  });
 
   logger.debug('Expl updated', { id: expl.id, key: expl.key });
   return expl;

@@ -10,7 +10,7 @@ async function start() {
   const bot = await createBot(new (Telegraf as any)(config.tg.token!, options));
 
   // Setup webhook if production
-  if (config.env.prod) {
+  if (config.env.prod && config.tg.webhook) {
     const webhook = `${config.tg.webhook}/bot${config.tg.token}`;
     await bot.telegram.setWebhook(webhook);
     await bot.startWebhook(`/bot${config.tg.token}`, null as any, config.tg.port);
