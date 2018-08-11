@@ -214,15 +214,15 @@ describe('Commands', () => {
 
       const ctx1 = message(`/list key`);
       await commands.list(ctx1);
-      expect(_.split(ctx1.reply.lastArg, ', ')).to.have.length(COUNT);
+      expect(_.split(ctx1.reply.args[0][0], ', ')).to.have.length(COUNT);
 
       const ctx2 = message(`/list like`);
       await commands.list(ctx2);
-      expect(_.split(ctx2.reply.lastArg, ', ')).to.have.length(COUNT);
+      expect(_.split(ctx2.reply.args[0][0], ', ')).to.have.length(COUNT);
 
       const ctx3 = message(`/list 1`);
       await commands.list(ctx3);
-      expect(_.split(ctx3.reply.lastArg, ', ')).to.have.length(1);
+      expect(_.split(ctx3.reply.args[0][0], ', ')).to.have.length(1);
 
     });
 
@@ -248,7 +248,7 @@ describe('Commands', () => {
 
       const ctx = message(`/list key`);
       await commands.list(ctx);
-      expect(ctx.reply.lastArg).to.contain(`[${COUNT}]`);
+      expect(ctx.reply.args[0][0]).to.contain(`[${COUNT}]`);
     });
 
     it('responds with error if no keys found', async () => {
@@ -256,7 +256,7 @@ describe('Commands', () => {
 
       const ctx = message(`/list ${KEY}`);
       await commands.list(ctx);
-      expect(ctx.reply.lastArg).to.equal(messages.list.notFound(KEY));
+      expect(ctx.reply.args[0][0]).to.equal(messages.list.notFound(KEY));
     });
 
     it(`responds with error if search results contains over ${MAX_LIST_COUNT} keys`, async () => {
@@ -271,7 +271,7 @@ describe('Commands', () => {
 
       const ctx = message(`/list ${KEY}`);
       await commands.list(ctx);
-      expect(ctx.reply.lastArg).to.equal(messages.list.tooMany(KEY));
+      expect(ctx.reply.args[0][0]).to.equal(messages.list.tooMany(KEY));
     });
   });
 });
