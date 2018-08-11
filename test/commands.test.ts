@@ -63,7 +63,7 @@ describe('Commands', () => {
       }
     });
 
-    it('updates echo_count and last_echo after sending expl', async () => {
+    it('updates echo history after sending a expl', async () => {
       const KEY = 'key';
 
       await knex('expls').insert({
@@ -74,14 +74,18 @@ describe('Commands', () => {
 
       await commands.expl(message(`/expl ${KEY}`));
 
-      const expl1 = await knex('expls').where('key', KEY).first();
-      expect(expl1.echo_count).to.equal(1);
-      expect(expl1.last_echo).to.be.not.null;
+      const history1 = await knex('echo_history')
+        .join('expls', 'expls.id', 'echo_history.expl_id')
+        .where('key', KEY);
+      expect(history1).to.have.length(1);
+      expect(history1[0].echoed_at).to.be.not.null;
 
       await commands.expl(message(`/expl ${KEY}`));
-      const expl2 = await knex('expls').where('key', KEY).first();
-      expect(expl2.echo_count).to.equal(2);
-      expect(expl2.last_echo).to.not.equal(expl1.last_echo);
+      const history2 = await knex('echo_history')
+        .join('expls', 'expls.id', 'echo_history.expl_id')
+        .where('key', KEY);
+      expect(history2).to.have.length(2);
+      expect(history2[1].echoed_at).to.be.not.null;
     });
   });
 

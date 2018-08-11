@@ -194,27 +194,15 @@ const getExplsForUser = (user: number) => {
   return query;
 };
 
-export const updateExpl = async (expl: Table.Expl, from: { chat: number; user: number }) => {
-  await knex.transaction(async (trx) => {
-    await trx.raw(`
-        UPDATE expls
-        SET
-          "echo_count" = "echo_count" + 1,
-          "last_echo" = ?
-        WHERE "id" = ?
-      `, [new Date().toISOString(), expl.id]);
+export const addEcho = async (expl: Table.Expl, from: { chat: number; user: number }) => {
+  await knex('echo_history')
+    .insert({
+      expl_id: expl.id,
+      user_id: from.user,
+      chat_id: from.chat,
+    });
 
-    await trx.from('echo_history')
-      .insert({
-        expl_id: expl.id,
-        user_id: from.user,
-        chat_id: from.chat,
-      });
-
-    await trx.commit();
-  });
-
-  logger.debug('Expl updated', { id: expl.id, key: expl.key });
+  logger.debug('Expl echoed', { id: expl.id, key: expl.key });
   return expl;
 };
 
