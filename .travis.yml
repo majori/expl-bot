@@ -15,3 +15,5 @@ after_success:
 notifications:
   email:
   - antti.kivimaki@futurice.com
+  webhooks:
+  - https://fathomless-fjord-24024.herokuapp.com/notify
