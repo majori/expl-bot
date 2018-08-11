@@ -4,6 +4,8 @@ import * as db from '../database';
 import { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 
+export const MAX_COUNT = 100;
+
 const searchExpls = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
   if (words.length < 2 || _.isEmpty(words[1])) {
@@ -29,7 +31,7 @@ const searchExpls = async (ctx: Context) => {
   }
 
   const uniqueKeys = _.groupBy(result, 'key');
-  if (_.size(uniqueKeys) > 100) {
+  if (_.size(uniqueKeys) > MAX_COUNT) {
     return ctx.reply(messages.list.tooMany(searchTerm), extraMarkup);
   }
 
