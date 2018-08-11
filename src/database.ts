@@ -194,12 +194,13 @@ const getExplsForUser = (user: number) => {
   return query;
 };
 
-export const addEcho = async (expl: Table.Expl, from: { chat: number; user: number }) => {
+export const addEcho = async (expl: Table.Expl, from: { chat: number; user: number }, wasRandom: boolean) => {
   await knex('echo_history')
     .insert({
       expl_id: expl.id,
       user_id: from.user,
       chat_id: from.chat,
+      was_random: wasRandom,
     });
 
   logger.debug('Expl echoed', { id: expl.id, key: expl.key });

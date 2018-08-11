@@ -6,12 +6,12 @@ import { addEcho } from './database';
 
 const logger = new Logger(__filename);
 
-export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | null) => {
+export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | null, wasRandom: boolean = false) => {
   if (!expl) {
     return ctx.reply(messages.errors.notFound(key));
   }
 
-  await addEcho(expl, ctx.state);
+  await addEcho(expl, ctx.state, wasRandom);
 
   if (expl.value) {
     return ctx.reply(`${expl.key}: ${expl.value}`);

@@ -24,7 +24,7 @@ const getRandomExpl = async (ctx: Context) => {
     return ctx.reply(messages.get.noExpls());
   }
 
-  await sendExpl(ctx, foundExpl.key, foundExpl);
+  await sendExpl(ctx, foundExpl.key, foundExpl, true);
 };
 
 export const expl = getExpl;

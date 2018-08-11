@@ -73,12 +73,12 @@ describe('Commands', () => {
       });
 
       await commands.expl(message(`/expl ${KEY}`));
-
       const history1 = await knex('echo_history')
         .join('expls', 'expls.id', 'echo_history.expl_id')
         .where('key', KEY);
       expect(history1).to.have.length(1);
       expect(history1[0].echoed_at).to.be.not.null;
+      expect(history1[0].was_random).to.be.false;
 
       await commands.expl(message(`/expl ${KEY}`));
       const history2 = await knex('echo_history')
@@ -86,6 +86,15 @@ describe('Commands', () => {
         .where('key', KEY);
       expect(history2).to.have.length(2);
       expect(history2[1].echoed_at).to.be.not.null;
+      expect(history2[1].was_random).to.be.false;
+
+      await commands.rexpl(message('/rexpl'));
+      const history3 = await knex('echo_history')
+        .join('expls', 'expls.id', 'echo_history.expl_id')
+        .where('key', KEY);
+      expect(history3).to.have.length(3);
+      expect(history3[2].echoed_at).to.be.not.null;
+      expect(history3[2].was_random).to.be.true;
     });
   });
 
