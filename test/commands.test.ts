@@ -18,20 +18,51 @@ describe('Commands', () => {
       expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
     });
 
-    it('get an existing expl', async () => {
+    it('gets expl with value', async () => {
       const expl = {
         key: 'key',
         value: 'value',
       };
 
-      const ctx = message(`/expl ${expl.key}`);
       await knex('expls').insert({
         ...expl,
         user_id: USER_ID,
       });
 
+      const ctx = message(`/expl ${expl.key}`);
       await commands.expl(ctx);
       expect(ctx.reply.lastArg).to.equal(`${expl.key}: ${expl.value}`);
+    });
+
+    describe('Telegram content', () => {
+      it('gets expl with message', async () => {
+        const KEY = 'key';
+        const content = {
+          message_id: 1234,
+          chat_id: -1,
+        };
+
+        const contentIds = await knex('tg_contents')
+          .insert(content)
+          .returning('content_id');
+
+        await knex('expls')
+          .insert({
+            key: KEY,
+            tg_content: _.first(contentIds),
+            user_id: USER_ID,
+          });
+
+        const ctx = message(`/expl ${KEY}`);
+        await commands.expl(ctx);
+        expect(ctx.telegram.forwardMessage.args[0])
+          .to.deep.equal([USER_ID, content.chat_id, content.message_id]);
+      });
+
+      it('gets expl with photo');
+      it('gets expl with sticker');
+      it('gets expl with audio');
+      it('gets expl with video');
     });
 
     it('correctly gets indexed expl', async () => {
