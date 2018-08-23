@@ -70,6 +70,9 @@ export default async (bot: Telegraf<Context>) => {
   bot.command('/list', commands.list);
   bot.hears(/^(\!ls ).*$/, commands.list);
 
+  bot.command('/resolve', commands.resolve);
+  bot.hears(/^(\!rs).*$/, commands.resolve);
+
   bot.on('inline_query', commands.inlineQuery);
 
   return bot;

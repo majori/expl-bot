@@ -11,17 +11,17 @@ export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | nul
     return ctx.reply(messages.errors.notFound(key));
   }
 
-  await addEcho(expl, ctx.state, wasRandom);
-
   if (expl.value) {
-    return ctx.reply(`${expl.key}: ${expl.value}`);
+    const sent = await ctx.reply(`${expl.key}: ${expl.value}`);
+    await addEcho(expl, ctx.state, wasRandom, sent.message_id);
   }
 
   if (expl.tg_content) {
     const content = expl.tg_content;
     if (content.message_id && content.chat_id) {
       try {
-        await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
+        const sent = await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
+        await addEcho(expl, ctx.state, wasRandom, sent.message_id);
       } catch (err) {
         switch (err.description) {
           case 'Bad Request: chat not found':
