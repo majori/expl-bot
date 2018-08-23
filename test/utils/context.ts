@@ -4,7 +4,9 @@ const baseContext = (state?: any) => {
   return {
     state,
     session: { joined: true },
-    reply: sinon.fake(),
+    reply: sinon.fake.returns(async (replyMessage: Text) => ({
+      message: { message_id: 1235 },
+    })),
     replyWithMarkdown: sinon.fake(),
     answerInlineQuery: sinon.fake(),
     telegram: {
