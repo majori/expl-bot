@@ -7,7 +7,7 @@ const resolveRexpl = async (ctx: Context) => {
   if (ctx.message!.reply_to_message) {
     const echo = ctx.message!.reply_to_message!.message_id;
 
-    const foundResolve = await db.getResolve(ctx.state.user, echo);
+    const foundResolve = await db.getResolve(ctx.state, echo);
 
     if (foundResolve) {
       return ctx.reply(foundResolve.key);

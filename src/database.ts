@@ -222,13 +222,14 @@ const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
   };
 };
 
-export const getResolve = async (user: number, echo: number) => {
-  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(user)
+export const getResolve = async (from: { chat: number; user: number }, echo: number) => {
+  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(from.user)
     .where(function() {
       this.whereIn('id', function() {
         this.from('echo_history')
           .select('expl_id')
           .where('echo_message_id', echo)
+          .andWhere('chat_id', from.chat)
           .andWhere('was_random', true);
       });
     });
