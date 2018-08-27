@@ -26,31 +26,6 @@ export default async (bot: Telegraf<Context>) => {
     next!();
   });
 
-  // We migrated an old bot to use this bot, so
-  // we notify user that we deprecated some commands
-  if (config.isBorisBot) {
-    bot.command([
-      '/kahvutti',
-      '/sumppi',
-      '/kahvi',
-      '/tee',
-      '/kahvit',
-      '/kippis',
-      '/kalja',
-      '/juoma',
-      '/viina',
-      '/kaljoja',
-      '/virvokkeita',
-      '/otinko',
-      '/kumpi',
-      '/cam',
-      '/webcam',
-    ], async (ctx: Context) => {
-      const words = ctx.message!.text!.split(' ');
-      ctx.replyWithMarkdown(`Command \`${_.first(words)}\` is having a much deserved vacation. More info TBA.`);
-    });
-  }
-
   bot.start(commands.help);
   bot.help(commands.help);
   bot.hears(/^(\!h)/, commands.help);
