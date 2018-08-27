@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
+import { escapeMarkdown, formatDate } from '../utils';
 
 const resolveRexpl = async (ctx: Context) => {
   if (ctx.message!.reply_to_message) {
@@ -10,7 +11,9 @@ const resolveRexpl = async (ctx: Context) => {
     const foundResolve = await db.getResolve(ctx.state, echo);
 
     if (foundResolve) {
-      return ctx.reply(foundResolve.key);
+      const key = await escapeMarkdown(foundResolve.key);
+      const year = await formatDate(foundResolve.created_at);
+      return ctx.replyWithMarkdown(`${key}, _${year}_`);
     }
   }
 };
