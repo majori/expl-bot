@@ -145,6 +145,25 @@ describe('Commands', () => {
     });
   });
 
+  describe('/resolve', () => {
+    it('gets a key of a random expl', async () => {
+      const KEY = 'key';
+      await knex('expls').insert({
+        key: KEY,
+        value: 'value',
+        user_id: USER_ID,
+      });
+
+      const ctx = message('/rexpl', true);
+      await commands.rexpl(ctx);
+
+      const ctx2 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      await commands.resolve(ctx2);
+
+      expect(ctx2.replyWithMarkdown.lastArg).to.contain(KEY);
+    });
+  });
+
   describe('/add', () => {
     it('creates expl', async () => {
       const expl = {

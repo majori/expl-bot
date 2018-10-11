@@ -12,8 +12,8 @@ const resolveRexpl = async (ctx: Context) => {
 
     if (foundResolve) {
       const key = await escapeMarkdown(foundResolve.key);
-      const year = await formatDate(foundResolve.created_at);
-      return ctx.replyWithMarkdown(`${key}, _${year}_`);
+      const date = await formatDate(foundResolve.created_at);
+      await ctx.replyWithMarkdown(`${key}, _${date}_`);
     }
   }
 };
