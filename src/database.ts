@@ -194,13 +194,19 @@ const getExplsForUser = (user: number) => {
   return query;
 };
 
-export const addEcho = async (expl: Table.Expl, from: { chat: number; user: number }, wasRandom: boolean) => {
+export const addEcho = async (
+  expl: Table.Expl,
+  from: { chat: number; user: number },
+  wasRandom: boolean,
+  sentMessageId: number,
+) => {
   await knex('echo_history')
     .insert({
       expl_id: expl.id,
       user_id: from.user,
       chat_id: from.chat,
       was_random: wasRandom,
+      echo_message_id: sentMessageId,
     });
 
   logger.debug('Expl echoed', { id: expl.id, key: expl.key });
@@ -214,4 +220,22 @@ const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
     ..._.omit(expl, columns) as any,
     tg_content: _.pick(expl, columns),
   };
+};
+
+export const getResolve = async (from: { chat: number; user: number }, echo: number) => {
+  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(from.user)
+    .where(function() {
+      this.whereIn('id', function() {
+        this.from('echo_history')
+          .select('expl_id')
+          .where('echo_message_id', echo)
+          .andWhere('chat_id', from.chat)
+          .andWhere('was_random', true);
+      });
+    });
+
+  if (_.isEmpty(results)) {
+    return null;
+  }
+  return createNestedExpl(_.first(results)!);
 };

@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
+import { inlineSearchKeyboard } from '../utils';
 
 export const MAX_COUNT = 100;
 
@@ -15,16 +16,7 @@ const searchExpls = async (ctx: Context) => {
   const searchTerm = words[1];
   const result = await db.searchExpls(ctx.state.user, searchTerm);
 
-  const extraMarkup = {
-    reply_markup: {
-      inline_keyboard: [
-        [{
-          text: 'Search with inline query',
-          switch_inline_query_current_chat: searchTerm,
-        }],
-      ],
-    },
-  };
+  const extraMarkup = await inlineSearchKeyboard(searchTerm);
 
   if (_.isEmpty(result)) {
     return ctx.reply(messages.list.notFound(searchTerm), extraMarkup);

@@ -4,7 +4,9 @@ const baseContext = (state?: any) => {
   return {
     state,
     session: { joined: true },
-    reply: sinon.fake(),
+    reply: sinon.fake.returns({
+      message_id: 1235,
+    }),
     replyWithMarkdown: sinon.fake(),
     answerInlineQuery: sinon.fake(),
     telegram: {
@@ -25,7 +27,7 @@ const user = {
   username: 'testuser',
 };
 
-export const message = (msg: string, fromGroup?: boolean): any => {
+export const message = (msg: string, fromGroup?: boolean, replyTo?: number): any => {
   const chat = fromGroup ?
     {
       id: GROUP_ID,
@@ -50,6 +52,7 @@ export const message = (msg: string, fromGroup?: boolean): any => {
       chat,
       date: Date.now(),
       text: msg,
+      reply_to_message: replyTo ? { message_id: replyTo } : null,
     },
   };
 };
