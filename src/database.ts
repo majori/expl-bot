@@ -47,7 +47,7 @@ export const createExpl = async (options: ExplOptions) => {
     throw err;
   }
 
-  logger.debug('Created expl', { key: options.key });
+  logger.debug('Created expl', { key: expl.key });
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {
@@ -140,7 +140,10 @@ export const deleteExpl = async (user: number, key: string) => {
 
   const count: number = await query.del();
 
-  logger.debug(`Expl ${key} deleted`, { user });
+  if (count > 0) {
+    logger.debug(`Expl ${key} deleted`, { user });
+  }
+
   return count;
 };
 
