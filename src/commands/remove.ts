@@ -10,7 +10,7 @@ const removeExpl = async (ctx: Context) => {
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.remove.invalidSyntax(_.first(words)));
   }
-  const key = words[1];
+  const key = _.toLower(words[1]);
   const count = await db.deleteExpl(ctx.state.user, key);
 
   return (count > 0) ?
