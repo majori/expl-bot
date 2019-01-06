@@ -13,7 +13,6 @@ after_success:
   - docker push $REPO
 
 notifications:
-  email:
-  - antti.kivimaki@futurice.com
   webhooks:
+  # Telegram notification
   - https://fathomless-fjord-24024.herokuapp.com/notify
