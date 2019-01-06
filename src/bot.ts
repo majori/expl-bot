@@ -4,7 +4,6 @@ import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import commands from './commands';
 import * as db from './database';
-import config from './config';
 
 export default async (bot: Telegraf<Context>) => {
   const info = await bot.telegram.getMe();
@@ -21,6 +20,16 @@ export default async (bot: Telegraf<Context>) => {
     if (ctx.from && ctx.chat && ctx.chat.type !== 'private' && !ctx.session.joined) {
       await db.addUserToChat(ctx.state.user, ctx.state.chat);
       ctx.session.joined = true;
+    }
+
+    // Lowercase the command
+    if (ctx.message && ctx.message.entities && ctx.message.text) {
+      const entity = ctx.message.entities.find(e => e.offset === 0 && e.type === 'bot_command');
+      if (entity) {
+        const command = ctx.message.text.substring(0, entity.length);
+        const rest = ctx.message.text.substring(entity.length);
+        ctx.message.text = `${command.toLowerCase()}${rest}`;
+      }
     }
 
     next!();
