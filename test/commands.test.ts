@@ -31,7 +31,7 @@ describe('Commands', () => {
 
       const ctx = message(`/expl ${expl.key}`);
       await commands.expl(ctx);
-      expect(ctx.reply.lastArg).to.equal(`${expl.key}: ${expl.value}`);
+      expect(ctx.reply.lastArg).to.equal(expl.value);
     });
 
     describe('Telegram content', () => {
@@ -91,7 +91,7 @@ describe('Commands', () => {
         const ctx = message(`/expl ${KEY} ${index + 1}`);
         await commands.expl(ctx);
 
-        expect(ctx.reply.lastArg).to.equal(`${KEY}: ${index}`);
+        expect(ctx.reply.lastArg).to.equal(index.toString());
       }
     });
 
@@ -132,16 +132,16 @@ describe('Commands', () => {
 
   describe('/rexpl', () => {
     it('gets a random expl', async () => {
-      const KEY = 'key';
+      const VALUE = 'key';
       await knex('expls').insert(_.times(20, (i) => ({
-        key: `${KEY}_${i}`,
-        value: 'value',
+        key: `key_${i}`,
+        value: VALUE,
         user_id: USER_ID,
       })));
 
       const ctx = message('/rexpl');
       await commands.rexpl(ctx);
-      expect(ctx.reply.lastArg).to.contain(KEY);
+      expect(ctx.reply.lastArg).equals(VALUE);
     });
   });
 
