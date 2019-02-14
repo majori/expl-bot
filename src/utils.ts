@@ -12,8 +12,8 @@ export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | nul
   }
 
   if (expl.value) {
-    const sent = await ctx.reply(`${expl.key}: ${expl.value}`);
-    await addEcho(expl, ctx.state, wasRandom, sent.message_id);
+    const { message_id } = await ctx.reply(expl.value);
+    await addEcho(expl, ctx.state, wasRandom, message_id);
   }
 
   if (expl.tg_content) {
