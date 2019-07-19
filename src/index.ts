@@ -1,4 +1,4 @@
-import config from './config';
+import * as config from './config';
 import createBot from './bot';
 import * as Telegraf from 'telegraf';
 import Logger from './logger';

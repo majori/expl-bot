@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 import { Logger as Winston, transports, CLILoggingLevel } from 'winston';
-import config from './config';
+import * as config from './config';
 
 export class Logger extends Winston {
 

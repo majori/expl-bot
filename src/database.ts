@@ -1,6 +1,6 @@
 import * as Knex from 'knex';
 import * as _ from 'lodash';
-import config from './config';
+import * as config from './config';
 import Logger from './logger';
 
 const logger = new Logger(__filename);
