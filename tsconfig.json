@@ -4,8 +4,9 @@
     "module": "commonjs",
     "outDir": "./build",
     "strict": true,
+    "baseUrl": "./src",
   },
   "include": [
-    "./src/**/*.ts"
-  ]
+    "src/"
+  ],
 }
