@@ -1,13 +1,14 @@
 import * as Knex from 'knex';
 import * as _ from 'lodash';
 import * as config from './config';
+import { Table, Options } from './types/database';
 import Logger from './logger';
 
 const logger = new Logger(__filename);
 
 export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
-export const createExpl = async (options: ExplOptions) => {
+export const createExpl = async (options: Options.Expl) => {
   const expl: Partial<Table.Expl> = {
     user_id: options.userId,
     key: _.toLower(options.key),

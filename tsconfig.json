@@ -5,6 +5,9 @@
     "outDir": "./build",
     "strict": true,
     "baseUrl": "./src",
+    "paths": {
+      "telegraf/session": ["./types/global"],
+    }
   },
   "include": [
     "src/"

@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
+import { Options } from '../types/database';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 
@@ -17,7 +18,7 @@ const createExpl = async (ctx: Context) => {
   }
 
   const key = words[1];
-  const expl: ExplOptions = {
+  const expl: Options.Expl = {
     userId: ctx.state.user,
     key,
   };
