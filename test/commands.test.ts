@@ -160,7 +160,7 @@ describe('Commands', () => {
       const ctx2 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
       await commands.resolve(ctx2);
 
-      expect(ctx2.replyWithMarkdown.lastArg).to.contain(KEY);
+      expect(ctx2.replyWithMarkdown.args[0][0]).to.contain(KEY);
     });
   });
 

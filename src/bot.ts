@@ -49,5 +49,7 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.on('inline_query', commands.inlineQuery);
 
+  bot.action(/^reaction/, commands.reaction);
+
   return bot;
 };
