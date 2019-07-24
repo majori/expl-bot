@@ -179,6 +179,8 @@ describe('Commands', () => {
 
       const keyboard = _.get(ctx2, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
 
+      expect(keyboard[0][0].text).to.contain('0');
+
       const ctx3 = callbackQuery(keyboard[0][0].callback_data);
       await commands.reaction(ctx3);
 
@@ -187,7 +189,9 @@ describe('Commands', () => {
 
       const keyboard2 = _.get(ctx4, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
 
-      const ctx5 = callbackQuery(keyboard[0][0].callback_data);
+      expect(keyboard2[0][0].text).to.contain('1');
+
+      const ctx5 = callbackQuery(keyboard2[0][0].callback_data);
       await commands.reaction(ctx5);
 
       const ctx6 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
@@ -195,8 +199,6 @@ describe('Commands', () => {
 
       const keyboard3 = _.get(ctx6, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
 
-      expect(keyboard[0][0].text).to.contain('0');
-      expect(keyboard2[0][0].text).to.contain('1');
       expect(keyboard3[0][0].text).to.contain('0');
     });
   });
