@@ -183,23 +183,18 @@ describe('Commands', () => {
 
       const ctx3 = callbackQuery(keyboard[0][0].callback_data);
       await commands.reaction(ctx3);
+      await commands.reaction(ctx3);
 
-      const ctx4 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
-      await commands.resolve(ctx4);
+      const ctx4 = callbackQuery(keyboard[0][1].callback_data);
+      await commands.reaction(ctx4);
 
-      const keyboard2 = _.get(ctx4, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+      const ctx5 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      await commands.resolve(ctx5);
 
-      expect(keyboard2[0][0].text).to.contain('1');
+      const keyboard2 = _.get(ctx5, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
 
-      const ctx5 = callbackQuery(keyboard2[0][0].callback_data);
-      await commands.reaction(ctx5);
-
-      const ctx6 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
-      await commands.resolve(ctx6);
-
-      const keyboard3 = _.get(ctx6, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
-
-      expect(keyboard3[0][0].text).to.contain('0');
+      expect(keyboard2[0][0].text).to.contain('0'); // because we 'pressed' to first button twice
+      expect(keyboard2[0][1].text).to.contain('1'); // ... and the second only once
     });
   });
 
