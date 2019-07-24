@@ -262,7 +262,7 @@ export const addReaction = async (from: { chat: number; user: number }, id: numb
     logger.debug('Reaction added', { id, reaction });
     return true;
   } catch (err) {
-    if (err.constraint === 'reactions_expl_id_user_id_reaction_unique') {
+    if (err.code === '23505') {
       throw new Error('already_exists');
     } else {
       logger.error(err);
