@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import commands from '../src/commands';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
 import * as messages from '../src/constants/messages';
-import { message, USER_ID } from './utils/context';
+import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
 
 describe('Commands', () => {
@@ -161,6 +161,43 @@ describe('Commands', () => {
       await commands.resolve(ctx2);
 
       expect(ctx2.replyWithMarkdown.args[0][0]).to.contain(KEY);
+    });
+
+    it('reacts to a key of a random expl', async () => {
+      const KEY = 'key';
+      await knex('expls').insert({
+        key: KEY,
+        value: 'value',
+        user_id: USER_ID,
+      });
+
+      const ctx = message('/rexpl', true);
+      await commands.rexpl(ctx);
+
+      const ctx2 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      await commands.resolve(ctx2);
+
+      const keyboard = _.get(ctx2, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+
+      const ctx3 = callbackQuery(keyboard[0][0].callback_data);
+      await commands.reaction(ctx3);
+
+      const ctx4 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      await commands.resolve(ctx4);
+
+      const keyboard2 = _.get(ctx4, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+
+      const ctx5 = callbackQuery(keyboard[0][0].callback_data);
+      await commands.reaction(ctx5);
+
+      const ctx6 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      await commands.resolve(ctx6);
+
+      const keyboard3 = _.get(ctx6, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+
+      expect(keyboard[0][0].text).to.contain('0');
+      expect(keyboard2[0][0].text).to.contain('1');
+      expect(keyboard3[0][0].text).to.contain('0');
     });
   });
 

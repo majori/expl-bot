@@ -9,6 +9,8 @@ const baseContext = (state?: any) => {
     }),
     replyWithMarkdown: sinon.fake(),
     answerInlineQuery: sinon.fake(),
+    answerCbQuery: sinon.fake(),
+    editMessageReplyMarkup: sinon.fake(),
     telegram: {
       forwardMessage: sinon.fake(),
       webkhookReply: sinon.fake(),
@@ -65,6 +67,15 @@ export const inlineQuery = (query?: string): any => {
       query,
       offset: '',
     },
+    ...baseContext({
+      user: USER_ID,
+    }),
+  };
+};
+
+export const callbackQuery = (data: string): any => {
+  return {
+    callbackQuery: { data },
     ...baseContext({
       user: USER_ID,
     }),
