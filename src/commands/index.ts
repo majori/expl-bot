@@ -5,6 +5,7 @@ import list from './list';
 import remove from './remove';
 import help from './help';
 import resolve from './resolve';
+import reaction from './reaction';
 
 export default {
   add,
@@ -15,4 +16,5 @@ export default {
   inlineQuery,
   help,
   resolve,
+  reaction,
 };

@@ -3,17 +3,22 @@ import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
 import { escapeMarkdown, formatDate } from '../utils';
+import { reactionsKeyboard } from './reaction';
 
 const resolveRexpl = async (ctx: Context) => {
   if (ctx.message!.reply_to_message) {
-    const echo = ctx.message!.reply_to_message!.message_id;
+    const echo = ctx.message!.reply_to_message.message_id;
 
-    const foundResolve = await db.getResolve(ctx.state, echo);
+    const expl = await db.getResolve(ctx.state, echo);
 
-    if (foundResolve) {
-      const key = await escapeMarkdown(foundResolve.key);
-      const date = await formatDate(foundResolve.created_at);
-      await ctx.replyWithMarkdown(`${key}, _${date}_`);
+    if (expl) {
+      const key = await escapeMarkdown(expl.key);
+      const date = await formatDate(expl.created_at);
+
+      const reactions = ['👍', '👎'];
+      const keyboard = await reactionsKeyboard(reactions, expl.id);
+
+      await ctx.replyWithMarkdown(`${key}, _${date}_`, { reply_markup: keyboard });
     }
   }
 };

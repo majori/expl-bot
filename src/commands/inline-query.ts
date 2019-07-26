@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import * as db from '../database';
 import * as config from '../config';
 import { Context } from '../types/telegraf';
+import { Table } from '../types/database';
 
 export const RESULT_LIMIT = 15;
 

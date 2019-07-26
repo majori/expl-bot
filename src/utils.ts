@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { Context } from './types/telegraf';
+import { Table } from './types/database';
 import Logger from './logger';
 import * as messages from './constants/messages';
 import { addEcho } from './database';

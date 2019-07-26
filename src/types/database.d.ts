@@ -1,4 +1,4 @@
-declare namespace Table {
+export namespace Table {
   export interface Expl {
     id: number;
     created_at: string;
@@ -27,18 +27,20 @@ declare namespace Table {
   }
 }
 
-declare type TelegramOptions = {
-  message?: number;
-  chat?: number;
-  sticker?: string;
-  audio?: string;
-  photo?: string;
-  video?: string;
-};
+export namespace Options {
+  export interface Telegram {
+    message?: number;
+    chat?: number;
+    sticker?: string;
+    audio?: string;
+    photo?: string;
+    video?: string;
+  }
 
-declare type ExplOptions = {
-  userId: number;
-  key: string;
-  message?: string;
-  telegram?: TelegramOptions
-};
+  export interface Expl {
+    userId: number;
+    key: string;
+    message?: string;
+    telegram?: Telegram
+  }
+}

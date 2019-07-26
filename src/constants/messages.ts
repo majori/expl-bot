@@ -48,3 +48,8 @@ export const help = constant(`
 /help or !h
   - Prints this info
 `);
+
+export const reaction = {
+  added: template('Added "{0}"'),
+  removed: template('Removed your previous "{0}"'),
+};

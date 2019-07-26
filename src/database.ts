@@ -1,13 +1,14 @@
 import * as Knex from 'knex';
 import * as _ from 'lodash';
 import * as config from './config';
+import { Table, Options } from './types/database';
 import Logger from './logger';
 
 const logger = new Logger(__filename);
 
 export const knex = Knex(config.env.prod ? config.db.production : config.db.development);
 
-export const createExpl = async (options: ExplOptions) => {
+export const createExpl = async (options: Options.Expl) => {
   const expl: Partial<Table.Expl> = {
     user_id: options.userId,
     key: _.toLower(options.key),
@@ -241,4 +242,49 @@ export const getResolve = async (from: { chat: number; user: number }, echo: num
     return null;
   }
   return createNestedExpl(_.first(results)!);
+};
+
+export const getReactionAmount = async ( id: number, reaction: string) => {
+  const query = knex('reactions').count().where({ expl_id: id, reaction });
+  const count: number = +_.get(await query, [0, 'count'], 0);
+
+  return count;
+};
+
+export const addReaction = async (from: { chat: number; user: number }, id: number, reaction: string) => {
+  try {
+    await knex('reactions').insert({
+      user_id: from.user,
+      expl_id: id,
+      reaction,
+    });
+
+    logger.debug('Reaction added', { id, reaction });
+    return true;
+  } catch (err) {
+    if (err.code === '23505') {
+      throw new Error('already_exists');
+    } else {
+      logger.error(err);
+    }
+
+    throw err;
+  }
+};
+
+export const deleteReaction = async (from: { chat: number; user: number }, id: number, reaction: string) => {
+  try {
+    await knex('reactions').where({
+      user_id: from.user,
+      expl_id: id,
+      reaction,
+    }).del();
+
+    logger.debug('Reaction deleted', { id, reaction });
+
+    return true;
+  } catch (err) {
+    logger.error(err);
+    throw err;
+  }
 };
