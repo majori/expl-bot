@@ -233,8 +233,7 @@ export const getResolve = async (from: { chat: number; user: number }, echo: num
         this.from('echo_history')
           .select('expl_id')
           .where('echo_message_id', echo)
-          .andWhere('chat_id', from.chat)
-          .andWhere('was_random', true);
+          .andWhere('chat_id', from.chat);
       });
     });
 
