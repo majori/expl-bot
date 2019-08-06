@@ -263,6 +263,8 @@ export const addReaction = async (from: { chat: number; user: number }, id: numb
   } catch (err) {
     if (err.code === '23505') {
       throw new Error('already_exists');
+    } else if (err.code === '23503') {
+      throw new Error('expl_removed');
     } else {
       logger.error(err);
     }
