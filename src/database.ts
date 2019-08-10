@@ -255,11 +255,11 @@ export const addReaction = async (from: { chat: number; user: number }, id: numb
     await knex('reactions').insert({
       user_id: from.user,
       expl_id: id,
+      chat_id: from.chat,
       reaction,
     });
 
     logger.debug('Reaction added', { id, reaction });
-    return true;
   } catch (err) {
     if (err.code === '23505') {
       throw new Error('already_exists');
