@@ -233,8 +233,7 @@ export const getResolve = async (from: { chat: number; user: number }, echo: num
         this.from('echo_history')
           .select('expl_id')
           .where('echo_message_id', echo)
-          .andWhere('chat_id', from.chat)
-          .andWhere('was_random', true);
+          .andWhere('chat_id', from.chat);
       });
     });
 
@@ -256,14 +255,16 @@ export const addReaction = async (from: { chat: number; user: number }, id: numb
     await knex('reactions').insert({
       user_id: from.user,
       expl_id: id,
+      chat_id: from.chat,
       reaction,
     });
 
     logger.debug('Reaction added', { id, reaction });
-    return true;
   } catch (err) {
     if (err.code === '23505') {
       throw new Error('already_exists');
+    } else if (err.code === '23503') {
+      throw new Error('expl_removed');
     } else {
       logger.error(err);
     }

@@ -38,7 +38,7 @@ export const help = constant(`
 /rexpl or ?!
   - Get a random expl
 /resolve or !rs
-  - Finds key of a rexpl. Has to be a reply to result of rexpl.
+  - Finds key of a expl
 /add or !add \`[key]\` \`[value or reply]\`
   - Creates a expl with the given key and value. Value can be omitted if using reply to other message.
 /remove or !rm \`[key]\`
@@ -52,4 +52,5 @@ export const help = constant(`
 export const reaction = {
   added: template('Added "{0}"'),
   removed: template('Removed your previous "{0}"'),
+  creatorHasRemoved: constant('Expl creator has removed this expl'),
 };

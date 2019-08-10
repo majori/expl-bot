@@ -37,8 +37,12 @@ const toggleReaction = async (ctx: Context) => {
         ctx.answerCbQuery(messages.reaction.removed(reaction));
         break;
 
+      case 'expl_removed':
+        await ctx.editMessageReplyMarkup();
+        return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
+
       default:
-        logger.error(err);
+        return;
     }
   }
 
@@ -47,7 +51,11 @@ const toggleReaction = async (ctx: Context) => {
 
   const keyboard = await reactionsKeyboard(reactions, +id);
 
-  await ctx.editMessageReplyMarkup(keyboard);
+  try {
+    await ctx.editMessageReplyMarkup(keyboard);
+  } catch (err) {
+    logger.error(err);
+  }
 };
 
 export default toggleReaction;
