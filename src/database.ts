@@ -38,7 +38,11 @@ export const createExpl = async (options: Options.Expl) => {
 
       await knex('expls')
         .transacting(trx)
-        .insert(expl);
+        .insert(expl)
+        .returning('id')
+        .then(([id]) => {
+          expl.id = id;
+        });
     });
   } catch (err) {
     // UNIQUE VIOLATION
@@ -49,6 +53,8 @@ export const createExpl = async (options: Options.Expl) => {
   }
 
   logger.debug('Created expl', { key: expl.key });
+
+  return expl;
 };
 
 export const getExpl = async (user: number, key: string, offset?: number) => {

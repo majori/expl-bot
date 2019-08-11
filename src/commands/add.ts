@@ -6,6 +6,8 @@ import { Options } from '../types/database';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 
+import { reactionsKeyboard } from './reaction';
+
 const logger = new Logger(__filename);
 
 const createExpl = async (ctx: Context) => {
@@ -50,12 +52,19 @@ const createExpl = async (ctx: Context) => {
     return ctx.replyWithMarkdown(errorMessage);
   }
   try {
-    await db.createExpl(expl);
+    const { id } = await db.createExpl(expl);
 
-    return (isExplWithValue || words.length <= 2) ?
-      ctx.reply(messages.add.successful()) :
-      ctx.reply(messages.add.successfulWithDisclaimer(key));
+    if (!id) {
+      return;
+    }
 
+    const message = isExplWithValue || words.length <= 2 ?
+      messages.add.successful(key) :
+      messages.add.successfulWithDisclaimer(key);
+
+    const keyboard = await reactionsKeyboard(id);
+
+    return ctx.reply(message, { reply_markup: keyboard });
   } catch (err) {
     let msg = messages.errors.unknownError();
     switch (err.message) {

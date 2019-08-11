@@ -8,8 +8,8 @@ export const errors = {
 };
 
 export const add = {
-  successful: constant('Expl created!'),
-  successfulWithDisclaimer: template('Expl "{0}" created! (If you wanna use multiple words in a key, use _ between words)'),
+  successful: template('Expl "{0}" created!'),
+  successfulWithDisclaimer: template('Expl "{0}" created! (If you want to use multiple words in a key, use _ between words)'),
   tooLong: template('Message has to be less than {0} characters.'),
   duplicate: template('You already have expl with the key "{0}".'),
   invalidSyntax: template('Try `{0} [key] [value]` or reply to any message with `{0} [key]`'),
