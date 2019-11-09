@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/majori/expl-bot#readme",
   "dependencies": {
-    "knex": "^0.14.6",
+    "knex": "^0.19.5",
     "lodash": "^4.17.15",
     "pg": "^7.11.0",
     "string-template": "^1.0.0",
