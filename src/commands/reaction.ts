@@ -1,5 +1,4 @@
 
-import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
 import Logger from '../logger';
@@ -7,7 +6,9 @@ import * as messages from '../constants/messages';
 
 const logger = new Logger(__filename);
 
-export const reactionsKeyboard = async (reactions: string[], id: number) => {
+export const reactionsKeyboard = async (id: number) => {
+  const reactions = ['👍', '👎'];
+
   const amounts = await Promise.all(
     reactions.map(async reaction => await db.getReactionAmount(id, reaction)),
   );
@@ -46,10 +47,7 @@ const toggleReaction = async (ctx: Context) => {
     }
   }
 
-  const oldKeyboard = _.get(ctx, 'callbackQuery.message.reply_markup.inline_keyboard[0]', []);
-  const reactions = _.map(oldKeyboard, key => key.callback_data!.split('|')[2]);
-
-  const keyboard = await reactionsKeyboard(reactions, +id);
+  const keyboard = await reactionsKeyboard(+id);
 
   try {
     await ctx.editMessageReplyMarkup(keyboard);

@@ -15,8 +15,7 @@ const resolveRexpl = async (ctx: Context) => {
       const key = await escapeMarkdown(expl.key);
       const date = await formatDate(expl.created_at);
 
-      const reactions = ['👍', '👎'];
-      const keyboard = await reactionsKeyboard(reactions, expl.id);
+      const keyboard = await reactionsKeyboard(expl.id);
 
       await ctx.replyWithMarkdown(`${key}, _${date}_`, { reply_markup: keyboard });
     }

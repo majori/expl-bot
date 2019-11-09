@@ -210,7 +210,7 @@ describe('Commands', () => {
       const expls = await knex('expls');
 
       expect(expls).to.have.length(1);
-      expect(ctx.reply.lastArg).to.equal(messages.add.successful());
+      expect(ctx.reply.args[0][0]).to.equal(messages.add.successful(expl.key));
       expect(_.first(expls)).to.have.property('key', expl.key);
       expect(_.first(expls)).to.have.property('value', expl.value);
     });
