@@ -49,5 +49,6 @@ export const startQuiz = async (ctx: Context) => {
   await (ctx as any).replyWithQuiz('Which one is the correct key?', options, {
     correct_option_id: correctOptionId,
     reply_to_message_id: replyTo,
+    is_anonymous: false,
   });
 };
