@@ -40,6 +40,11 @@ export const get = {
   noExpls: constant("Can't find any expl for you :/"),
 };
 
+export const resolve = {
+  notExpl: constant('Replied ressage was not an expl'),
+  noReply: constant('Reply to an expl to find out its key'),
+};
+
 export const help = constant(`
 /expl or ?? \`[key]\`
   - Get a expl with the given key
