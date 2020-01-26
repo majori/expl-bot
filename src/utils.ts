@@ -18,8 +18,9 @@ export const sendExpl = async (
   }
 
   if (expl.value) {
-    const { message_id } = await ctx.reply(expl.value);
-    await addEcho(expl, ctx.state, wasRandom, message_id);
+    const sent = await ctx.reply(expl.value);
+    await addEcho(expl, ctx.state, wasRandom, sent.message_id);
+    return sent;
   }
 
   if (expl.tg_content) {
@@ -32,6 +33,7 @@ export const sendExpl = async (
           content.message_id,
         );
         await addEcho(expl, ctx.state, wasRandom, sent.message_id);
+        return sent;
       } catch (err) {
         switch (err.description) {
           case 'Bad Request: chat not found':

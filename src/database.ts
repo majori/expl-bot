@@ -79,22 +79,23 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
   return createNestedExpl(selected);
 };
 
-export const getRandomExpl = async (user: number) => {
-  const count: number = +_.get(
-    await getExplsForUser(user).count(),
-    [0, 'count'],
-    0,
-  );
-  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
-    user,
-  )
-    .limit(1)
-    .offset(_.random(count - 1));
+export const getRandomExpls = async (
+  user: number,
+  amount: number = 1,
+  keyFilter?: string,
+) => {
+  const results = getExplsForUser(user)
+    .orderByRaw('RANDOM()')
+    .limit(amount);
 
-  if (_.isEmpty(results)) {
-    return null;
+  if (keyFilter) {
+    results.whereNot({ key: keyFilter });
   }
-  return createNestedExpl(_.first(results)!);
+
+  return _.map<Table.Expl & Table.TgContents, Table.Expl>(
+    await results,
+    createNestedExpl,
+  );
 };
 
 type SearchExpls = (
