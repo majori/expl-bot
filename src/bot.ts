@@ -17,7 +17,12 @@ export default async (bot: Telegraf<Context>) => {
     };
 
     // Autojoin user to the group if not joined already
-    if (ctx.from && ctx.chat && ctx.chat.type !== 'private' && !ctx.session.joined) {
+    if (
+      ctx.from &&
+      ctx.chat &&
+      ctx.chat.type !== 'private' &&
+      !ctx.session.joined
+    ) {
       await db.addUserToChat(ctx.state.user, ctx.state.chat);
       ctx.session.joined = true;
     }
@@ -46,6 +51,9 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.command('/resolve', commands.resolve);
   bot.hears(/^(\!rs).*$/, commands.resolve);
+
+  bot.command('/quiz', commands.quiz);
+  bot.hears(/^(\!q).*$/, commands.quiz);
 
   bot.on('inline_query', commands.inlineQuery);
 

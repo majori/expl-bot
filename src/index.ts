@@ -13,10 +13,14 @@ async function start() {
   if (config.env.prod && config.tg.webhook) {
     const webhook = `${config.tg.webhook}/bot${config.tg.token}`;
     await bot.telegram.setWebhook(webhook);
-    await bot.startWebhook(`/bot${config.tg.token}`, null as any, config.tg.port);
+    await bot.startWebhook(
+      `/bot${config.tg.token}`,
+      null as any,
+      config.tg.port,
+    );
     logger.info(`Webhook listening at ${webhook}`);
 
-  // Do polling in development
+    // Do polling in development
   } else {
     await bot.telegram.deleteWebhook();
     await bot.startPolling();

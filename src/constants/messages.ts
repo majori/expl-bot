@@ -9,16 +9,22 @@ export const errors = {
 
 export const add = {
   successful: template('Expl "{0}" created!'),
-  successfulWithDisclaimer: template('Expl "{0}" created! (If you want to use multiple words in a key, use _ between words)'),
+  successfulWithDisclaimer: template(
+    'Expl "{0}" created! (If you want to use multiple words in a key, use _ between words)',
+  ),
   tooLong: template('Message has to be less than {0} characters.'),
   duplicate: template('You already have expl with the key "{0}".'),
-  invalidSyntax: template('Try `{0} [key] [value]` or reply to any message with `{0} [key]`'),
+  invalidSyntax: template(
+    'Try `{0} [key] [value]` or reply to any message with `{0} [key]`',
+  ),
 };
 
 export const list = {
   invalidSyntax: template('Try `{0} [key]`'),
   notFound: template('No expls found with key like "{0}".'),
-  tooMany: template('Found over 100 expls with key like "{0}". Try to narrow it down.'),
+  tooMany: template(
+    'Found over 100 expls with key like "{0}". Try to narrow it down.',
+  ),
 };
 
 export const remove = {
@@ -27,9 +33,16 @@ export const remove = {
 };
 
 export const get = {
-  forbidden: constant('Expl cannot be shown since the user or the chat has blocked the bot 😢'),
+  forbidden: constant(
+    'Expl cannot be shown since the user or the chat has blocked the bot 😢',
+  ),
   invalidSyntax: template('Try `{0} [key]`'),
-  noExpls: constant('Can\'t find any expl for you :/'),
+  noExpls: constant("Can't find any expl for you :/"),
+};
+
+export const resolve = {
+  notExpl: constant('Replied ressage was not an expl'),
+  noReply: constant('Reply to an expl to find out its key'),
 };
 
 export const help = constant(`
@@ -53,4 +66,10 @@ export const reaction = {
   added: template('Added "{0}"'),
   removed: template('Removed your previous "{0}"'),
   creatorHasRemoved: constant('Expl creator has removed this expl'),
+};
+
+export const quiz = {
+  notEnoughOptions: constant(
+    'There needs to be atleast one more expls to create a quiz',
+  ),
 };

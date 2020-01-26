@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
@@ -10,7 +9,7 @@ import { reactionsKeyboard } from './reaction';
 
 const logger = new Logger(__filename);
 
-const createExpl = async (ctx: Context) => {
+export const createExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
   const errorMessage = messages.add.invalidSyntax(_.first(words));
@@ -29,9 +28,11 @@ const createExpl = async (ctx: Context) => {
 
   // Expl value is normal text
   if (isExplWithValue) {
-    expl.message = _(words).drop(2).join(' ');
+    expl.message = _(words)
+      .drop(2)
+      .join(' ');
 
-  // Expl value is reply to other message
+    // Expl value is reply to other message
   } else if (ctx.message!.reply_to_message) {
     const replyTo: any = ctx.message!.reply_to_message!;
     expl.telegram = {
@@ -47,20 +48,21 @@ const createExpl = async (ctx: Context) => {
       expl.telegram.sticker = replyTo.sticker.file_id;
     }
 
-  // Unknown format, send error message
+    // Unknown format, send error message
   } else {
     return ctx.replyWithMarkdown(errorMessage);
   }
   try {
-    const { id } = await db.createExpl(expl);
+    const { id } = await db.createExpl(expl);
 
     if (!id) {
       return;
     }
 
-    const message = isExplWithValue || words.length <= 2 ?
-      messages.add.successful(key) :
-      messages.add.successfulWithDisclaimer(key);
+    const message =
+      isExplWithValue || words.length <= 2
+        ? messages.add.successful(key)
+        : messages.add.successfulWithDisclaimer(key);
 
     const keyboard = await reactionsKeyboard(id);
 
@@ -81,5 +83,3 @@ const createExpl = async (ctx: Context) => {
     ctx.reply(msg);
   }
 };
-
-export default createExpl;

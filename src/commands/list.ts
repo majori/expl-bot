@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
@@ -7,7 +6,7 @@ import { inlineSearchKeyboard } from '../utils';
 
 export const MAX_COUNT = 100;
 
-const searchExpls = async (ctx: Context) => {
+export const searchExpls = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.list.invalidSyntax(_.first(words)));
@@ -32,10 +31,9 @@ const searchExpls = async (ctx: Context) => {
     (memo: string[], rows, key) => {
       memo.push(key + (_.size(rows) > 1 ? ` [${_.size(rows)}]` : ''));
       return memo;
-    }, [],
+    },
+    [],
   );
 
   return ctx.reply(_.join(keys, ', '), extraMarkup);
 };
-
-export default searchExpls;

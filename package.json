@@ -10,9 +10,8 @@
     "dev": "nodemon --exec 'ts-node' src/index.ts",
     "mocha": "mocha --exit test/**/*.test.ts",
     "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
-    "lint": "tslint -p tsconfig.json",
     "migrate": "npm i @types/node && TS_TRANSPILE_ONLY=true npx -q -p ts-node knex migrate:latest",
-    "test": "npm run lint && npm run build:test && npm run mocha"
+    "test": "npm run build:test && npm run mocha"
   },
   "repository": {
     "type": "git",
@@ -27,26 +26,25 @@
   "dependencies": {
     "knex": "^0.19.5",
     "lodash": "^4.17.15",
-    "pg": "^7.11.0",
+    "pg": "^7.17.1",
     "string-template": "^1.0.0",
-    "telegraf": "^3.30.1",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.3",
+    "telegraf": "^3.36.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5",
     "winston": "^2.4.4"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.7",
     "@types/knex": "^0.14.26",
-    "@types/chai": "^4.1.7",
-    "@types/lodash": "^4.14.136",
+    "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.13",
+    "@types/node": "^10.17.13",
     "@types/sinon": "^5.0.7",
     "@types/string-template": "^1.0.2",
     "chai": "^4.2.0",
     "dotenv": "^5.0.1",
     "mocha": "^5.2.0",
-    "nodemon": "^1.19.1",
-    "sinon": "^6.3.5",
-    "tslint": "^5.18.0"
+    "nodemon": "^1.19.4",
+    "sinon": "^6.3.5"
   }
 }
