@@ -6,7 +6,6 @@ import { removeExpl } from './remove';
 import { printHelp } from './help';
 import { resolveRexpl } from './resolve';
 import { toggleReaction } from './reaction';
-import { startGame } from './game';
 
 export default {
   add: createExpl,
@@ -18,5 +17,4 @@ export default {
   help: printHelp,
   resolve: resolveRexpl,
   reaction: toggleReaction,
-  game: startGame,
 };

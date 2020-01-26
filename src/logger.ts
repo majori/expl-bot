@@ -4,14 +4,15 @@ import { Logger as Winston, transports, CLILoggingLevel } from 'winston';
 import * as config from './config';
 
 export class Logger extends Winston {
-
   constructor(filePath?: string) {
     super();
 
     this.configure({
       transports: [
         new transports.Console({
-          label: filePath ? path.basename(filePath) : require('../package.json').name,
+          label: filePath
+            ? path.basename(filePath)
+            : require('../package.json').name,
           timestamp: true,
           colorize: true,
         }),

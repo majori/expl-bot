@@ -1,4 +1,3 @@
-
 import * as db from '../database';
 import { Context } from '../types/telegraf';
 import Logger from '../logger';
@@ -10,7 +9,7 @@ export const reactionsKeyboard = async (id: number) => {
   const reactions = ['👍', '👎'];
 
   const amounts = await Promise.all(
-    reactions.map(async reaction => await db.getReactionAmount(id, reaction)),
+    reactions.map(async (reaction) => await db.getReactionAmount(id, reaction)),
   );
 
   const buttons = reactions.map((reaction, i) => ({
@@ -18,15 +17,15 @@ export const reactionsKeyboard = async (id: number) => {
     callback_data: `reaction|${id}|${reaction}`,
   }));
 
-  return { inline_keyboard: [ buttons ] };
+  return { inline_keyboard: [buttons] };
 };
 
 export const toggleReaction = async (ctx: Context) => {
-  if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
+  if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
     return;
   }
 
-  const [ type, id, reaction ] = ctx.callbackQuery.data.split('|');
+  const [type, id, reaction] = ctx.callbackQuery.data.split('|');
 
   try {
     await db.addReaction(ctx.state, +id, reaction);
@@ -55,4 +54,3 @@ export const toggleReaction = async (ctx: Context) => {
     logger.error(err);
   }
 };
-

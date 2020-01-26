@@ -10,9 +10,8 @@
     "dev": "nodemon --exec 'ts-node' src/index.ts",
     "mocha": "mocha --exit test/**/*.test.ts",
     "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
-    "lint": "tslint -p tsconfig.json",
     "migrate": "npm i @types/node && TS_TRANSPILE_ONLY=true npx -q -p ts-node knex migrate:latest",
-    "test": "npm run lint && npm run build:test && npm run mocha"
+    "test": "npm run build:test && npm run mocha"
   },
   "repository": {
     "type": "git",
@@ -46,7 +45,6 @@
     "dotenv": "^5.0.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.19.4",
-    "sinon": "^6.3.5",
-    "tslint": "^5.20.1"
+    "sinon": "^6.3.5"
   }
 }

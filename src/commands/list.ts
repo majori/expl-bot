@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
@@ -32,9 +31,9 @@ export const searchExpls = async (ctx: Context) => {
     (memo: string[], rows, key) => {
       memo.push(key + (_.size(rows) > 1 ? ` [${_.size(rows)}]` : ''));
       return memo;
-    }, [],
+    },
+    [],
   );
 
   return ctx.reply(_.join(keys, ', '), extraMarkup);
 };
-

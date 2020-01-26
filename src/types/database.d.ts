@@ -41,6 +41,6 @@ export namespace Options {
     userId: number;
     key: string;
     message?: string;
-    telegram?: Telegram
+    telegram?: Telegram;
   }
 }

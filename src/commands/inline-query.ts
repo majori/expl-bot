@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import * as db from '../database';
 import * as config from '../config';
@@ -10,11 +9,10 @@ export const RESULT_LIMIT = 15;
 export const handleInlineQuery = async (ctx: Context) => {
   const query = ctx.inlineQuery!.query;
 
-  const expls = await (_.isEmpty(query) ?
-    db.searchRexpls(ctx.state.user) :
-    db.searchExpls(ctx.state.user, query, RESULT_LIMIT, true)
-  );
-  const results = _.map(expls, expl => getInlineResult(expl));
+  const expls = await (_.isEmpty(query)
+    ? db.searchRexpls(ctx.state.user)
+    : db.searchExpls(ctx.state.user, query, RESULT_LIMIT, true));
+  const results = _.map(expls, (expl) => getInlineResult(expl));
 
   return ctx.answerInlineQuery(results as any, {
     switch_pm_text: _.isEmpty(query) ? 'Bot commands' : undefined,
@@ -25,6 +23,8 @@ export const handleInlineQuery = async (ctx: Context) => {
 };
 
 const getInlineResult = (
+  expl: Partial<Table.Expl> & Partial<Table.TgContents>,
+) => {
   const inlineOpt = {
     title: expl.key,
     id: expl.key,
@@ -60,4 +60,3 @@ const getInlineResult = (
     ...inlineOpt,
   };
 };
-

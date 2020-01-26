@@ -7,7 +7,12 @@ import { addEcho } from './database';
 
 const logger = new Logger(__filename);
 
-export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | null, wasRandom: boolean = false) => {
+export const sendExpl = async (
+  ctx: Context,
+  key: string,
+  expl: Table.Expl | null,
+  wasRandom: boolean = false,
+) => {
   if (!expl) {
     return ctx.reply(messages.errors.notFound(key));
   }
@@ -21,7 +26,11 @@ export const sendExpl = async (ctx: Context, key: string, expl: Table.Expl | nul
     const content = expl.tg_content;
     if (content.message_id && content.chat_id) {
       try {
-        const sent = await ctx.telegram.forwardMessage(ctx.state.chat, +content.chat_id, content.message_id);
+        const sent = await ctx.telegram.forwardMessage(
+          ctx.state.chat,
+          +content.chat_id,
+          content.message_id,
+        );
         await addEcho(expl, ctx.state, wasRandom, sent.message_id);
       } catch (err) {
         switch (err.description) {
@@ -57,10 +66,12 @@ export const formatDate = async (date: string) => {
 export const inlineSearchKeyboard = async (searchTerm: string) => ({
   reply_markup: {
     inline_keyboard: [
-      [{
-        text: 'Search with inline query',
-        switch_inline_query_current_chat: searchTerm,
-      }],
+      [
+        {
+          text: 'Search with inline query',
+          switch_inline_query_current_chat: searchTerm,
+        },
+      ],
     ],
   },
 });

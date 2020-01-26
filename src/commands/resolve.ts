@@ -1,4 +1,3 @@
-
 import * as _ from 'lodash';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
@@ -17,8 +16,9 @@ export const resolveRexpl = async (ctx: Context) => {
 
       const keyboard = await reactionsKeyboard(expl.id);
 
-      await ctx.replyWithMarkdown(`${key}, _${date}_`, { reply_markup: keyboard });
+      await ctx.replyWithMarkdown(`${key}, _${date}_`, {
+        reply_markup: keyboard,
+      });
     }
   }
 };
-
