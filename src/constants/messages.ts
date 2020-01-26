@@ -41,7 +41,7 @@ export const get = {
 };
 
 export const resolve = {
-  notExpl: constant('Replied ressage was not an expl'),
+  notExpl: constant('Replied message was not an expl'),
   noReply: constant('Reply to an expl to find out its key'),
 };
 
