@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import * as _ from 'lodash';
 import commands from '../src/commands';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
+import { AMOUNT_OF_OPTIONS } from '../src/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb } from './helper';
@@ -46,17 +47,19 @@ describe('Commands', () => {
           .insert(content)
           .returning('content_id');
 
-        await knex('expls')
-          .insert({
-            key: KEY,
-            tg_content: _.first(contentIds),
-            user_id: USER_ID,
-          });
+        await knex('expls').insert({
+          key: KEY,
+          tg_content: _.first(contentIds),
+          user_id: USER_ID,
+        });
 
         const ctx = message(`/expl ${KEY}`);
         await commands.expl(ctx);
-        expect(ctx.telegram.forwardMessage.args[0])
-          .to.deep.equal([USER_ID, content.chat_id, content.message_id]);
+        expect(ctx.telegram.forwardMessage.args[0]).to.deep.equal([
+          USER_ID,
+          content.chat_id,
+          content.message_id,
+        ]);
       });
 
       it('gets expl with photo');
@@ -70,11 +73,12 @@ describe('Commands', () => {
       const users = [USER_ID, 223456789, 323456789, 423456789];
 
       // Make user to be in the same group
-      await knex('auth')
-        .insert(_.map(users, (user) => ({
+      await knex('auth').insert(
+        _.map(users, (user) => ({
           user_id: user,
           chat_id: -123456789,
-        })));
+        })),
+      );
 
       const expls = _.times(4, (num) => ({
         key: KEY,
@@ -133,11 +137,13 @@ describe('Commands', () => {
   describe('/rexpl', () => {
     it('gets a random expl', async () => {
       const VALUE = 'key';
-      await knex('expls').insert(_.times(20, (i) => ({
-        key: `key_${i}`,
-        value: VALUE,
-        user_id: USER_ID,
-      })));
+      await knex('expls').insert(
+        _.times(20, (i) => ({
+          key: `key_${i}`,
+          value: VALUE,
+          user_id: USER_ID,
+        })),
+      );
 
       const ctx = message('/rexpl');
       await commands.rexpl(ctx);
@@ -157,7 +163,11 @@ describe('Commands', () => {
       const ctx = message('/rexpl', true);
       await commands.rexpl(ctx);
 
-      const ctx2 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      const ctx2 = message(
+        '/resolve',
+        true,
+        ctx.reply.returnValues[0].message_id,
+      );
       await commands.resolve(ctx2);
 
       expect(ctx2.replyWithMarkdown.args[0][0]).to.contain(KEY);
@@ -174,10 +184,17 @@ describe('Commands', () => {
       const ctx = message('/rexpl', true);
       await commands.rexpl(ctx);
 
-      const ctx2 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      const ctx2 = message(
+        '/resolve',
+        true,
+        ctx.reply.returnValues[0].message_id,
+      );
       await commands.resolve(ctx2);
 
-      const keyboard = _.get(ctx2, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+      const keyboard = _.get(
+        ctx2,
+        'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard',
+      );
 
       expect(keyboard[0][0].text).to.contain('0');
 
@@ -188,10 +205,17 @@ describe('Commands', () => {
       const ctx4 = callbackQuery(keyboard[0][1].callback_data);
       await commands.reaction(ctx4);
 
-      const ctx5 = message('/resolve', true, ctx.reply.returnValues[0].message_id);
+      const ctx5 = message(
+        '/resolve',
+        true,
+        ctx.reply.returnValues[0].message_id,
+      );
       await commands.resolve(ctx5);
 
-      const keyboard2 = _.get(ctx5, 'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard');
+      const keyboard2 = _.get(
+        ctx5,
+        'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard',
+      );
 
       expect(keyboard2[0][0].text).to.contain('0'); // because we 'pressed' to first button twice
       expect(keyboard2[0][1].text).to.contain('1'); // ... and the second only once
@@ -290,11 +314,13 @@ describe('Commands', () => {
     it('searches keys with given search term', async () => {
       const COUNT = 3;
 
-      await knex('expls').insert(_.times(COUNT, (i) => ({
-        key: `like_key_${i}`,
-        value: 'value',
-        user_id: USER_ID,
-      })));
+      await knex('expls').insert(
+        _.times(COUNT, (i) => ({
+          key: `like_key_${i}`,
+          value: 'value',
+          user_id: USER_ID,
+        })),
+      );
 
       const ctx1 = message(`/list key`);
       await commands.list(ctx1);
@@ -307,28 +333,31 @@ describe('Commands', () => {
       const ctx3 = message(`/list 1`);
       await commands.list(ctx3);
       expect(_.split(ctx3.reply.args[0][0], ', ')).to.have.length(1);
-
     });
 
     it('shows amount of duplicate keys found', async () => {
       const COUNT = 3;
 
-      await knex('expls').insert(_.times(COUNT, (i) => ({
-        key: `same_key`,
-        value: 'value',
-        user_id: i,
-      })));
-
-      await knex('auth').insert(_.flatten([
+      await knex('expls').insert(
         _.times(COUNT, (i) => ({
+          key: `same_key`,
+          value: 'value',
           user_id: i,
-          chat_id: -1,
         })),
-        {
-          user_id: USER_ID,
-          chat_id: -1,
-        },
-      ]));
+      );
+
+      await knex('auth').insert(
+        _.flatten([
+          _.times(COUNT, (i) => ({
+            user_id: i,
+            chat_id: -1,
+          })),
+          {
+            user_id: USER_ID,
+            chat_id: -1,
+          },
+        ]),
+      );
 
       const ctx = message(`/list key`);
       await commands.list(ctx);
@@ -347,15 +376,86 @@ describe('Commands', () => {
       const COUNT = MAX_LIST_COUNT + 10;
       const KEY = 'key';
 
-      await knex('expls').insert(_.times(COUNT, (i) => ({
-        key: `like_${KEY}_${i}`,
-        value: 'value',
-        user_id: USER_ID,
-      })));
+      await knex('expls').insert(
+        _.times(COUNT, (i) => ({
+          key: `like_${KEY}_${i}`,
+          value: 'value',
+          user_id: USER_ID,
+        })),
+      );
 
       const ctx = message(`/list ${KEY}`);
       await commands.list(ctx);
       expect(ctx.reply.args[0][0]).to.equal(messages.list.tooMany(KEY));
+    });
+  });
+
+  describe('/quiz', async () => {
+    it('can start a quiz with rexpl', async () => {
+      await knex('expls').insert(
+        _.times(10, (i) => ({
+          key: `expl_${i}`,
+          value: 'value',
+          user_id: USER_ID,
+        })),
+      );
+
+      const ctx = message('/quiz');
+      await commands.quiz(ctx);
+
+      expect(ctx.reply.callCount).to.equal(1);
+      expect(ctx.reply.args[0][0]).to.equal('value');
+
+      expect(ctx.replyWithQuiz.called).to.be.true;
+
+      const args = ctx.replyWithQuiz.args[0];
+      expect(args[0]).to.not.be.empty;
+      expect(args[1]).to.have.length(AMOUNT_OF_OPTIONS);
+      expect(args[2].correct_option_id).to.be.gte(0);
+      expect(args[2].correct_option_id).to.be.lt(AMOUNT_OF_OPTIONS);
+    });
+
+    it('can start a quiz even if there is only few expls available', async () => {
+      await knex('expls').insert(
+        _.times(AMOUNT_OF_OPTIONS - 1, (i) => ({
+          key: `expl_${i}`,
+          value: 'value',
+          user_id: USER_ID,
+        })),
+      );
+
+      const ctx = message('/quiz');
+      await commands.quiz(ctx);
+
+      expect(ctx.replyWithQuiz.called).to.be.true;
+
+      const args = ctx.replyWithQuiz.args[0];
+      expect(args[0]).to.not.be.empty;
+      expect(args[1]).to.have.length(AMOUNT_OF_OPTIONS - 1);
+    });
+
+    it('print error if there is too few expls available', async () => {
+      await knex('expls').insert({
+        key: `expl`,
+        value: 'value',
+        user_id: USER_ID,
+      });
+
+      const ctx = message('/quiz');
+      await commands.quiz(ctx);
+
+      expect(ctx.replyWithQuiz.called).not.to.be.true;
+      expect(ctx.reply.lastCall.args[0]).to.equal(
+        messages.quiz.notEnoughOptions(),
+      );
+    });
+
+    it('print error if there is no expls available', async () => {
+      const ctx = message('/quiz');
+      await commands.quiz(ctx);
+
+      expect(ctx.replyWithQuiz.called).not.to.be.true;
+      expect(ctx.reply.lastCall.args[0]).to.equal(messages.get.noExpls());
     });
   });
 });

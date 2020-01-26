@@ -4,7 +4,7 @@ import { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 import { sendExpl } from '../utils';
 
-const AMOUNT_OF_OPTIONS = 4;
+export const AMOUNT_OF_OPTIONS = 4;
 
 export const startQuiz = async (ctx: Context) => {
   const wasReply = Boolean(ctx.message!.reply_to_message);

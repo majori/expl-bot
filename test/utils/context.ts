@@ -8,6 +8,7 @@ const baseContext = (state?: any) => {
       message_id: 1235,
     }),
     replyWithMarkdown: sinon.fake(),
+    replyWithQuiz: sinon.fake(),
     answerInlineQuery: sinon.fake(),
     answerCbQuery: sinon.fake(),
     editMessageReplyMarkup: sinon.fake(),
@@ -29,19 +30,23 @@ const user = {
   username: 'testuser',
 };
 
-export const message = (msg: string, fromGroup?: boolean, replyTo?: number): any => {
-  const chat = fromGroup ?
-    {
-      id: GROUP_ID,
-      title: 'expl-bot dev group',
-      type: 'supergroup',
-    } :
-    {
-      id: USER_ID,
-      first_name: 'Test',
-      last_name: 'User',
-      username: 'testuser',
-    };
+export const message = (
+  msg: string,
+  fromGroup?: boolean,
+  replyTo?: number,
+): any => {
+  const chat = fromGroup
+    ? {
+        id: GROUP_ID,
+        title: 'expl-bot dev group',
+        type: 'supergroup',
+      }
+    : {
+        id: USER_ID,
+        first_name: 'Test',
+        last_name: 'User',
+        username: 'testuser',
+      };
 
   return {
     ...baseContext({
