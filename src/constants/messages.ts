@@ -67,3 +67,9 @@ export const reaction = {
   removed: template('Removed your previous "{0}"'),
   creatorHasRemoved: constant('Expl creator has removed this expl'),
 };
+
+export const quiz = {
+  notEnoughOptions: constant(
+    'There needs to be atleast one more expls to create a quiz',
+  ),
+};

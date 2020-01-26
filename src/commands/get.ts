@@ -21,7 +21,7 @@ export const getExpl = async (ctx: Context) => {
 };
 
 export const getRandomExpl = async (ctx: Context) => {
-  const foundExpl = await db.getRandomExpl(ctx.state.user);
+  const foundExpl = _.first(await db.getRandomExpls(ctx.state.user));
 
   if (!foundExpl) {
     return ctx.reply(messages.get.noExpls());
