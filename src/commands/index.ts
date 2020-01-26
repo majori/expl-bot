@@ -6,6 +6,7 @@ import { removeExpl } from './remove';
 import { printHelp } from './help';
 import { resolveRexpl } from './resolve';
 import { toggleReaction } from './reaction';
+import { startQuiz } from './quiz';
 
 export default {
   add: createExpl,
@@ -17,4 +18,5 @@ export default {
   help: printHelp,
   resolve: resolveRexpl,
   reaction: toggleReaction,
+  quiz: startQuiz,
 };
