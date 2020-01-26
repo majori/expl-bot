@@ -58,6 +58,8 @@ export const help = constant(`
   - Removes your own expl with the given key
 /list or !ls \`[search term]\`
   - Get expls which key is like given search term
+/quiz or !q
+  - Guess which one of the keys belongs to the given expl.
 /help or !h
   - Prints this info
 `);
