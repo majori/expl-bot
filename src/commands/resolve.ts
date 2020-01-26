@@ -5,7 +5,7 @@ import { Context } from '../types/telegraf';
 import { escapeMarkdown, formatDate } from '../utils';
 import { reactionsKeyboard } from './reaction';
 
-const resolveRexpl = async (ctx: Context) => {
+export const resolveRexpl = async (ctx: Context) => {
   if (ctx.message!.reply_to_message) {
     const echo = ctx.message!.reply_to_message.message_id;
 
@@ -22,4 +22,3 @@ const resolveRexpl = async (ctx: Context) => {
   }
 };
 
-export default resolveRexpl;

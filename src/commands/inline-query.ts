@@ -7,7 +7,7 @@ import { Table } from '../types/database';
 
 export const RESULT_LIMIT = 15;
 
-const handleInlineQuery = async (ctx: Context) => {
+export const handleInlineQuery = async (ctx: Context) => {
   const query = ctx.inlineQuery!.query;
 
   const expls = await (_.isEmpty(query) ?
@@ -24,7 +24,7 @@ const handleInlineQuery = async (ctx: Context) => {
   });
 };
 
-const getInlineResult = (expl: Partial<Table.Expl> & Partial<Table.TgContents>) => {
+const getInlineResult = (
   const inlineOpt = {
     title: expl.key,
     id: expl.key,
@@ -61,4 +61,3 @@ const getInlineResult = (expl: Partial<Table.Expl> & Partial<Table.TgContents>) 
   };
 };
 
-export default handleInlineQuery;

@@ -7,7 +7,7 @@ import { inlineSearchKeyboard } from '../utils';
 
 export const MAX_COUNT = 100;
 
-const searchExpls = async (ctx: Context) => {
+export const searchExpls = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.list.invalidSyntax(_.first(words)));
@@ -38,4 +38,3 @@ const searchExpls = async (ctx: Context) => {
   return ctx.reply(_.join(keys, ', '), extraMarkup);
 };
 
-export default searchExpls;

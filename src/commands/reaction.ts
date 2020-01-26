@@ -21,7 +21,7 @@ export const reactionsKeyboard = async (id: number) => {
   return { inline_keyboard: [ buttons ] };
 };
 
-const toggleReaction = async (ctx: Context) => {
+export const toggleReaction = async (ctx: Context) => {
   if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
     return;
   }
@@ -56,4 +56,3 @@ const toggleReaction = async (ctx: Context) => {
   }
 };
 
-export default toggleReaction;

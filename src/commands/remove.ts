@@ -4,7 +4,7 @@ import * as db from '../database';
 import { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 
-const removeExpl = async (ctx: Context) => {
+export const removeExpl = async (ctx: Context) => {
   const words = ctx.message!.text!.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
@@ -18,4 +18,3 @@ const removeExpl = async (ctx: Context) => {
     ctx.reply(messages.errors.notFound(key));
 };
 
-export default removeExpl;
