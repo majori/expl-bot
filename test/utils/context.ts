@@ -8,7 +8,11 @@ const baseContext = (state?: any) => {
       message_id: 1235,
     }),
     replyWithMarkdown: sinon.fake(),
-    replyWithQuiz: sinon.fake(),
+    replyWithQuiz: sinon.fake.returns({
+      poll: {
+        id: '1234',
+      },
+    }),
     answerInlineQuery: sinon.fake(),
     answerCbQuery: sinon.fake(),
     editMessageReplyMarkup: sinon.fake(),
@@ -49,10 +53,9 @@ export const message = (
       };
 
   return {
-    ...baseContext({
-      user: USER_ID,
-      chat: chat.id,
-    }),
+    ...baseContext(),
+    from: { id: USER_ID },
+    chat: { id: chat.id },
     message: {
       message_id: 1234,
       from: user,
@@ -66,23 +69,22 @@ export const message = (
 
 export const inlineQuery = (query?: string): any => {
   return {
+    ...baseContext(),
     inlineQuery: {
       id: 'INLINE_QUERY_ID',
       from: user,
       query,
       offset: '',
     },
-    ...baseContext({
-      user: USER_ID,
-    }),
+    from: { id: USER_ID },
   };
 };
 
 export const callbackQuery = (data: string): any => {
   return {
+    ...baseContext(),
     callbackQuery: { data },
-    ...baseContext({
-      user: USER_ID,
-    }),
+    from: { id: USER_ID },
+    chat: { id: GROUP_ID },
   };
 };

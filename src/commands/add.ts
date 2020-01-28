@@ -20,7 +20,7 @@ export const createExpl = async (ctx: Context) => {
 
   const key = words[1];
   const expl: Options.Expl = {
-    userId: ctx.state.user,
+    userId: ctx.from!.id,
     key,
   };
 

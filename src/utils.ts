@@ -19,7 +19,12 @@ export const sendExpl = async (
 
   if (expl.value) {
     const sent = await ctx.reply(expl.value);
-    await addEcho(expl, ctx.state, wasRandom, sent.message_id);
+    await addEcho(
+      expl,
+      { user: ctx.from!.id, chat: ctx.chat!.id },
+      wasRandom,
+      sent.message_id,
+    );
     return sent;
   }
 
@@ -28,11 +33,16 @@ export const sendExpl = async (
     if (content.message_id && content.chat_id) {
       try {
         const sent = await ctx.telegram.forwardMessage(
-          ctx.state.chat,
+          ctx.chat!.id,
           +content.chat_id,
           content.message_id,
         );
-        await addEcho(expl, ctx.state, wasRandom, sent.message_id);
+        await addEcho(
+          expl,
+          { user: ctx.from!.id, chat: ctx.chat!.id },
+          wasRandom,
+          sent.message_id,
+        );
         return sent;
       } catch (err) {
         switch (err.description) {

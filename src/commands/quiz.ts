@@ -10,8 +10,11 @@ export const startQuiz = async (ctx: Context) => {
   const wasReply = Boolean(ctx.message!.reply_to_message);
 
   const correctExpl = wasReply
-    ? await db.getResolve(ctx.state, ctx.message!.reply_to_message!.message_id)
-    : _.first(await db.getRandomExpls(ctx.state.user));
+    ? await db.getResolve(
+        { user: ctx.from!.id, chat: ctx.chat!.id },
+        ctx.message!.reply_to_message!.message_id,
+      )
+    : _.first(await db.getRandomExpls(ctx.from!.id));
 
   if (!correctExpl) {
     return ctx.reply(
@@ -29,7 +32,7 @@ export const startQuiz = async (ctx: Context) => {
 
   const wrongExpls = _.map(
     await db.getRandomExpls(
-      ctx.state.user,
+      ctx.from!.id,
       AMOUNT_OF_OPTIONS - 1,
       correctExpl.key,
     ),
@@ -58,7 +61,7 @@ export const startQuiz = async (ctx: Context) => {
 
   await db.knex('quizzes').insert({
     id: quiz.poll.id,
-    creator_user_id: ctx.state.user,
+    creator_user_id: ctx.from!.id,
     correct_expl_id: correctExpl.id,
     correct_option_index: correctOptionId,
     chat_id: ctx.chat?.id,

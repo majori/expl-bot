@@ -10,7 +10,7 @@ export const removeExpl = async (ctx: Context) => {
     return ctx.replyWithMarkdown(messages.remove.invalidSyntax(_.first(words)));
   }
   const key = _.toLower(words[1]);
-  const count = await db.deleteExpl(ctx.state.user, key);
+  const count = await db.deleteExpl(ctx.from!.id, key);
 
   return count > 0
     ? ctx.reply(messages.remove.successful(key))

@@ -3,6 +3,7 @@ import { Telegraf } from 'telegraf';
 import * as session from 'telegraf/session';
 import { Context } from './types/telegraf';
 import commands from './commands';
+import handlers from './handlers';
 import * as db from './database';
 
 export default async (bot: Telegraf<Context>) => {
@@ -11,11 +12,6 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.use(session());
   bot.use(async (ctx, next) => {
-    ctx.state = {
-      user: _.get(ctx, 'from.id'),
-      chat: _.get(ctx, 'chat.id'),
-    };
-
     // Autojoin user to the group if not joined already
     if (
       ctx.from &&
@@ -23,7 +19,7 @@ export default async (bot: Telegraf<Context>) => {
       ctx.chat.type !== 'private' &&
       !ctx.session.joined
     ) {
-      await db.addUserToChat(ctx.state.user, ctx.state.chat);
+      await db.addUserToChat(ctx.from!.id, ctx.chat!.id);
       ctx.session.joined = true;
     }
 
@@ -55,7 +51,7 @@ export default async (bot: Telegraf<Context>) => {
   bot.command('/quiz', commands.quiz);
   bot.hears(/^(\!qz).*$/, commands.quiz);
 
-  bot.on('inline_query', commands.inlineQuery);
+  bot.on('inline_query', handlers.inlineQuery);
 
   bot.action(/^reaction/, commands.reaction);
 

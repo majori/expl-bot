@@ -314,14 +314,14 @@ export const addReaction = async (
 };
 
 export const deleteReaction = async (
-  from: { chat: number; user: number },
+  user: number,
   id: number,
   reaction: string,
 ) => {
   try {
     await knex('reactions')
       .where({
-        user_id: from.user,
+        user_id: user,
         expl_id: id,
         reaction,
       })

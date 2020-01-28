@@ -13,7 +13,7 @@ export const searchExpls = async (ctx: Context) => {
   }
 
   const searchTerm = words[1];
-  const result = await db.searchExpls(ctx.state.user, searchTerm);
+  const result = await db.searchExpls(ctx.from!.id, searchTerm);
 
   const extraMarkup = await inlineSearchKeyboard(searchTerm);
 

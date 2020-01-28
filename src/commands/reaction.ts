@@ -28,12 +28,16 @@ export const toggleReaction = async (ctx: Context) => {
   const [type, id, reaction] = ctx.callbackQuery.data.split('|');
 
   try {
-    await db.addReaction(ctx.state, +id, reaction);
+    await db.addReaction(
+      { user: ctx.from!.id, chat: ctx.chat!.id },
+      +id,
+      reaction,
+    );
     ctx.answerCbQuery(messages.reaction.added(reaction));
   } catch (err) {
     switch (err.message) {
       case 'already_exists':
-        await db.deleteReaction(ctx.state, +id, reaction);
+        await db.deleteReaction(ctx.from!.id, +id, reaction);
         ctx.answerCbQuery(messages.reaction.removed(reaction));
         break;
 
@@ -42,7 +46,7 @@ export const toggleReaction = async (ctx: Context) => {
         return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
 
       default:
-        return;
+        throw err;
     }
   }
 
