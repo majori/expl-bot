@@ -1,6 +1,5 @@
 import { createExpl } from './add';
 import { getExpl, getRandomExpl } from './get';
-import { handleInlineQuery } from './inline-query';
 import { searchExpls } from './list';
 import { removeExpl } from './remove';
 import { printHelp } from './help';
@@ -14,7 +13,6 @@ export default {
   rexpl: getRandomExpl,
   list: searchExpls,
   remove: removeExpl,
-  inlineQuery: handleInlineQuery,
   help: printHelp,
   resolve: resolveRexpl,
   reaction: toggleReaction,

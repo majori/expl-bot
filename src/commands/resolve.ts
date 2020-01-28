@@ -11,7 +11,10 @@ export const resolveRexpl = async (ctx: Context) => {
   }
 
   const echo = ctx.message!.reply_to_message.message_id;
-  const expl = await db.getResolve(ctx.state, echo);
+  const expl = await db.getResolve(
+    { user: ctx.from!.id, chat: ctx.chat!.id },
+    echo,
+  );
 
   if (!expl) {
     return ctx.reply(messages.resolve.notExpl());

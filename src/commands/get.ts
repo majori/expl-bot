@@ -16,12 +16,12 @@ export const getExpl = async (ctx: Context) => {
       .toNumber()
       .value() || 0;
 
-  const foundExpl = await db.getExpl(ctx.state.user, words[1], offset);
+  const foundExpl = await db.getExpl(ctx.from!.id, words[1], offset);
   await sendExpl(ctx, words[1], foundExpl);
 };
 
 export const getRandomExpl = async (ctx: Context) => {
-  const foundExpl = _.first(await db.getRandomExpls(ctx.state.user));
+  const foundExpl = _.first(await db.getRandomExpls(ctx.from!.id));
 
   if (!foundExpl) {
     return ctx.reply(messages.get.noExpls());

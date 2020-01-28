@@ -1,17 +1,20 @@
 import * as _ from 'lodash';
+import * as messages from '../constants/messages';
 import * as db from '../database';
 import { Context } from '../types/telegraf';
-import * as messages from '../constants/messages';
 import { sendExpl } from '../utils';
 
-const AMOUNT_OF_OPTIONS = 4;
+export const AMOUNT_OF_OPTIONS = 4;
 
 export const startQuiz = async (ctx: Context) => {
   const wasReply = Boolean(ctx.message!.reply_to_message);
 
   const correctExpl = wasReply
-    ? await db.getResolve(ctx.state, ctx.message!.reply_to_message!.message_id)
-    : _.first(await db.getRandomExpls(ctx.state.user));
+    ? await db.getResolve(
+        { user: ctx.from!.id, chat: ctx.chat!.id },
+        ctx.message!.reply_to_message!.message_id,
+      )
+    : _.first(await db.getRandomExpls(ctx.from!.id));
 
   if (!correctExpl) {
     return ctx.reply(
@@ -29,7 +32,7 @@ export const startQuiz = async (ctx: Context) => {
 
   const wrongExpls = _.map(
     await db.getRandomExpls(
-      ctx.state.user,
+      ctx.from!.id,
       AMOUNT_OF_OPTIONS - 1,
       correctExpl.key,
     ),
@@ -46,9 +49,21 @@ export const startQuiz = async (ctx: Context) => {
     (option) => option === correctExpl.key,
   );
 
-  await (ctx as any).replyWithQuiz('Which one is the correct key?', options, {
-    correct_option_id: correctOptionId,
-    reply_to_message_id: replyTo,
-    is_anonymous: false,
+  const quiz = await (ctx as any).replyWithQuiz(
+    'Which one is the correct key?',
+    options,
+    {
+      correct_option_id: correctOptionId,
+      reply_to_message_id: replyTo,
+      is_anonymous: false,
+    },
+  );
+
+  await db.knex('quizzes').insert({
+    id: quiz.poll.id,
+    creator_user_id: ctx.from!.id,
+    correct_expl_id: correctExpl.id,
+    correct_option_index: correctOptionId,
+    chat_id: ctx.chat?.id,
   });
 };

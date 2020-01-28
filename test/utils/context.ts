@@ -8,6 +8,11 @@ const baseContext = (state?: any) => {
       message_id: 1235,
     }),
     replyWithMarkdown: sinon.fake(),
+    replyWithQuiz: sinon.fake.returns({
+      poll: {
+        id: '1234',
+      },
+    }),
     answerInlineQuery: sinon.fake(),
     answerCbQuery: sinon.fake(),
     editMessageReplyMarkup: sinon.fake(),
@@ -29,25 +34,28 @@ const user = {
   username: 'testuser',
 };
 
-export const message = (msg: string, fromGroup?: boolean, replyTo?: number): any => {
-  const chat = fromGroup ?
-    {
-      id: GROUP_ID,
-      title: 'expl-bot dev group',
-      type: 'supergroup',
-    } :
-    {
-      id: USER_ID,
-      first_name: 'Test',
-      last_name: 'User',
-      username: 'testuser',
-    };
+export const message = (
+  msg: string,
+  fromGroup?: boolean,
+  replyTo?: number,
+): any => {
+  const chat = fromGroup
+    ? {
+        id: GROUP_ID,
+        title: 'expl-bot dev group',
+        type: 'supergroup',
+      }
+    : {
+        id: USER_ID,
+        first_name: 'Test',
+        last_name: 'User',
+        username: 'testuser',
+      };
 
   return {
-    ...baseContext({
-      user: USER_ID,
-      chat: chat.id,
-    }),
+    ...baseContext(),
+    from: { id: USER_ID },
+    chat: { id: chat.id },
     message: {
       message_id: 1234,
       from: user,
@@ -61,23 +69,22 @@ export const message = (msg: string, fromGroup?: boolean, replyTo?: number): any
 
 export const inlineQuery = (query?: string): any => {
   return {
+    ...baseContext(),
     inlineQuery: {
       id: 'INLINE_QUERY_ID',
       from: user,
       query,
       offset: '',
     },
-    ...baseContext({
-      user: USER_ID,
-    }),
+    from: { id: USER_ID },
   };
 };
 
 export const callbackQuery = (data: string): any => {
   return {
+    ...baseContext(),
     callbackQuery: { data },
-    ...baseContext({
-      user: USER_ID,
-    }),
+    from: { id: USER_ID },
+    chat: { id: GROUP_ID },
   };
 };
