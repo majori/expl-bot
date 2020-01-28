@@ -21,11 +21,12 @@ export const up = async (knex: Knex) => {
       .inTable('quizzes')
       .onDelete('CASCADE');
     t.integer('user_id');
+    t.boolean('was_correct');
     t.timestamp('created_at').defaultTo(knex.fn.now());
   });
 };
 
 export const down = async (knex: Knex) => {
-  await knex.schema.dropTable('quizzes');
   await knex.schema.dropTable('quiz_answers');
+  await knex.schema.dropTable('quizzes');
 };
