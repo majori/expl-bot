@@ -6,10 +6,11 @@ import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
 import { AMOUNT_OF_OPTIONS } from '../src/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
-import { knex, clearDb } from './helper';
+import { knex, clearDb, migrateAllDown } from './helper';
 
 describe('Commands', () => {
   beforeEach(clearDb);
+  after(migrateAllDown);
 
   describe('/expl', () => {
     it('respond with error if expl not found', async () => {
