@@ -10,7 +10,7 @@
     "dev": "nodemon --exec 'ts-node' src/index.ts",
     "mocha": "mocha --exit test/**/*.test.ts",
     "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
-    "migrate": "npm i @types/node && TS_TRANSPILE_ONLY=true npx -q -p ts-node knex migrate:latest",
+    "migrate": "npx knex --cwd build migrate:latest",
     "test": "npm run build:test && npm run mocha"
   },
   "repository": {

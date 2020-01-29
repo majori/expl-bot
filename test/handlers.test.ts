@@ -4,10 +4,11 @@ import * as _ from 'lodash';
 import { handleInlineQuery } from '../src/handlers/inline-query';
 import { RESULT_LIMIT } from '../src/handlers/inline-query';
 import { inlineQuery, USER_ID } from './utils/context';
-import { knex, clearDb } from './helper';
+import { knex, clearDb, migrateAllDown } from './helper';
 
 describe('Inline query', () => {
   beforeEach(clearDb);
+  after(migrateAllDown);
 
   it('suggests rexpls if query is empty', async () => {
     const EXPL_COUNT = 10;

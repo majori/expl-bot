@@ -25,12 +25,12 @@ export async function createTestableBot() {
 export async function migrateAllDown(): Promise<void> {
   const version = await knex.migrate.currentVersion();
   if (version !== 'none') {
-    await knex.migrate.rollback();
+    await knex.migrate.rollback({ directory: './src/migrations' });
     return migrateAllDown();
   }
 }
 
 export const clearDb = async () => {
   await migrateAllDown();
-  await knex.migrate.latest();
+  await knex.migrate.latest({ directory: './src/migrations' });
 };
