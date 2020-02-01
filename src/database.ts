@@ -272,7 +272,7 @@ export const getResolve = async (
   });
 
   if (_.isEmpty(results)) {
-    return null;
+    return;
   }
   return createNestedExpl(_.first(results)!);
 };
