@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as _ from 'lodash';
 import commands from '../src/commands';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
-import { AMOUNT_OF_OPTIONS } from '../src/commands/quiz';
+import { AMOUNT_OF_EXPL_OPTIONS } from '../src/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
@@ -392,6 +392,8 @@ describe('Commands', () => {
   });
 
   describe('/quiz', async () => {
+    const TOTAL_AMOUNT_OF_OPTIONS = AMOUNT_OF_EXPL_OPTIONS + 1; // Amount of expl options + "none of the above"
+
     it('can start a quiz with rexpl', async () => {
       await knex('expls').insert(
         _.times(10, (i) => ({
@@ -411,14 +413,14 @@ describe('Commands', () => {
 
       const args = ctx.replyWithQuiz.args[0];
       expect(args[0]).to.not.be.empty;
-      expect(args[1]).to.have.length(AMOUNT_OF_OPTIONS);
+      expect(args[1]).to.have.length(TOTAL_AMOUNT_OF_OPTIONS);
       expect(args[2].correct_option_id).to.be.gte(0);
-      expect(args[2].correct_option_id).to.be.lt(AMOUNT_OF_OPTIONS);
+      expect(args[2].correct_option_id).to.be.lt(TOTAL_AMOUNT_OF_OPTIONS);
     });
 
     it('can start a quiz even if there is only few expls available', async () => {
       await knex('expls').insert(
-        _.times(AMOUNT_OF_OPTIONS - 1, (i) => ({
+        _.times(AMOUNT_OF_EXPL_OPTIONS - 1, (i) => ({
           key: `expl_${i}`,
           value: 'value',
           user_id: USER_ID,
@@ -432,7 +434,7 @@ describe('Commands', () => {
 
       const args = ctx.replyWithQuiz.args[0];
       expect(args[0]).to.not.be.empty;
-      expect(args[1]).to.have.length(AMOUNT_OF_OPTIONS - 1);
+      expect(args[1]).to.have.length(TOTAL_AMOUNT_OF_OPTIONS - 1);
     });
 
     it('print error if there is too few expls available', async () => {
