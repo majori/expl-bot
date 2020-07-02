@@ -19,7 +19,13 @@ export const logging = {
 export const db = {
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: process.env.PG_CONNECTION_STRING || {
+      host: process.env.PG_HOST,
+      port: parseInt(process.env.PG_PORT || '5432', 10),
+      database: process.env.PG_DATABASE,
+      user: process.env.PG_USER,
+      password: process.env.PG_PASSWORD,
+    },
     pool: {
       min: 2,
       max: 10,
@@ -28,7 +34,7 @@ export const db = {
 
   development: {
     client: 'pg',
-    connection: process.env.DATABASE_URL || {
+    connection: process.env.PG_CONNECTION_STRING || {
       host: 'localhost',
       port: 6001,
       database: 'postgres',
@@ -43,7 +49,7 @@ export const db = {
 
   test: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: process.env.PG_CONNECTION_STRING,
     pool: {
       min: 2,
       max: 10,
