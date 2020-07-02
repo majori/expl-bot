@@ -157,11 +157,6 @@ export const addUserToChat = async (user: number, chat: number) => {
 export const deleteExpl = async (user: number, key: string) => {
   const query = knex('expls').where({ user_id: user, key });
 
-  // HACK: We can't show all expls because of BorisBot migration
-  if (!config.isBorisBot) {
-    query.andWhere('expls.created_at', '>', '2018-06-04');
-  }
-
   const count: number = await query.del();
 
   if (count > 0) {
@@ -212,11 +207,6 @@ const getExplsForUser = (user: number) => {
           });
       }).orWhere('user_id', user);
     });
-
-  if (!config.isBorisBot) {
-    // HACK: We can't show all expls because of BorisBot migration
-    query.andWhere('expls.created_at', '>', '2018-06-04');
-  }
 
   return query;
 };

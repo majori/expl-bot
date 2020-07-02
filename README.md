@@ -3,7 +3,8 @@
 [![Build Status](https://travis-ci.org/majori/expl-bot.svg?branch=development)](https://travis-ci.org/majori/expl-bot)
 
 # Development
-- Install [node.js](https://nodejs.org/en/) v8.* and [Docker](https://www.docker.com/community-edition)
+
+- Install [node.js](https://nodejs.org/en/) v12.\* and [Docker](https://www.docker.com/community-edition)
 - Run `npm install`
 - Create local database with `docker-compose up -d`
 - Copy contents of `.env-sample` to new file called `.env`
@@ -21,7 +22,7 @@ docker run \
   --name expl-bot \
   -e "NODE_ENV=production" \
   -e "LOG_LEVEL=info" \
-  -e "DATABASE_URL=$DATABASE_URL" \
+  -e "PG_CONNECTION_STRING=$PG_CONNECTION_STRING" \
   -e "WEBHOOK_DOMAIN=$WEBHOOK_DOMAIN" \
   -e "TELEGRAM_TOKEN=$TELEGRAM_TOKEN" \
   -p 6000:6000 \
