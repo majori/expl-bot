@@ -6,8 +6,6 @@ export const env = {
   test: process.env.NODE_ENV === 'test',
 };
 
-export const isBorisBot = Boolean(process.env.IS_BORISBOT);
-
 export const tg = {
   token: process.env.TELEGRAM_TOKEN,
   webhook: process.env.WEBHOOK_DOMAIN,
