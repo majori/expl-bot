@@ -10,7 +10,7 @@
 - Copy contents of `.env-sample` to new file called `.env`
 - Create your bot with [Botfather](https://telegram.me/botfather) and insert the token to `.env` file
 - Source environment variables file with `source .env`
-- Initialize database with `npm run migrate`
+- Initialize database with `npm run migrate:dev`
 - Run `npm run dev` to start the bot
 
 # Production (Docker)
