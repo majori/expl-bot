@@ -10,11 +10,7 @@ export const getExpl = async (ctx: Context) => {
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.get.invalidSyntax(_.first(words)));
   }
-  const offset =
-    _.chain(words)
-      .get(2, 0)
-      .toNumber()
-      .value() || 0;
+  const offset = _.chain(words).get(2, 0).toNumber().value() || 0;
 
   const foundExpl = await db.getExpl(ctx.from!.id, words[1], offset);
   await sendExpl(ctx, words[1], foundExpl);

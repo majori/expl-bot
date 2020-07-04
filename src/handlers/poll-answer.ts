@@ -4,10 +4,7 @@ import { Context } from '../types/telegraf';
 export const handlePollAnswer = async (ctx: Context) => {
   const answer = (ctx.update as any).poll_answer;
 
-  const quiz = await db
-    .knex('quizzes')
-    .where({ id: answer.poll_id })
-    .first();
+  const quiz = await db.knex('quizzes').where({ id: answer.poll_id }).first();
 
   if (!quiz) {
     return;

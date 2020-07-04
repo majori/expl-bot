@@ -12,7 +12,8 @@ export const down = async (knex: Knex) => {
     t.integer('echo_count')
       .defaultTo(0)
       .comment('How many times this expl has been requested');
-    t.timestamp('last_echo')
-      .comment('Last time this expl was echoed somewhere');
+    t.timestamp('last_echo').comment(
+      'Last time this expl was echoed somewhere',
+    );
   });
 };

@@ -28,9 +28,7 @@ export const createExpl = async (ctx: Context) => {
 
   // Expl value is normal text
   if (isExplWithValue) {
-    expl.message = _(words)
-      .drop(2)
-      .join(' ');
+    expl.message = _(words).drop(2).join(' ');
 
     // Expl value is reply to other message
   } else if (ctx.message!.reply_to_message) {

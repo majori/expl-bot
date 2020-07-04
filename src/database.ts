@@ -84,9 +84,7 @@ export const getRandomExpls = async (
   amount: number = 1,
   keyFilter?: string,
 ) => {
-  const results = getExplsForUser(user)
-    .orderByRaw('RANDOM()')
-    .limit(amount);
+  const results = getExplsForUser(user).orderByRaw('RANDOM()').limit(amount);
 
   if (keyFilter) {
     results.whereNot({ key: keyFilter });
@@ -196,14 +194,12 @@ const getExplsForUser = (user: number) => {
   const query = knex
     .from('expls')
     .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
-    .where(function() {
-      this.whereIn('user_id', function() {
+    .where(function () {
+      this.whereIn('user_id', function () {
         this.from('auth')
           .select('user_id')
-          .whereIn('chat_id', function() {
-            this.from('auth')
-              .select('chat_id')
-              .where({ user_id: user });
+          .whereIn('chat_id', function () {
+            this.from('auth').select('chat_id').where({ user_id: user });
           });
       }).orWhere('user_id', user);
     });
@@ -252,8 +248,8 @@ export const getResolve = async (
 ) => {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
     from.user,
-  ).where(function() {
-    this.whereIn('id', function() {
+  ).where(function () {
+    this.whereIn('id', function () {
       this.from('echo_history')
         .select('expl_id')
         .where('echo_message_id', echo)
@@ -268,9 +264,7 @@ export const getResolve = async (
 };
 
 export const getReactionAmount = async (id: number, reaction: string) => {
-  const query = knex('reactions')
-    .count()
-    .where({ expl_id: id, reaction });
+  const query = knex('reactions').count().where({ expl_id: id, reaction });
   const count: number = +_.get(await query, [0, 'count'], 0);
 
   return count;

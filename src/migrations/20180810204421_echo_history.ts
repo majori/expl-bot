@@ -10,9 +10,7 @@ export const up = async (knex: Knex) => {
       .onDelete('CASCADE');
     t.integer('user_id');
     t.bigInteger('chat_id');
-    t.timestamp('echoed_at')
-      .defaultTo(knex.fn.now())
-      .nullable();
+    t.timestamp('echoed_at').defaultTo(knex.fn.now()).nullable();
   });
 };
 
