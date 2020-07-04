@@ -23,8 +23,8 @@ docker run \
   -e "NODE_ENV=production" \
   -e "LOG_LEVEL=info" \
   -e "PG_CONNECTION_STRING=$PG_CONNECTION_STRING" \
-  -e "WEBHOOK_DOMAIN=$WEBHOOK_DOMAIN" \
-  -e "TELEGRAM_TOKEN=$TELEGRAM_TOKEN" \
+  -e "TG_WEBHOOK=$TG_WEBHOOK" \
+  -e "TG_TOKEN=$TG_TOKEN" \
   -p 6000:6000 \
   -d \
   majori/expl-bot

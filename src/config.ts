@@ -7,8 +7,8 @@ export const env = {
 };
 
 export const tg = {
-  token: process.env.TELEGRAM_TOKEN,
-  webhook: process.env.WEBHOOK_DOMAIN,
+  token: process.env.TG_TOKEN,
+  webhook: process.env.TG_WEBHOOK,
   port: process.env.PORT ? parseInt(process.env.PORT, 10) : 6000,
 };
 
