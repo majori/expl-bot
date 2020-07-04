@@ -13,10 +13,12 @@
 - Initialize database with `npm run migrate`
 - Run `npm run dev` to start the bot
 
-# Production
+# Production (Docker)
+
 - Use existing PostgreSQL database or create one with `docker run --name postgres -e POSTGRES_PASSWORD=<mysecretpassword> -d postgres`
 - Make sure your `.env` file contains variables for production use
 - Start bot with
+
 ```
 docker run \
   --name expl-bot \
@@ -29,4 +31,5 @@ docker run \
   -d \
   majori/expl-bot
 ```
+
 - Run migrations with `docker exec expl-bot npm run migrate`
