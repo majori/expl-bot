@@ -1,4 +1,4 @@
-import { CLILoggingLevel } from 'winston';
+import type { CLILoggingLevel } from 'winston';
 
 export const env = {
   prod: process.env.NODE_ENV === 'production',

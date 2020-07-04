@@ -1,5 +1,5 @@
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 

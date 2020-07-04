@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import { escapeMarkdown, formatDate } from '../utils';
 import { reactionsKeyboard } from './reaction';
 import * as messages from '../constants/messages';

@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 import * as messages from '../constants/messages';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
-import { Table } from '../types/database';
+import type { Context } from '../types/telegraf';
+import type { Table } from '../types/database';
 import { sendExpl } from '../utils';
 
 export const AMOUNT_OF_EXPL_OPTIONS = 3;

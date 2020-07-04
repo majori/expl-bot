@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
-import { Options } from '../types/database';
+import type { Context } from '../types/telegraf';
+import type { Options } from '../types/database';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 import { sendExpl } from '../utils';
 
