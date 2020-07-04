@@ -11,7 +11,8 @@
     "mocha": "mocha --exit test/**/*.test.ts",
     "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
     "migrate": "npx knex --cwd build migrate:latest",
-    "test": "npm run build:test && npm run mocha"
+    "lint": "npx prettier --check .",
+    "test": "npm run lint && npm run build:test && npm run mocha"
   },
   "repository": {
     "type": "git",
