@@ -10,6 +10,17 @@ addons:
     packages:
       - postgresql-12
       - postgresql-client-12
+      - postgresql-server-dev-12
+      - postgresql-client-common
+      - postgresql-common
+env:
+  global:
+    - PGPORT=5433
+    - PGVERSION=12
+
+before_install:
+  - 'if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi'
+  - 'if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi'
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
