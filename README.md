@@ -22,8 +22,6 @@
 ```
 docker run \
   --name expl-bot \
-  -e "NODE_ENV=production" \
-  -e "LOG_LEVEL=info" \
   -e "PG_CONNECTION_STRING=$PG_CONNECTION_STRING" \
   -e "TG_WEBHOOK=$TG_WEBHOOK" \
   -e "TG_TOKEN=$TG_TOKEN" \

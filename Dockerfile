@@ -1,5 +1,8 @@
 FROM node:12-alpine
 
+ENV NODE_ENV production
+ENV NPM_CONFIG_PRODUCTION false
+
 WORKDIR /usr/src/app
 COPY package*.json ./
 
