@@ -28,6 +28,7 @@ export async function up(knex: Knex): Promise<any> {
     .from('echo_history')
     .innerJoin('expls', 'echo_history.expl_id', 'expls.id')
     .whereRaw('echo_history.user_id != expls.user_id') // Ignore echos to own expls
+    .andWhereRaw('echo_history.was_random = FALSE')
     .groupBy('expls.user_id');
 
   // Combine queries by user_id
