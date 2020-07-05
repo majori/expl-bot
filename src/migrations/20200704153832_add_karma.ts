@@ -19,6 +19,7 @@ export async function up(knex: Knex): Promise<any> {
     })
     .from('expls')
     .innerJoin('reactions', 'reactions.expl_id', 'expls.id')
+    .whereRaw('reactions.user_id != expls.user_id') // Ignore reactions to own expls
     .groupBy('expls.user_id');
 
   const echos: any[] = await knex
@@ -26,6 +27,7 @@ export async function up(knex: Knex): Promise<any> {
     .count({ echos: '*' })
     .from('echo_history')
     .innerJoin('expls', 'echo_history.expl_id', 'expls.id')
+    .whereRaw('echo_history.user_id != expls.user_id') // Ignore echos to own expls
     .groupBy('expls.user_id');
 
   // Combine queries by user_id
