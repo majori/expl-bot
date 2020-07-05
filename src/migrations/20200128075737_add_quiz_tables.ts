@@ -1,6 +1,6 @@
 import * as Knex from 'knex';
 
-export const up = async (knex: Knex) => {
+export async function up(knex: Knex): Promise<any> {
   await knex.schema.createTable('quizzes', (t) => {
     t.string('id').primary();
     t.integer('correct_expl_id')
@@ -21,9 +21,9 @@ export const up = async (knex: Knex) => {
     t.boolean('was_correct');
     t.timestamp('created_at').defaultTo(knex.fn.now());
   });
-};
+}
 
-export const down = async (knex: Knex) => {
+export async function down(knex: Knex): Promise<any> {
   await knex.schema.dropTable('quiz_answers');
   await knex.schema.dropTable('quizzes');
-};
+}

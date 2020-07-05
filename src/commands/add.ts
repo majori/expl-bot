@@ -9,7 +9,7 @@ import { reactionsKeyboard } from './reaction';
 
 const logger = new Logger(__filename);
 
-export const createExpl = async (ctx: Context) => {
+export async function createExpl(ctx: Context) {
   const words = ctx.message!.text!.split(' ');
 
   const errorMessage = messages.add.invalidSyntax(_.first(words));
@@ -80,4 +80,4 @@ export const createExpl = async (ctx: Context) => {
 
     ctx.reply(msg);
   }
-};
+}

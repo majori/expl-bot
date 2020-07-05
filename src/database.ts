@@ -10,7 +10,7 @@ export const knex = Knex(
   config.env.prod ? config.db.production : config.db.development,
 );
 
-export const createExpl = async (options: Options.Expl) => {
+export async function createExpl(options: Options.Expl) {
   const expl: Partial<Table.Expl> = {
     user_id: options.userId,
     key: _.toLower(options.key),
@@ -57,9 +57,9 @@ export const createExpl = async (options: Options.Expl) => {
   logger.debug('Created expl', { key: expl.key });
 
   return expl;
-};
+}
 
-export const getExpl = async (user: number, key: string, offset?: number) => {
+export async function getExpl(user: number, key: string, offset?: number) {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
     user,
   )
@@ -77,13 +77,13 @@ export const getExpl = async (user: number, key: string, offset?: number) => {
       : _.sample(results)!;
 
   return createNestedExpl(selected);
-};
+}
 
-export const getRandomExpls = async (
+export async function getRandomExpls(
   user: number,
   amount: number = 1,
   keyFilter?: string,
-) => {
+) {
   const results = getExplsForUser(user).orderByRaw('RANDOM()').limit(amount);
 
   if (keyFilter) {
@@ -94,7 +94,7 @@ export const getRandomExpls = async (
     await results,
     createNestedExpl,
   );
-};
+}
 
 type SearchExpls = (
   user: number,
@@ -124,17 +124,17 @@ export const searchExpls: SearchExpls = async (
   return query;
 };
 
-export const searchRexpls = async (
+export async function searchRexpls(
   user: number,
-): Promise<Array<Partial<Table.Expl>>> => {
+): Promise<Array<Partial<Table.Expl>>> {
   return getExplsForUser(user)
     .whereNotNull('tg_contents.photo_id')
     .orWhereNotNull('tg_contents.sticker_id')
     .orWhereNotNull('tg_contents.video_id')
     .orderBy('created_at', 'desc');
-};
+}
 
-export const addUserToChat = async (user: number, chat: number) => {
+export async function addUserToChat(user: number, chat: number) {
   try {
     await knex('auth').insert({
       user_id: user,
@@ -150,9 +150,9 @@ export const addUserToChat = async (user: number, chat: number) => {
     logger.error(err);
     throw err;
   }
-};
+}
 
-export const deleteExpl = async (user: number, key: string) => {
+export async function deleteExpl(user: number, key: string) {
   const query = knex('expls').where({ user_id: user, key });
 
   const count: number = await query.del();
@@ -162,9 +162,9 @@ export const deleteExpl = async (user: number, key: string) => {
   }
 
   return count;
-};
+}
 
-export const deleteUser = async (user: number) => {
+export async function deleteUser(user: number) {
   return knex.transaction(async (trx) => {
     try {
       const explCount = await knex('expls')
@@ -188,9 +188,9 @@ export const deleteUser = async (user: number) => {
       await trx.rollback(err);
     }
   });
-};
+}
 
-const getExplsForUser = (user: number) => {
+function getExplsForUser(user: number) {
   const query = knex
     .from('expls')
     .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
@@ -205,14 +205,14 @@ const getExplsForUser = (user: number) => {
     });
 
   return query;
-};
+}
 
-export const addEcho = async (
+export async function addEcho(
   expl: Table.Expl,
   from: { chat: number; user: number },
   wasRandom: boolean,
   sentMessageId: number,
-) => {
+) {
   await knex('echo_history').insert({
     expl_id: expl.id,
     user_id: from.user,
@@ -223,7 +223,7 @@ export const addEcho = async (
 
   logger.debug('Expl echoed', { id: expl.id, key: expl.key });
   return expl;
-};
+}
 
 const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
   // Telegram content columns
@@ -242,10 +242,10 @@ const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
   };
 };
 
-export const getResolve = async (
+export async function getResolve(
   from: { chat: number; user: number },
   echo: number,
-) => {
+) {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
     from.user,
   ).where(function () {
@@ -261,20 +261,20 @@ export const getResolve = async (
     return;
   }
   return createNestedExpl(_.first(results)!);
-};
+}
 
-export const getReactionAmount = async (id: number, reaction: string) => {
+export async function getReactionAmount(id: number, reaction: string) {
   const query = knex('reactions').count().where({ expl_id: id, reaction });
   const count: number = +_.get(await query, [0, 'count'], 0);
 
   return count;
-};
+}
 
-export const addReaction = async (
+export async function addReaction(
   from: { chat: number; user: number },
   id: number,
   reaction: string,
-) => {
+) {
   try {
     await knex('reactions').insert({
       user_id: from.user,
@@ -295,13 +295,13 @@ export const addReaction = async (
 
     throw err;
   }
-};
+}
 
-export const deleteReaction = async (
+export async function deleteReaction(
   user: number,
   id: number,
   reaction: string,
-) => {
+) {
   try {
     await knex('reactions')
       .where({
@@ -318,4 +318,4 @@ export const deleteReaction = async (
     logger.error(err);
     throw err;
   }
-};
+}

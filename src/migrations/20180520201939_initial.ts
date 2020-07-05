@@ -1,6 +1,6 @@
 import * as Knex from 'knex';
 
-export const up = async (knex: Knex) => {
+export async function up(knex: Knex): Promise<any> {
   await knex.schema.createTable('tg_contents', (t) => {
     t.increments('content_id').primary();
     t.integer('message_id');
@@ -54,10 +54,10 @@ export const up = async (knex: Knex) => {
 
     t.unique(['user_id', 'chat_id']);
   });
-};
+}
 
-export const down = async (knex: Knex) => {
+export async function down(knex: Knex): Promise<any> {
   await knex.schema.dropTable('expls');
   await knex.schema.dropTable('tg_contents');
   await knex.schema.dropTable('auth');
-};
+}

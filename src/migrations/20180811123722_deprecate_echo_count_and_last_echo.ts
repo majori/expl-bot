@@ -1,13 +1,13 @@
 import * as Knex from 'knex';
 
-export const up = async (knex: Knex) => {
+export async function up(knex: Knex): Promise<any> {
   await knex.schema.alterTable('expls', (t) => {
     t.dropColumn('echo_count');
     t.dropColumn('last_echo');
   });
-};
+}
 
-export const down = async (knex: Knex) => {
+export async function down(knex: Knex): Promise<any> {
   await knex.schema.alterTable('expls', (t) => {
     t.integer('echo_count')
       .defaultTo(0)
@@ -16,4 +16,4 @@ export const down = async (knex: Knex) => {
       'Last time this expl was echoed somewhere',
     );
   });
-};
+}
