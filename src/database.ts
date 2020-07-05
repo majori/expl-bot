@@ -13,6 +13,12 @@ const karmaTableMapping: { [key: string]: KarmaStatColumn } = {
   '👎': 'dislikes',
 };
 
+export enum KarmaMultipliers {
+  likes = 10,
+  dislikes = -7,
+  echos = 2,
+}
+
 export const knex = Knex(
   config.env.prod ? config.db.production : config.db.development,
 );
@@ -233,6 +239,11 @@ export async function addEcho(
   });
 
   logger.debug('Expl echoed', { id: expl.id, key: expl.key });
+
+  if (expl.user_id != from.user && !wasRandom) {
+    await addKarmaStat(expl.user_id, 'echos', 1);
+  }
+
   return expl;
 }
 
@@ -358,11 +369,16 @@ export async function addKarmaStat(
 }
 
 export async function getUserKarma(user: number): Promise<number> {
-  const karmaRow = await knex('karma').where({ user_id: user }).first();
-  if (!karmaRow) {
-    return 0;
-  }
+  const row = await knex('karma')
+    .select(
+      knex.raw('(likes * ? + dislikes * ? + echos * ?) AS karma', [
+        KarmaMultipliers.likes,
+        KarmaMultipliers.dislikes,
+        KarmaMultipliers.echos,
+      ]),
+    )
+    .where({ user_id: user })
+    .first();
 
-  // TODO: Calculate karma
-  return 1;
+  return row?.karma || 0;
 }

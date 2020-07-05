@@ -464,14 +464,14 @@ describe('Commands', () => {
     });
   });
 
-  describe.only('/karma', async () => {
+  describe('/karma', async () => {
     it('responds even if user has no karma', async () => {
       const ctx = message('/karma');
       await commands.karma(ctx);
       expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
     });
 
-    describe("doesn't count actions to own expls", async () => {
+    describe("doesn't modify karma on actions to own expls", async () => {
       const EXPL: Partial<Table.Expl> = {
         id: 1,
         key: 'expl_0',
@@ -508,7 +508,7 @@ describe('Commands', () => {
       });
     });
 
-    describe('modifies karma if someone else reacts to expls', async () => {
+    describe("modifies karma if someone else reacts to user's expl", async () => {
       const EXPL: Partial<Table.Expl> = {
         id: 1,
         key: 'expl_0',
@@ -525,11 +525,11 @@ describe('Commands', () => {
         const ctx = message('/karma');
         await commands.karma(ctx);
 
-        const karma1 = await db.getUserKarma(USER_ID);
+        const karma = await db.getUserKarma(USER_ID);
 
-        expect(karma1).to.not.equal(0);
+        expect(karma).to.not.equal(0);
         expect(ctx.reply.lastCall.args[0]).to.equal(
-          messages.karma.display(karma1),
+          messages.karma.display(karma),
         );
       });
 
@@ -540,21 +540,26 @@ describe('Commands', () => {
         const ctx = message('/karma');
         await commands.karma(ctx);
 
-        const karma2 = await db.getUserKarma(USER_ID);
+        const karma = await db.getUserKarma(USER_ID);
 
-        expect(karma2).to.not.equal(0);
+        expect(karma).to.not.equal(0);
         expect(ctx.reply.lastCall.args[0]).to.equal(
-          messages.karma.display(karma2),
+          messages.karma.display(karma),
         );
       });
 
       it('echo', async () => {
         await knex('expls').insert(EXPL);
-        db.addEcho(EXPL as any, FROM, false, 1);
+        await db.addEcho(EXPL as any, FROM, false, 1);
 
         const ctx = message('/karma');
         await commands.karma(ctx);
-        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+
+        const karma = await db.getUserKarma(USER_ID);
+        expect(karma).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma),
+        );
       });
     });
   });
