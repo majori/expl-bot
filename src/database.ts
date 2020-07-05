@@ -10,6 +10,11 @@ export const knex = Knex(
   config.env.prod ? config.db.production : config.db.development,
 );
 
+const enum PostgresErrorCodes {
+  uniqueViolation = '23505',
+  foreignKeyViolation = '23503',
+}
+
 export async function createExpl(options: Options.Expl) {
   const expl: Partial<Table.Expl> = {
     user_id: options.userId,
@@ -47,8 +52,7 @@ export async function createExpl(options: Options.Expl) {
         });
     });
   } catch (err) {
-    // UNIQUE VIOLATION
-    if (err.code === '23505') {
+    if (err.code === PostgresErrorCodes.uniqueViolation) {
       throw new Error('already_exists');
     }
     throw err;
@@ -285,9 +289,9 @@ export async function addReaction(
 
     logger.debug('Reaction added', { id, reaction });
   } catch (err) {
-    if (err.code === '23505') {
+    if (err.code === PostgresErrorCodes.uniqueViolation) {
       throw new Error('already_exists');
-    } else if (err.code === '23503') {
+    } else if (err.code === PostgresErrorCodes.foreignKeyViolation) {
       throw new Error('expl_removed');
     } else {
       logger.error(err);
