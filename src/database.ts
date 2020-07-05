@@ -8,7 +8,7 @@ const logger = new Logger(__filename);
 
 type KarmaStatColumn = 'likes' | 'dislikes' | 'echos';
 
-const karmaTableMapping: { [key: string]: KarmaStatColumn } = {
+const karmaColumnMapping: { [key: string]: KarmaStatColumn } = {
   '👍': 'likes',
   '👎': 'dislikes',
 };
@@ -305,10 +305,10 @@ export async function addReaction(
       reaction,
     });
 
-    if (karmaTableMapping[reaction]) {
+    if (karmaColumnMapping[reaction]) {
       const expl = await knex('expls').where({ id: id }).first();
       if (expl.user_id != from.user) {
-        await addKarmaStat(expl.user_id, karmaTableMapping[reaction], 1);
+        await addKarmaStat(expl.user_id, karmaColumnMapping[reaction], 1);
       }
     }
 
@@ -342,10 +342,10 @@ export async function deleteReaction(
 
     logger.debug('Reaction deleted', { id: explId, reaction });
 
-    if (karmaTableMapping[reaction]) {
+    if (karmaColumnMapping[reaction]) {
       const expl = await knex('expls').where({ id: explId }).first();
       if (expl.user_id != userId) {
-        await addKarmaStat(expl.user_id, karmaTableMapping[reaction], -1);
+        await addKarmaStat(expl.user_id, karmaColumnMapping[reaction], -1);
       }
     }
 
