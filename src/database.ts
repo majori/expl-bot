@@ -6,6 +6,13 @@ import Logger from './logger';
 
 const logger = new Logger(__filename);
 
+type KarmaStatColumn = 'likes' | 'dislikes' | 'echos';
+
+const karmaTableMapping: { [key: string]: KarmaStatColumn } = {
+  '👍': 'likes',
+  '👎': 'dislikes',
+};
+
 export const knex = Knex(
   config.env.prod ? config.db.production : config.db.development,
 );
@@ -287,6 +294,13 @@ export async function addReaction(
       reaction,
     });
 
+    if (karmaTableMapping[reaction]) {
+      const expl = await knex('expls').where({ id: id }).first();
+      if (expl.user_id != from.user) {
+        await addKarmaStat(expl.user_id, karmaTableMapping[reaction], 1);
+      }
+    }
+
     logger.debug('Reaction added', { id, reaction });
   } catch (err) {
     if (err.code === PostgresErrorCodes.uniqueViolation) {
@@ -302,24 +316,53 @@ export async function addReaction(
 }
 
 export async function deleteReaction(
-  user: number,
-  id: number,
+  userId: number,
+  explId: number,
   reaction: string,
 ) {
   try {
     await knex('reactions')
       .where({
-        user_id: user,
-        expl_id: id,
+        user_id: userId,
+        expl_id: explId,
         reaction,
       })
       .del();
 
-    logger.debug('Reaction deleted', { id, reaction });
+    logger.debug('Reaction deleted', { id: explId, reaction });
+
+    if (karmaTableMapping[reaction]) {
+      const expl = await knex('expls').where({ id: explId }).first();
+      if (expl.user_id != userId) {
+        await addKarmaStat(expl.user_id, karmaTableMapping[reaction], -1);
+      }
+    }
 
     return true;
   } catch (err) {
     logger.error(err);
     throw err;
   }
+}
+
+export async function addKarmaStat(
+  user: number,
+  column: 'likes' | 'dislikes' | 'echos',
+  amount: number,
+) {
+  if (!(await knex('karma').where('user_id', user).first())) {
+    await knex('karma').insert({ user_id: user, [column]: amount });
+  } else {
+    await knex('karma').where('user_id', user).increment(column, amount);
+  }
+}
+
+export async function getUserKarma(user: number): Promise<number> {
+  const karmaRow = await knex('karma').where({ user_id: user }).first();
+  if (!karmaRow) {
+    return 0;
+  }
+
+  // TODO: Calculate karma
+  return 1;
 }

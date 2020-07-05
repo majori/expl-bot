@@ -1,12 +1,14 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
+import * as db from '../src/database';
 import commands from '../src/commands';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
 import { AMOUNT_OF_EXPL_OPTIONS } from '../src/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
+import { Table } from '../src/types/database';
 
 describe('Commands', () => {
   beforeEach(clearDb);
@@ -459,6 +461,101 @@ describe('Commands', () => {
 
       expect(ctx.replyWithQuiz.called).not.to.be.true;
       expect(ctx.reply.lastCall.args[0]).to.equal(messages.get.noExpls());
+    });
+  });
+
+  describe.only('/karma', async () => {
+    it('responds even if user has no karma', async () => {
+      const ctx = message('/karma');
+      await commands.karma(ctx);
+      expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+    });
+
+    describe("doesn't count actions to own expls", async () => {
+      const EXPL: Partial<Table.Expl> = {
+        id: 1,
+        key: 'expl_0',
+        value: 'value',
+        user_id: USER_ID,
+      };
+      const FROM = { chat: -1, user: USER_ID };
+
+      it('like', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👍');
+
+        const ctx1 = message('/karma');
+        await commands.karma(ctx1);
+        expect(ctx1.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+
+      it('dislike', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👎');
+
+        const ctx2 = message('/karma');
+        await commands.karma(ctx2);
+        expect(ctx2.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+
+      it('echo', async () => {
+        await knex('expls').insert(EXPL);
+        db.addEcho(EXPL as any, FROM, false, 1);
+
+        const ctx3 = message('/karma');
+        await commands.karma(ctx3);
+        expect(ctx3.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+    });
+
+    describe('modifies karma if someone else reacts to expls', async () => {
+      const EXPL: Partial<Table.Expl> = {
+        id: 1,
+        key: 'expl_0',
+        value: 'value',
+        user_id: USER_ID,
+      };
+
+      const FROM = { chat: -1, user: 223456789 };
+
+      it('like', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👍');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+
+        const karma1 = await db.getUserKarma(USER_ID);
+
+        expect(karma1).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma1),
+        );
+      });
+
+      it('dislike', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👎');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+
+        const karma2 = await db.getUserKarma(USER_ID);
+
+        expect(karma2).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma2),
+        );
+      });
+
+      it('echo', async () => {
+        await knex('expls').insert(EXPL);
+        db.addEcho(EXPL as any, FROM, false, 1);
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
     });
   });
 });
