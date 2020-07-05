@@ -1,4 +1,5 @@
 import type { CLILoggingLevel } from 'winston';
+import type * as Knex from 'knex';
 
 export const env = {
   prod: process.env.NODE_ENV === 'production',
@@ -16,24 +17,34 @@ export const logging = {
   level: (process.env.LOG_LEVEL || 'info') as CLILoggingLevel,
 };
 
-export const db = {
+const defaultDbConfig: Knex.Config = {
+  client: 'pg',
+  connection: process.env.PG_CONNECTION_STRING || {
+    host: process.env.PG_HOST,
+    port: parseInt(process.env.PG_PORT || '5432', 10),
+    database: process.env.PG_DATABASE,
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+  },
+  pool: {
+    min: 2,
+    max: 10,
+  },
+  migrations: {
+    extension: 'ts',
+  },
+};
+
+export const db: { [env: string]: Knex.Config } = {
   production: {
-    client: 'pg',
-    connection: process.env.PG_CONNECTION_STRING || {
-      host: process.env.PG_HOST,
-      port: parseInt(process.env.PG_PORT || '5432', 10),
-      database: process.env.PG_DATABASE,
-      user: process.env.PG_USER,
-      password: process.env.PG_PASSWORD,
-    },
-    pool: {
-      min: 2,
-      max: 10,
+    ...defaultDbConfig,
+    migrations: {
+      extension: 'js',
     },
   },
 
   development: {
-    client: 'pg',
+    ...defaultDbConfig,
     connection: process.env.PG_CONNECTION_STRING || {
       host: 'localhost',
       port: 6001,
@@ -41,18 +52,9 @@ export const db = {
       user: 'postgres',
       password: 'password12!',
     },
-    pool: {
-      min: 2,
-      max: 10,
-    },
   },
 
   test: {
-    client: 'pg',
-    connection: process.env.PG_CONNECTION_STRING,
-    pool: {
-      min: 2,
-      max: 10,
-    },
+    ...defaultDbConfig,
   },
 };
