@@ -229,7 +229,7 @@ export async function addEcho(
   return expl;
 }
 
-const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
+function createNestedExpl(expl: Table.Expl & Table.TgContents): Table.Expl {
   // Telegram content columns
   const columns = [
     'content_id',
@@ -244,7 +244,7 @@ const createNestedExpl = (expl: Table.Expl & Table.TgContents): Table.Expl => {
     ...(_.omit(expl, columns) as any),
     tg_content: _.pick(expl, columns),
   };
-};
+}
 
 export async function getResolve(
   from: { chat: number; user: number },
