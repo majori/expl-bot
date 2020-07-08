@@ -22,7 +22,7 @@ async function start() {
     logger.info('Polling started for updates');
   }
 
-  // TODO: Health check endpoint
+  server.get('/health', (req, res) => res.send('ok'));
 
   server.listen(config.server.port, () => {
     logger.info(`Server listening on port ${config.server.port}`);
