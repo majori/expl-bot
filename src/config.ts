@@ -7,10 +7,13 @@ export const env = {
   test: process.env.NODE_ENV === 'test',
 };
 
+export const server = {
+  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 6000,
+};
+
 export const tg = {
   token: process.env.TG_TOKEN,
   webhook: process.env.TG_WEBHOOK,
-  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 6000,
 };
 
 export const logging = {

@@ -24,8 +24,8 @@ async function start() {
 
   // TODO: Health check endpoint
 
-  server.listen(config.tg.port, () => {
-    logger.info(`Server listening on port ${config.tg.port}`);
+  server.listen(config.server.port, () => {
+    logger.info(`Server listening on port ${config.server.port}`);
   });
 }
 
