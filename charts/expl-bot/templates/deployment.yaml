@@ -37,7 +37,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "expl-bot.fullname" . }}-telegram-token
                   key: token
-            {{- if .Values.ingress.enabled -}}
+            {{- if .Values.ingress.enabled }}
             - name: TG_WEBHOOK
               value: https://{{ .Values.ingress.host }}
             {{- end }}
