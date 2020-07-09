@@ -33,7 +33,7 @@ export async function toggleReaction(ctx: Context) {
       +id,
       reaction,
     );
-    ctx.answerCbQuery(messages.reaction.added(reaction));
+    await ctx.answerCbQuery(messages.reaction.added(reaction));
   } catch (err) {
     switch (err.message) {
       case 'already_exists':

@@ -1,12 +1,14 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
+import * as db from '../src/database';
 import commands from '../src/commands';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
 import { AMOUNT_OF_EXPL_OPTIONS } from '../src/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
+import { Table } from '../src/types/database';
 
 describe('Commands', () => {
   beforeEach(clearDb);
@@ -459,6 +461,130 @@ describe('Commands', () => {
 
       expect(ctx.replyWithQuiz.called).not.to.be.true;
       expect(ctx.reply.lastCall.args[0]).to.equal(messages.get.noExpls());
+    });
+  });
+
+  describe('/karma', async () => {
+    it('responds even if user has no karma', async () => {
+      const ctx = message('/karma');
+      await commands.karma(ctx);
+      expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+    });
+
+    it('calculates karma points from stats correctly', async () => {
+      const stats = {
+        likes: 5,
+        dislikes: 4,
+        echos: 40,
+      };
+
+      await knex('karma').insert({
+        user_id: USER_ID,
+        ...stats,
+      });
+
+      const points =
+        db.KarmaMultipliers.likes * stats.likes +
+        db.KarmaMultipliers.dislikes * stats.dislikes +
+        db.KarmaMultipliers.echos * stats.echos;
+
+      const ctx = message('/karma');
+      await commands.karma(ctx);
+      expect(ctx.reply.lastCall.args[0]).to.equal(
+        messages.karma.display(points),
+      );
+    });
+
+    describe("doesn't modify karma on actions to own expls", async () => {
+      const EXPL: Partial<Table.Expl> = {
+        id: 1,
+        key: 'expl_0',
+        value: 'value',
+        user_id: USER_ID,
+      };
+      const FROM = { chat: -1, user: USER_ID };
+
+      it('like', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👍');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+
+      it('dislike', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👎');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+
+      it('echo', async () => {
+        await knex('expls').insert(EXPL);
+        db.addEcho(EXPL as any, FROM, false, 1);
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
+      });
+    });
+
+    describe("modifies karma if someone else reacts to user's expl", async () => {
+      const EXPL: Partial<Table.Expl> = {
+        id: 1,
+        key: 'expl_0',
+        value: 'value',
+        user_id: USER_ID,
+      };
+
+      const FROM = { chat: -1, user: 223456789 };
+
+      it('like', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👍');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+
+        const karma = await db.getUserKarma(USER_ID);
+
+        expect(karma).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma),
+        );
+      });
+
+      it('dislike', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addReaction(FROM, EXPL.id!, '👎');
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+
+        const karma = await db.getUserKarma(USER_ID);
+
+        expect(karma).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma),
+        );
+      });
+
+      it('echo', async () => {
+        await knex('expls').insert(EXPL);
+        await db.addEcho(EXPL as any, FROM, false, 1);
+
+        const ctx = message('/karma');
+        await commands.karma(ctx);
+
+        const karma = await db.getUserKarma(USER_ID);
+        expect(karma).to.not.equal(0);
+        expect(ctx.reply.lastCall.args[0]).to.equal(
+          messages.karma.display(karma),
+        );
+      });
     });
   });
 });
