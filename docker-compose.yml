@@ -1,8 +1,8 @@
-version: "3"
+version: '3'
 services:
   db:
-    image: postgres
+    image: postgres:12-alpine
     ports:
-        - "6001:5432"
+      - '6001:5432'
     environment:
-        - POSTGRES_PASSWORD=password12!
+      - POSTGRES_PASSWORD=password12!

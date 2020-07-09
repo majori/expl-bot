@@ -67,7 +67,7 @@ export const message = (
   };
 };
 
-export const inlineQuery = (query?: string): any => {
+export function inlineQuery(query?: string): any {
   return {
     ...baseContext(),
     inlineQuery: {
@@ -78,13 +78,13 @@ export const inlineQuery = (query?: string): any => {
     },
     from: { id: USER_ID },
   };
-};
+}
 
-export const callbackQuery = (data: string): any => {
+export function callbackQuery(data: string): any {
   return {
     ...baseContext(),
     callbackQuery: { data },
     from: { id: USER_ID },
     chat: { id: GROUP_ID },
   };
-};
+}

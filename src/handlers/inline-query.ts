@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 import * as db from '../database';
 import * as config from '../config';
-import { Context } from '../types/telegraf';
-import { Table } from '../types/database';
+import type { Context } from '../types/telegraf';
+import type { Table } from '../types/database';
 
 export const RESULT_LIMIT = 15;
 
-export const handleInlineQuery = async (ctx: Context) => {
+export async function handleInlineQuery(ctx: Context) {
   const query = ctx.inlineQuery!.query;
 
   const expls = await (_.isEmpty(query)
@@ -20,7 +20,7 @@ export const handleInlineQuery = async (ctx: Context) => {
     is_personal: true,
     cache_time: config.env.prod ? undefined : 0, // Cache only in production
   });
-};
+}
 
 const getInlineResult = (
   expl: Partial<Table.Expl> & Partial<Table.TgContents>,

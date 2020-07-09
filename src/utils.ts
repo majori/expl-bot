@@ -7,12 +7,12 @@ import { addEcho } from './database';
 
 const logger = new Logger(__filename);
 
-export const sendExpl = async (
+export async function sendExpl(
   ctx: Context,
   key: string,
   expl: Table.Expl | null,
   wasRandom: boolean = false,
-) => {
+) {
   if (!expl) {
     return ctx.reply(messages.errors.notFound(key));
   }
@@ -56,34 +56,36 @@ export const sendExpl = async (
       }
     }
   }
-};
+}
 
-export const escapeMarkdown = async (msg: string) => {
+export async function escapeMarkdown(msg: string) {
   return msg
     .replace(/\_/g, '\\_')
     .replace(/\*/g, '\\*')
     .replace(/\[/g, '\\[')
     .replace(/\`/g, '\\`');
-};
+}
 
-export const formatDate = async (date: string) => {
+export async function formatDate(date: string) {
   const d = new Date(date);
   const dd = d.getDate();
   const mm = 1 + d.getMonth();
   const yyyy = d.getFullYear();
 
   return [dd, mm, yyyy].join('.');
-};
+}
 
-export const inlineSearchKeyboard = async (searchTerm: string) => ({
-  reply_markup: {
-    inline_keyboard: [
-      [
-        {
-          text: 'Search with inline query',
-          switch_inline_query_current_chat: searchTerm,
-        },
+export async function inlineSearchKeyboard(searchTerm: string) {
+  return {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: 'Search with inline query',
+            switch_inline_query_current_chat: searchTerm,
+          },
+        ],
       ],
-    ],
-  },
-});
+    },
+  };
+}

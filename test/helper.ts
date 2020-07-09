@@ -30,7 +30,7 @@ export async function migrateAllDown(): Promise<void> {
   }
 }
 
-export const clearDb = async () => {
+export async function clearDb() {
   await migrateAllDown();
   await knex.migrate.latest({ directory: './src/migrations' });
-};
+}

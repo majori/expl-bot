@@ -1,9 +1,8 @@
 import * as Knex from 'knex';
 
-export const up = async (knex: Knex) => {
+export async function up(knex: Knex): Promise<any> {
   await knex.schema.createTable('tg_contents', (t) => {
-    t.increments('content_id')
-      .primary();
+    t.increments('content_id').primary();
     t.integer('message_id');
     t.bigInteger('chat_id');
     t.string('sticker_id');
@@ -19,15 +18,11 @@ export const up = async (knex: Knex) => {
   `);
 
   await knex.schema.createTable('expls', (t) => {
-    t.increments('id')
-      .primary();
-    t.timestamp('created_at')
-      .defaultTo(knex.fn.now());
+    t.increments('id').primary();
+    t.timestamp('created_at').defaultTo(knex.fn.now());
 
-    t.integer('user_id')
-      .notNullable();
-    t.string('key', 50)
-      .notNullable();
+    t.integer('user_id').notNullable();
+    t.string('key', 50).notNullable();
     t.string('value', 250);
 
     t.integer('tg_content')
@@ -39,8 +34,9 @@ export const up = async (knex: Knex) => {
     t.integer('echo_count')
       .defaultTo(0)
       .comment('How many times this expl has been requested');
-    t.timestamp('last_echo')
-      .comment('Last time this expl was echoed somewhere');
+    t.timestamp('last_echo').comment(
+      'Last time this expl was echoed somewhere',
+    );
 
     t.unique(['user_id', 'key']);
   });
@@ -52,20 +48,16 @@ export const up = async (knex: Knex) => {
   `);
 
   await knex.schema.createTable('auth', (t) => {
-    t.increments('id')
-      .primary();
-    t.integer('user_id')
-      .notNullable();
-    t.bigInteger('chat_id')
-      .notNullable();
+    t.increments('id').primary();
+    t.integer('user_id').notNullable();
+    t.bigInteger('chat_id').notNullable();
 
     t.unique(['user_id', 'chat_id']);
   });
+}
 
-};
-
-export const down = async (knex: Knex) => {
+export async function down(knex: Knex): Promise<any> {
   await knex.schema.dropTable('expls');
   await knex.schema.dropTable('tg_contents');
   await knex.schema.dropTable('auth');
-};
+}

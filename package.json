@@ -11,7 +11,9 @@
     "mocha": "mocha --exit test/**/*.test.ts",
     "mocha:watch": "mocha -w --inspect test/**/*.test.ts",
     "migrate": "npx knex --cwd build migrate:latest",
-    "test": "npm run build:test && npm run mocha"
+    "migrate:dev": "npx knex --cwd src migrate:latest",
+    "lint": "npx prettier --check ./src ./test",
+    "test": "npm run lint && npm run build:test && npm run mocha"
   },
   "repository": {
     "type": "git",
@@ -24,19 +26,19 @@
   },
   "homepage": "https://github.com/majori/expl-bot#readme",
   "dependencies": {
-    "knex": "^0.19.5",
+    "express": "^4.17.1",
+    "knex": "^0.21.1",
     "lodash": "^4.17.15",
-    "pg": "^7.17.1",
+    "pg": "^7.18.2",
     "string-template": "^1.0.0",
-    "telegraf": "^3.36.0",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.5",
-    "winston": "^2.4.4"
+    "telegraf": "^3.38.0",
+    "winston": "^2.4.5"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
-    "@types/knex": "^0.14.26",
-    "@types/lodash": "^4.14.149",
+    "@types/express": "^4.17.7",
+    "@types/knex": "^0.16.1",
+    "@types/lodash": "^4.14.157",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.17.13",
     "@types/sinon": "^5.0.7",
@@ -45,6 +47,9 @@
     "dotenv": "^5.0.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.19.4",
-    "sinon": "^6.3.5"
+    "prettier": "^2.0.5",
+    "sinon": "^6.3.5",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
   }
 }

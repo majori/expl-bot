@@ -6,10 +6,8 @@
     "strict": true,
     "baseUrl": "./src",
     "paths": {
-      "telegraf/session": ["./types/global"],
+      "telegraf/session": ["./types/global"]
     }
   },
-  "include": [
-    "src/"
-  ],
+  "include": ["src/"]
 }

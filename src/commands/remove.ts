@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import * as messages from '../constants/messages';
 
-export const removeExpl = async (ctx: Context) => {
+export async function removeExpl(ctx: Context) {
   const words = ctx.message!.text!.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
@@ -15,4 +15,4 @@ export const removeExpl = async (ctx: Context) => {
   return count > 0
     ? ctx.reply(messages.remove.successful(key))
     : ctx.reply(messages.errors.notFound(key));
-};
+}

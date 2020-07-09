@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
 import * as messages from '../constants/messages';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
-import { Table } from '../types/database';
+import type { Context } from '../types/telegraf';
+import type { Table } from '../types/database';
 import { sendExpl } from '../utils';
 
 export const AMOUNT_OF_EXPL_OPTIONS = 3;
 export const CHANCE_TO_OMIT_CORRECT_KEY = 33; // %
 
-export const startQuiz = async (ctx: Context) => {
+export async function startQuiz(ctx: Context) {
   const wasReply = Boolean(ctx.message!.reply_to_message);
 
   let correctExpl: Table.Expl | undefined;
@@ -81,4 +81,4 @@ export const startQuiz = async (ctx: Context) => {
     correct_option_index: correctOptionId,
     chat_id: ctx.chat?.id,
   });
-};
+}

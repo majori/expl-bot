@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import { escapeMarkdown, formatDate } from '../utils';
 import { reactionsKeyboard } from './reaction';
 import * as messages from '../constants/messages';
 
-export const resolveRexpl = async (ctx: Context) => {
+export async function resolveRexpl(ctx: Context) {
   if (!ctx.message!.reply_to_message) {
     return ctx.reply(messages.resolve.noReply());
   }
@@ -28,4 +28,4 @@ export const resolveRexpl = async (ctx: Context) => {
   await ctx.replyWithMarkdown(`${key}, _${date}_`, {
     reply_markup: keyboard,
   });
-};
+}

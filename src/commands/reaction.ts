@@ -1,11 +1,11 @@
 import * as db from '../database';
-import { Context } from '../types/telegraf';
+import type { Context } from '../types/telegraf';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 
 const logger = new Logger(__filename);
 
-export const reactionsKeyboard = async (id: number) => {
+export async function reactionsKeyboard(id: number) {
   const reactions = ['👍', '👎'];
 
   const amounts = await Promise.all(
@@ -18,9 +18,9 @@ export const reactionsKeyboard = async (id: number) => {
   }));
 
   return { inline_keyboard: [buttons] };
-};
+}
 
-export const toggleReaction = async (ctx: Context) => {
+export async function toggleReaction(ctx: Context) {
   if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
     return;
   }
@@ -57,4 +57,4 @@ export const toggleReaction = async (ctx: Context) => {
   } catch (err) {
     logger.error(err);
   }
-};
+}

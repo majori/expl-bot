@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as db from '../database';
-import { Context } from '../types/telegraf';
-import { Options } from '../types/database';
+import type { Context } from '../types/telegraf';
+import type { Options } from '../types/database';
 import Logger from '../logger';
 import * as messages from '../constants/messages';
 
@@ -9,7 +9,7 @@ import { reactionsKeyboard } from './reaction';
 
 const logger = new Logger(__filename);
 
-export const createExpl = async (ctx: Context) => {
+export async function createExpl(ctx: Context) {
   const words = ctx.message!.text!.split(' ');
 
   const errorMessage = messages.add.invalidSyntax(_.first(words));
@@ -28,9 +28,7 @@ export const createExpl = async (ctx: Context) => {
 
   // Expl value is normal text
   if (isExplWithValue) {
-    expl.message = _(words)
-      .drop(2)
-      .join(' ');
+    expl.message = _(words).drop(2).join(' ');
 
     // Expl value is reply to other message
   } else if (ctx.message!.reply_to_message) {
@@ -82,4 +80,4 @@ export const createExpl = async (ctx: Context) => {
 
     ctx.reply(msg);
   }
-};
+}
