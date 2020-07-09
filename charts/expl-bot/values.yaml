@@ -1,0 +1,64 @@
+image:
+  repository: majori/expl-bot
+  tag: latest
+  pullPolicy: IfNotPresent
+
+logging:
+  level: info
+
+telegram:
+  token:
+
+postgres:
+  host:
+  database:
+  userSecret:
+    name:
+    key:
+  passwordSecret:
+    name:
+    key:
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  host: chart-example.local
+  tls: 
+    secretName: chart-example-tls
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 5m
+    memory: 50Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

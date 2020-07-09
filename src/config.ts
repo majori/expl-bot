@@ -7,10 +7,13 @@ export const env = {
   test: process.env.NODE_ENV === 'test',
 };
 
+export const server = {
+  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 6000,
+};
+
 export const tg = {
   token: process.env.TG_TOKEN,
   webhook: process.env.TG_WEBHOOK,
-  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 6000,
 };
 
 export const logging = {
@@ -21,7 +24,7 @@ const defaultDbConfig: Knex.Config = {
   client: 'pg',
   connection: process.env.PG_CONNECTION_STRING || {
     host: process.env.PG_HOST,
-    port: parseInt(process.env.PG_PORT || '5432', 10),
+    port: process.env.PG_PORT ? parseInt(process.env.PG_PORT, 10) : 5432,
     database: process.env.PG_DATABASE,
     user: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
