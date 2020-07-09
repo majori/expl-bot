@@ -8,7 +8,9 @@ import * as express from 'express';
 const logger = new Logger(__filename);
 
 async function start() {
-  const bot = await createBot(new Telegraf(config.tg.token!));
+  const bot = await createBot(
+    new Telegraf(config.tg.token!, { telegram: { webhookReply: false } }),
+  );
   const server = express();
 
   if (config.tg.webhook) {
