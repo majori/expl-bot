@@ -28,7 +28,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "knex": "^0.21.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "pg": "^7.18.2",
     "string-template": "^1.0.0",
     "telegraf": "^3.38.0",
