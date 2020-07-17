@@ -59,6 +59,9 @@ export default async (bot: Telegraf<Context>) => {
   bot.command('/quiz', commands.quiz);
   bot.hears(/^(\!qz).*$/, commands.quiz);
 
+  bot.command('/karma', commands.karma);
+  bot.hears(/^(\!k).*$/, commands.karma);
+
   bot.on('inline_query', handlers.inlineQuery);
   bot.on('poll_answer' as any, handlers.pollAnswer);
 

@@ -6,6 +6,19 @@ import Logger from './logger';
 
 const logger = new Logger(__filename);
 
+type KarmaStatColumn = 'likes' | 'dislikes' | 'echos';
+
+const karmaColumnMapping: { [key: string]: KarmaStatColumn } = {
+  '👍': 'likes',
+  '👎': 'dislikes',
+};
+
+export enum KarmaMultipliers {
+  likes = 10,
+  dislikes = -7,
+  echos = 2,
+}
+
 export const knex = Knex(
   config.env.prod ? config.db.production : config.db.development,
 );
@@ -226,6 +239,11 @@ export async function addEcho(
   });
 
   logger.debug('Expl echoed', { id: expl.id, key: expl.key });
+
+  if (expl.user_id != from.user && !wasRandom) {
+    await addKarmaStat(expl.user_id, 'echos', 1);
+  }
+
   return expl;
 }
 
@@ -287,6 +305,13 @@ export async function addReaction(
       reaction,
     });
 
+    if (karmaColumnMapping[reaction]) {
+      const expl = await knex('expls').where({ id: id }).first();
+      if (expl.user_id != from.user) {
+        await addKarmaStat(expl.user_id, karmaColumnMapping[reaction], 1);
+      }
+    }
+
     logger.debug('Reaction added', { id, reaction });
   } catch (err) {
     if (err.code === PostgresErrorCodes.uniqueViolation) {
@@ -302,24 +327,58 @@ export async function addReaction(
 }
 
 export async function deleteReaction(
-  user: number,
-  id: number,
+  userId: number,
+  explId: number,
   reaction: string,
 ) {
   try {
     await knex('reactions')
       .where({
-        user_id: user,
-        expl_id: id,
+        user_id: userId,
+        expl_id: explId,
         reaction,
       })
       .del();
 
-    logger.debug('Reaction deleted', { id, reaction });
+    logger.debug('Reaction deleted', { id: explId, reaction });
+
+    if (karmaColumnMapping[reaction]) {
+      const expl = await knex('expls').where({ id: explId }).first();
+      if (expl.user_id != userId) {
+        await addKarmaStat(expl.user_id, karmaColumnMapping[reaction], -1);
+      }
+    }
 
     return true;
   } catch (err) {
     logger.error(err);
     throw err;
   }
+}
+
+export async function addKarmaStat(
+  user: number,
+  column: 'likes' | 'dislikes' | 'echos',
+  amount: number,
+) {
+  if (!(await knex('karma').where('user_id', user).first())) {
+    await knex('karma').insert({ user_id: user, [column]: amount });
+  } else {
+    await knex('karma').where('user_id', user).increment(column, amount);
+  }
+}
+
+export async function getUserKarma(user: number): Promise<number> {
+  const row = await knex('karma')
+    .select(
+      knex.raw('(likes * ? + dislikes * ? + echos * ?) AS karma', [
+        KarmaMultipliers.likes,
+        KarmaMultipliers.dislikes,
+        KarmaMultipliers.echos,
+      ]),
+    )
+    .where({ user_id: user })
+    .first();
+
+  return row?.karma || 0;
 }

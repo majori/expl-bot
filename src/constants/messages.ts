@@ -75,3 +75,7 @@ export const quiz = {
     'There needs to be atleast one more expls to create a quiz',
   ),
 };
+
+export const karma = {
+  display: template('Your karma: {0}'),
+};
