@@ -11,8 +11,6 @@ const logger = winston.createLogger({
 });
 
 if (config.env.test && config.logging.level !== 'debug') {
-  console.log(config.env.test);
-  console.log(config.logging.level);
   logger.remove(winston.transports.Console);
 }
 

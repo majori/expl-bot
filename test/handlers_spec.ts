@@ -1,4 +1,3 @@
-import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import { handleInlineQuery } from '../src/handlers/inline-query';

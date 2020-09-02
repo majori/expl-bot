@@ -1,4 +1,3 @@
-import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as db from '../src/database';
