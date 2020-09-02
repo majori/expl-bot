@@ -1,37 +1,19 @@
 import * as path from 'path';
 import * as _ from 'lodash';
-import { Logger as Winston, transports, CLILoggingLevel } from 'winston';
+import * as winston from 'winston';
 import * as config from './config';
 
-export class Logger extends Winston {
-  constructor(filePath?: string) {
-    super();
+const logger = winston.createLogger({
+  level: config.logging.level,
+  format: winston.format.simple(),
+  defaultMeta: { service: 'user-service' },
+  transports: [new winston.transports.Console()],
+});
 
-    this.configure({
-      transports: [
-        new transports.Console({
-          label: filePath
-            ? path.basename(filePath)
-            : require('../package.json').name,
-          timestamp: true,
-          colorize: true,
-        }),
-      ],
-    });
-
-    // Suppress console messages when testing
-    if (config.env.test && process.env.LOG_LEVEL !== 'debug') {
-      this.remove(transports.Console);
-    }
-
-    this.setLevelForTransports(config.logging.level);
-  }
-
-  private setLevelForTransports(level: CLILoggingLevel) {
-    _.forEach(this.transports, (transport) => {
-      transport.level = level;
-    });
-  }
+if (config.env.test && config.logging.level !== 'debug') {
+  console.log(config.env.test);
+  console.log(config.logging.level);
+  logger.remove(winston.transports.Console);
 }
 
-export default Logger;
+export default logger;

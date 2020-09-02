@@ -1,13 +1,11 @@
 import * as _ from 'lodash';
 import * as session from 'telegraf/session';
-import Logger from './logger';
+import logger from './logger';
 import commands from './commands';
 import handlers from './handlers';
 import * as db from './database';
 import type { Telegraf } from 'telegraf';
 import type { Context } from './types/telegraf';
-
-const logger = new Logger(__filename);
 
 export default async (bot: Telegraf<Context>) => {
   const info = await bot.telegram.getMe();

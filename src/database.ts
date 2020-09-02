@@ -2,9 +2,7 @@ import * as Knex from 'knex';
 import * as _ from 'lodash';
 import * as config from './config';
 import { Table, Options } from './types/database';
-import Logger from './logger';
-
-const logger = new Logger(__filename);
+import logger from './logger';
 
 type KarmaStatColumn = 'likes' | 'dislikes' | 'echos';
 

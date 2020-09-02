@@ -1,11 +1,9 @@
 import * as _ from 'lodash';
 import { Context } from './types/telegraf';
 import { Table } from './types/database';
-import Logger from './logger';
+import logger from './logger';
 import * as messages from './constants/messages';
 import { addEcho } from './database';
-
-const logger = new Logger(__filename);
 
 export async function sendExpl(
   ctx: Context,

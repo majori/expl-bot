@@ -1,4 +1,3 @@
-import type { CLILoggingLevel } from 'winston';
 import type * as Knex from 'knex';
 
 export const env = {
@@ -17,7 +16,7 @@ export const tg = {
 };
 
 export const logging = {
-  level: (process.env.LOG_LEVEL || 'info') as CLILoggingLevel,
+  level: (process.env.LOG_LEVEL || 'info') as string,
 };
 
 const defaultDbConfig: Knex.Config = {
