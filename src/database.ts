@@ -396,9 +396,9 @@ export async function getExlpsLikedByUser(
     .orderBy('created_at', order === 'latest' ? 'desc' : 'asc')
     .offset(offset);
 
-    if (amount) {
-      results.limit(amount);
-    }
+  if (amount) {
+    results.limit(amount);
+  }
 
   return await results;
 }

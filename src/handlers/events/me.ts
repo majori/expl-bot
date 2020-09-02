@@ -70,7 +70,11 @@ function explsList(list: any[], page: string, offset: number = 0) {
   return [title, ...items].join('\n');
 }
 
-async function createKeyboard(user: number, page: string = 'home', offset: number = 0) {
+async function createKeyboard(
+  user: number,
+  page: string = 'home',
+  offset: number = 0,
+) {
   switch (page) {
     case 'selfmade':
       return [
@@ -104,15 +108,16 @@ async function createKeyboard(user: number, page: string = 'home', offset: numbe
       const likedExpls = await db.getExlpsLikedByUser(user);
 
       if (likedExpls.length <= EXPLS_IN_PAGE) {
-        return [
-          [button('⬅️ Go back', 'home')],
-        ];
+        return [[button('⬅️ Go back', 'home')]];
       }
 
       const prevOffset = `${offset - EXPLS_IN_PAGE}`;
       const nextOffset = `${offset + EXPLS_IN_PAGE}`;
       return [
-        [button('Previous', ['likes', `${prevOffset}`]), button('Next', ['likes', `${nextOffset}`])],
+        [
+          button('Previous', ['likes', `${prevOffset}`]),
+          button('Next', ['likes', `${nextOffset}`]),
+        ],
         [button('⬅️ Go back', 'home')],
       ];
 
@@ -129,7 +134,11 @@ async function meText(user: number, page: string = 'home', offset?: number) {
       return 'On which basis would you like to browse your expls?';
 
     case 'likes':
-      const likedExpls = await db.getExlpsLikedByUser(user, EXPLS_IN_PAGE, offset);
+      const likedExpls = await db.getExlpsLikedByUser(
+        user,
+        EXPLS_IN_PAGE,
+        offset,
+      );
 
       return explsList(likedExpls, page);
 
@@ -144,12 +153,16 @@ async function meText(user: number, page: string = 'home', offset?: number) {
 
     case 'home':
     default:
-        return 'What kind of expls are you looking for?';
+      return 'What kind of expls are you looking for?';
   }
 }
 
 export async function meKeyboard(ctx: Context, page: string = 'home') {
-  const keyboard = await createKeyboard(ctx.from!.id, page, ctx.session.meOffset);
+  const keyboard = await createKeyboard(
+    ctx.from!.id,
+    page,
+    ctx.session.meOffset,
+  );
 
   return { inline_keyboard: keyboard };
 }
