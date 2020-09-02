@@ -2,11 +2,9 @@ import * as _ from 'lodash';
 import * as db from '../../database';
 import { formatDate } from '../../utils';
 import type { Context } from '../../types/telegraf';
-import Logger from '../../logger';
+import logger from '../../logger';
 import * as messages from '../../constants/messages';
 import { sendExpl } from '../../utils';
-
-const logger = new Logger(__filename);
 
 const DATA_SEPARATOR = '|';
 const EXPLS_IN_PAGE = 5;
