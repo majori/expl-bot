@@ -380,3 +380,65 @@ export async function getUserKarma(user: number): Promise<number> {
 
   return row?.karma || 0;
 }
+
+export async function getExlpsLikedByUser(
+  user: number,
+  amount?: number,
+  offset: number = 0,
+  order: string = 'latest',
+) {
+  const results = knex
+    .select('reactions.created_at', 'key')
+    .from('reactions')
+    .leftJoin('expls', 'reactions.expl_id', 'expls.id')
+    .where({ reaction: '👍', 'reactions.user_id': user })
+    .whereNot({ 'expls.user_id': user })
+    .orderBy('created_at', order === 'latest' ? 'desc' : 'asc')
+    .offset(offset);
+
+    if (amount) {
+      results.limit(amount);
+    }
+
+  return await results;
+}
+
+export async function getExlpsMadeByUser(
+  user: number,
+  order: string = 'latest',
+  offset: number = 0,
+  amount: number = 5,
+) {
+  const query = knex.from('expls').where({ user_id: user });
+  let results;
+
+  switch (order) {
+    case 'best':
+    case 'worst':
+      results = knex
+        .select('reaction', 'key')
+        .count()
+        .from('reactions')
+        .leftJoin('expls', 'reactions.expl_id', 'expls.id')
+        .where({ reaction: order === 'best' ? '👍' : '👎' })
+        .whereIn('expl_id', query.select('id'))
+        .groupBy('reaction', 'expl_id', 'key')
+        .orderBy('count', 'desc');
+      break;
+
+    case 'oldest':
+      results = query.orderBy('created_at');
+      break;
+
+    case 'latest':
+    default:
+      results = query.orderBy('created_at', 'desc');
+      break;
+  }
+
+  if (amount) {
+    results.limit(amount);
+  }
+
+  return await results.offset(offset);
+}

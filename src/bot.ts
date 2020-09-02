@@ -55,6 +55,7 @@ export default async (bot: Telegraf<Context>) => {
   bot.on('inline_query', events.inlineQuery);
   bot.on('poll_answer', events.pollAnswer);
   bot.action(/^reaction/, events.reaction);
+  bot.action(/^medata/, events.me);
 
   return bot;
 };
