@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import * as db from '../database';
-import type { Context } from '../types/telegraf';
-import { escapeMarkdown, formatDate } from '../utils';
-import { reactionsKeyboard } from './reaction';
-import * as messages from '../constants/messages';
+import * as db from '../../database';
+import type { Context } from '../../types/telegraf';
+import { escapeMarkdown, formatDate } from '../../utils';
+import { reactionsKeyboard } from '../events/reaction';
+import * as messages from '../../constants/messages';
 
 export async function resolveRexpl(ctx: Context) {
   if (!ctx.message!.reply_to_message) {

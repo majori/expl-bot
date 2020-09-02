@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as _ from 'lodash';
-import { handleInlineQuery } from '../src/handlers/inline-query';
-import { RESULT_LIMIT } from '../src/handlers/inline-query';
+import { handleInlineQuery } from '../src/handlers/events/inline-query';
+import { RESULT_LIMIT } from '../src/handlers/events/inline-query';
 import { inlineQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
 

@@ -1,7 +1,7 @@
-import * as db from '../database';
-import type { Context } from '../types/telegraf';
-import logger from '../logger';
-import * as messages from '../constants/messages';
+import * as db from '../../database';
+import type { Context } from '../../types/telegraf';
+import logger from '../../logger';
+import * as messages from '../../constants/messages';
 
 export async function reactionsKeyboard(id: number) {
   const reactions = ['👍', '👎'];

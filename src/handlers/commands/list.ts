@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import * as db from '../database';
-import type { Context } from '../types/telegraf';
-import * as messages from '../constants/messages';
-import { inlineSearchKeyboard } from '../utils';
+import * as db from '../../database';
+import type { Context } from '../../types/telegraf';
+import * as messages from '../../constants/messages';
+import { inlineSearchKeyboard } from '../../utils';
 
 export const MAX_COUNT = 100;
 
