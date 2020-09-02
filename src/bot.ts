@@ -45,6 +45,7 @@ export default async (bot: Telegraf<Context>) => {
     ['/resolve', /^(\!rs).*$/, commands.resolve],
     ['/quiz', /^(\!qz).*$/, commands.resolve],
     ['/karma', /^(\!k).*$/, commands.karma],
+    ['/me', /^(\!me).*$/, commands.me],
   ];
 
   for (const handler of commandHandlers) {
