@@ -1,4 +1,3 @@
-import 'mocha';
 import { expect } from 'chai';
 
 import { createTestableBot, botInfo } from './helper';
@@ -9,7 +8,7 @@ describe('Bot', () => {
   before(async () => (bot = await createTestableBot()));
   after((done) => bot.stop(done));
 
-  it("will fetch it's name with getMe()", () => {
+  it("will fetch it's name with getMe()", async () => {
     expect(bot.telegram.getMe.called).to.be.true;
     expect(bot.options).to.have.property('username', botInfo.username);
   });

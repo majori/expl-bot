@@ -1,10 +1,10 @@
-import 'mocha';
 import { expect } from 'chai';
 import * as _ from 'lodash';
 import * as db from '../src/database';
-import commands from '../src/commands';
-import { MAX_COUNT as MAX_LIST_COUNT } from '../src/commands/list';
-import { AMOUNT_OF_EXPL_OPTIONS } from '../src/commands/quiz';
+import commands from '../src/handlers/commands';
+import events from '../src/handlers/events';
+import { MAX_COUNT as MAX_LIST_COUNT } from '../src/handlers/commands/list';
+import { AMOUNT_OF_EXPL_OPTIONS } from '../src/handlers/commands/quiz';
 import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
@@ -202,11 +202,11 @@ describe('Commands', () => {
       expect(keyboard[0][0].text).to.contain('0');
 
       const ctx3 = callbackQuery(keyboard[0][0].callback_data);
-      await commands.reaction(ctx3);
-      await commands.reaction(ctx3);
+      await events.reaction(ctx3);
+      await events.reaction(ctx3);
 
       const ctx4 = callbackQuery(keyboard[0][1].callback_data);
-      await commands.reaction(ctx4);
+      await events.reaction(ctx4);
 
       const ctx5 = message(
         '/resolve',

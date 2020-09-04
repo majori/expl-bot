@@ -1,11 +1,9 @@
 import * as config from './config';
 import createBot from './bot';
 import Telegraf from 'telegraf';
-import Logger from './logger';
+import logger from './logger';
 import { knex } from './database';
 import * as express from 'express';
-
-const logger = new Logger(__filename);
 
 async function start() {
   const bot = await createBot(

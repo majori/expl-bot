@@ -1,5 +1,5 @@
-import * as db from '../database';
-import { Context } from '../types/telegraf';
+import * as db from '../../database';
+import { Context } from '../../types/telegraf';
 
 export async function handlePollAnswer(ctx: Context) {
   const answer = (ctx.update as any).poll_answer;

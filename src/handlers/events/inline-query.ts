@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import * as db from '../database';
-import * as config from '../config';
-import type { Context } from '../types/telegraf';
-import type { Table } from '../types/database';
+import * as db from '../../database';
+import * as config from '../../config';
+import type { Context } from '../../types/telegraf';
+import type { Table } from '../../types/database';
 
 export const RESULT_LIMIT = 15;
 

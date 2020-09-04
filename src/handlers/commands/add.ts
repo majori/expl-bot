@@ -1,13 +1,11 @@
 import * as _ from 'lodash';
-import * as db from '../database';
-import type { Context } from '../types/telegraf';
-import type { Options } from '../types/database';
-import Logger from '../logger';
-import * as messages from '../constants/messages';
+import * as db from '../../database';
+import type { Context } from '../../types/telegraf';
+import type { Options } from '../../types/database';
+import logger from '../../logger';
+import * as messages from '../../constants/messages';
 
-import { reactionsKeyboard } from './reaction';
-
-const logger = new Logger(__filename);
+import { reactionsKeyboard } from '../events/reaction';
 
 export async function createExpl(ctx: Context) {
   const words = ctx.message!.text!.split(' ');
