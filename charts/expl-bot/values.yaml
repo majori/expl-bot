@@ -1,5 +1,5 @@
 image:
-  repository: majori/expl-bot
+  repository: ghcr.io/majori/expl-bot
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -22,22 +22,25 @@ postgres:
 replicaCount: 1
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   host: chart-example.local
-  tls: 
+  tls:
     secretName: chart-example-tls
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
