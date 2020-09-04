@@ -21,6 +21,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container: node:12
+    defaults:
+      run:
+        shell: bash
 
     services:
       postgres:
@@ -46,6 +49,37 @@ jobs:
       - run: npm run test
         env:
           PG_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/postgres
+
+      - name: Generate Telegram message
+        if: ${{ always() }}
+        id: telegram_message
+        run: |
+          if [ $STATUS == "success" ]
+          then
+            MESSAGE=✅
+          else
+            MESSAGE=❌
+          fi
+
+          MESSAGE="$MESSAGE \"${{ github.event.head_commit.message }}\""
+          MESSAGE="$MESSAGE ([#$( echo "${{ github.sha }}" | head -c 7)](https://github.com/${{ github.repository	 }}/commit/${{ github.sha }}))"
+          MESSAGE="$MESSAGE @ \`${GITHUB_REF#refs/heads/}\`"
+          MESSAGE="$MESSAGE by *${{ github.actor }}*"
+
+          echo "::set-output name=message::$MESSAGE"
+        env:
+          STATUS: ${{ job.status }}
+
+      - name: Send notification
+        if: ${{ always() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: ${{ steps.telegram_message.outputs.message }}
+          format: markdown
+        env:
+          PLUGIN_WEBPAGE_PREVIEW: false
 
   # Push image to GitHub Packages.
   push:
