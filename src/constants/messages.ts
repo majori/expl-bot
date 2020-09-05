@@ -60,6 +60,8 @@ export const help = constant(`
   - Get expls which key is like given search term
 /quiz or !qz
   - Guess which one of the keys belongs to the given expl.
+/me or !me
+  - Get info of your expls and likes.
 /help or !h
   - Prints this info
 `);
