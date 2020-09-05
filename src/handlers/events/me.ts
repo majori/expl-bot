@@ -10,29 +10,25 @@ import { User } from 'telegraf/typings/telegram-types';
 const DATA_SEPARATOR = '|';
 const EXPLS_IN_PAGE = 5;
 
-function getListTitle(page: string) {
-  switch (page) {
-    case 'latest':
-      return messages.me.latestByYou();
-    case 'oldest':
-      return messages.me.oldestByYou();
-    case 'best':
-      return messages.me.bestByYou();
-    case 'worst':
-      return messages.me.worstByYou();
-    case 'likes':
-      return messages.me.likedByYou();
-    default:
-      return '';
-  }
+type page = 'latest' | 'oldest' | 'best' | 'worst' | 'likes';
+
+function getListTitle(page: page) {
+  const titleMap = {
+    latest: messages.me.latestByYou(),
+    oldest: messages.me.oldestByYou(),
+    best: messages.me.bestByYou(),
+    worst: messages.me.worstByYou(),
+    likes: messages.me.likedByYou(),
+  };
+
+  return titleMap[page] || '';
 }
 
 function button(text: string, data: string | string[]) {
-  if (_.isString(data)) {
-    data = [data];
-  }
-
-  return { text, callback_data: ['medata', ...data].join(DATA_SEPARATOR) };
+  return {
+    text,
+    callback_data: ['medata', ..._.castArray(data)].join(DATA_SEPARATOR),
+  };
 }
 
 function explsListItem(
@@ -54,7 +50,7 @@ function explsListItem(
   }
 }
 
-function explsList(list: any[], page: string, offset: number = 0) {
+function explsList(list: any[], page: page, offset: number = 0) {
   if (list.length < 1) {
     return messages.me.empty();
   }
@@ -173,9 +169,9 @@ async function meText(user: number, page: string = 'home', offset?: number) {
 }
 
 async function statsText(user: User) {
-  const amount = await db.getExlpCountByUser(+user.id);
-  const karma = await db.getUserKarma(+user.id);
-  const best = await db.getExlpsMadeByUser(+user.id, 'best', 1);
+  const amount = await db.getExlpCountByUser(user.id);
+  const karma = await db.getUserKarma(user.id);
+  const best = await db.getExlpsMadeByUser(user.id, 'best', 1);
 
   const helloText = _.isEmpty(user.username)
     ? messages.me.helloStranger()
@@ -203,15 +199,15 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
 export async function meStart(ctx: Context) {
   const keyboard = await meKeyboard(ctx);
   const texts = {
-    navigate: await meText(+ctx.from!.id, 'home'),
+    navigate: await meText(ctx.from!.id, 'home'),
     stats: await statsText(ctx.from!),
   };
 
-  await ctx.telegram.sendMessage(+ctx.from!.id, texts.stats, {
-    parse_mode: 'HTML',
+  await ctx.telegram.sendMessage(ctx.from!.id, texts.stats, {
+    parse_mode: 'MarkdownV2',
   });
 
-  await ctx.telegram.sendMessage(+ctx.from!.id, texts.navigate, {
+  await ctx.telegram.sendMessage(ctx.from!.id, texts.navigate, {
     reply_markup: keyboard,
   });
 }
@@ -228,7 +224,7 @@ async function reviewKey(ctx: Context, key: string) {
   const text = messages.me.removalAssurance(key);
 
   const replyTo = msg!.message_id;
-  await ctx.telegram.sendMessage(+ctx.from!.id, text, {
+  await ctx.telegram.sendMessage(ctx.from!.id, text, {
     reply_markup: {
       inline_keyboard: [
         [button(messages.me.deletePermanently(), ['remove', key])],
@@ -289,7 +285,7 @@ export async function meNavigate(ctx: Context) {
     return;
   }
 
-  const text = await meText(+ctx.from!.id, page, ctx.session.meOffset);
+  const text = await meText(ctx.from!.id, page, ctx.session.meOffset);
 
   try {
     await ctx.editMessageText(text, { reply_markup: keyboard });
