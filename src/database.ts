@@ -383,7 +383,7 @@ export async function getUserKarma(user: number): Promise<number> {
 
 export async function getExlpsLikedByUser(
   user: number,
-  amount?: number,
+  limit: number | boolean = false,
   offset: number = 0,
   order: string = 'latest',
 ) {
@@ -396,8 +396,8 @@ export async function getExlpsLikedByUser(
     .orderBy('created_at', order === 'latest' ? 'desc' : 'asc')
     .offset(offset);
 
-  if (amount) {
-    results.limit(amount);
+  if (_.isNumber(limit)) {
+    results.limit(limit);
   }
 
   return await results;
@@ -406,8 +406,8 @@ export async function getExlpsLikedByUser(
 export async function getExlpsMadeByUser(
   user: number,
   order: string = 'latest',
+  limit: number | boolean = false,
   offset: number = 0,
-  amount: number = 5,
 ) {
   const query = knex.from('expls').where({ user_id: user });
   let results;
@@ -436,9 +436,16 @@ export async function getExlpsMadeByUser(
       break;
   }
 
-  if (amount) {
-    results.limit(amount);
+  if (_.isNumber(limit)) {
+    results.limit(limit);
   }
 
   return await results.offset(offset);
+}
+
+export async function getExlpCountByUser(user: number) {
+  const query = knex.from('expls').count().where({ user_id: user });
+  const count: number = +_.get(await query, [0, 'count'], 0);
+
+  return count;
 }
