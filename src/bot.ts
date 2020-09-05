@@ -44,7 +44,6 @@ export default async (bot: Telegraf<Context>) => {
     ['/list', /^(\!ls ).*$/, commands.list],
     ['/resolve', /^(\!rs).*$/, commands.resolve],
     ['/quiz', /^(\!qz).*$/, commands.resolve],
-    ['/karma', /^(\!k).*$/, commands.karma],
     ['/me', /^(\!me).*$/, commands.me],
   ];
 
