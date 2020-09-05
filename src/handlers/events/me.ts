@@ -5,6 +5,7 @@ import type { Context } from '../../types/telegraf';
 import logger from '../../logger';
 import * as messages from '../../constants/messages';
 import { sendExpl } from '../../utils';
+import { User } from 'telegraf/typings/telegram-types';
 
 const DATA_SEPARATOR = '|';
 const EXPLS_IN_PAGE = 5;
@@ -73,6 +74,12 @@ async function createKeyboard(
   page: string = 'home',
   offset: number = 0,
 ) {
+  const worstExpls: any[] = await db.getExlpsMadeByUser(
+    user,
+    'worst',
+    EXPLS_IN_PAGE,
+  );
+
   switch (page) {
     case 'selfmade':
       return [
@@ -93,17 +100,16 @@ async function createKeyboard(
       return [[button(messages.me.goBack(), 'selfmade')]];
 
     case 'worst':
-      return [
-        [button(messages.me.reviewAbove(), 'review')],
-        [button(messages.me.goBack(), 'selfmade')],
-      ];
+      if (worstExpls.length > 0) {
+        return [
+          [button(messages.me.reviewAbove(), 'review')],
+          [button(messages.me.goBack(), 'selfmade')],
+        ];
+      } else {
+        return [[button(messages.me.goBack(), 'selfmade')]];
+      }
 
     case 'review':
-      const worstExpls: any[] = await db.getExlpsMadeByUser(
-        user,
-        'worst',
-        EXPLS_IN_PAGE,
-      );
       const mappedExpls = worstExpls.map(({ key }) => [
         button(key, ['review', key]),
       ]);
@@ -166,12 +172,16 @@ async function meText(user: number, page: string = 'home', offset?: number) {
   }
 }
 
-async function statsText(user: number) {
-  const amount = await db.getExlpCountByUser(user);
-  const karma = await db.getUserKarma(user);
-  const best = await db.getExlpsMadeByUser(user, 'best', 1);
+async function statsText(user: User) {
+  const amount = await db.getExlpCountByUser(+user.id);
+  const karma = await db.getUserKarma(+user.id);
+  const best = await db.getExlpsMadeByUser(+user.id, 'best', 1);
 
-  const statTexts = [messages.me.stats(amount, karma)];
+  const helloText = _.isEmpty(user.username)
+    ? messages.me.helloStranger()
+    : messages.me.hello(user.username);
+
+  const statTexts = [[helloText, messages.me.stats(amount, karma)].join(' ')];
 
   if (!_.isEmpty(best)) {
     statTexts.push(messages.me.bestSoFar(best[0].key));
@@ -194,7 +204,7 @@ export async function meStart(ctx: Context) {
   const keyboard = await meKeyboard(ctx);
   const texts = {
     navigate: await meText(+ctx.from!.id, 'home'),
-    stats: await statsText(+ctx.from!.id),
+    stats: await statsText(ctx.from!),
   };
 
   await ctx.telegram.sendMessage(+ctx.from!.id, texts.stats, {
@@ -247,7 +257,7 @@ export async function meNavigate(ctx: Context) {
 
     const likedExpls = await db.getExlpsLikedByUser(ctx.from!.id);
 
-    if (offset >= likedExpls.length) {
+    if (offset >= likedExpls.length && likedExpls.length > 0) {
       return ctx.answerCbQuery(messages.me.listEnd());
     }
 

@@ -102,6 +102,8 @@ export const me = {
     'If you click expl below, that expl will be displayed with a prompt to remove it.',
   ),
   exploreMore: template('If you want to explore more, click a button below.'),
+  hello: template('Hello {0}!'),
+  helloStranger: template('Hello stranger!'),
   stats: template(
     'You have added <b>{0}</b> expls, and all in all you have generated total karma of <b>{1}</b> 🎉.',
   ),
