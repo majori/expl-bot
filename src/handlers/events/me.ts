@@ -96,7 +96,11 @@ async function createKeyboard(
       ];
 
     case 'review':
-      const worstExpls: any[] = await db.getExlpsMadeByUser(user, 'worst');
+      const worstExpls: any[] = await db.getExlpsMadeByUser(
+        user,
+        'worst',
+        EXPLS_IN_PAGE,
+      );
       const mappedExpls = worstExpls.map(({ key }) => [
         button(key, ['review', key]),
       ]);
@@ -111,10 +115,11 @@ async function createKeyboard(
 
       const prevOffset = `${offset - EXPLS_IN_PAGE}`;
       const nextOffset = `${offset + EXPLS_IN_PAGE}`;
+
       return [
         [
-          button('Previous', ['likes', `${prevOffset}`]),
-          button('Next', ['likes', `${nextOffset}`]),
+          button('Previous', ['likes', prevOffset]),
+          button('Next', ['likes', nextOffset]),
         ],
         [button('⬅️ Go back', 'home')],
       ];
@@ -145,14 +150,32 @@ async function meText(user: number, page: string = 'home', offset?: number) {
 
     case 'best':
     case 'worst':
-      const usersExpls = await db.getExlpsMadeByUser(user, page);
+      const usersExpls = await db.getExlpsMadeByUser(user, page, EXPLS_IN_PAGE);
 
       return explsList(usersExpls, page);
 
     case 'home':
     default:
-      return 'What kind of expls are you looking for?';
+      return 'If you want to explore more, click a button below.';
   }
+}
+
+async function statsText(user: number) {
+  const amount = await db.getExlpCountByUser(user);
+  const karma = await db.getUserKarma(user);
+  const best = await db.getExlpsMadeByUser(user, 'best', 1);
+
+  const statTexts = [
+    `You have added <b>${amount}</b> expls, and all in all you have generated total karma of <b>${karma}</b> 🎉.`,
+  ];
+
+  if (!_.isEmpty(best)) {
+    statTexts.push(
+      `Your most popular expl so far has been <b>${best[0].key}</b>.`,
+    );
+  }
+
+  return statTexts.join('\n\n');
 }
 
 export async function meKeyboard(ctx: Context, page: string = 'home') {
@@ -167,9 +190,16 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
 
 export async function meStart(ctx: Context) {
   const keyboard = await meKeyboard(ctx);
-  const text = await meText(+ctx.from!.id, 'home');
+  const texts = {
+    navigate: await meText(+ctx.from!.id, 'home'),
+    stats: await statsText(+ctx.from!.id),
+  };
 
-  await ctx.telegram.sendMessage(+ctx.from!.id, text, {
+  await ctx.telegram.sendMessage(+ctx.from!.id, texts.stats, {
+    parse_mode: 'HTML',
+  });
+
+  await ctx.telegram.sendMessage(+ctx.from!.id, texts.navigate, {
     reply_markup: keyboard,
   });
 }
