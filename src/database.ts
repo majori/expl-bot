@@ -383,7 +383,7 @@ export async function getUserKarma(user: number): Promise<number> {
 
 export async function getExlpsLikedByUser(
   user: number,
-  limit: number | boolean = false,
+  limit: number | null = null,
   offset: number = 0,
   order: string = 'latest',
 ) {
@@ -406,7 +406,7 @@ export async function getExlpsLikedByUser(
 export async function getExlpsMadeByUser(
   user: number,
   order: string = 'latest',
-  limit: number | boolean = false,
+  limit: number | null = null,
   offset: number = 0,
 ) {
   const query = knex.from('expls').where({ user_id: user });
