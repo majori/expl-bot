@@ -79,3 +79,38 @@ export const quiz = {
 export const karma = {
   display: template('Your karma: {0}'),
 };
+
+export const me = {
+  latestByYou: template('Expls made by you, starting with latest:'),
+  oldestByYou: template('Expls made by you, starting with oldest:'),
+  bestByYou: template('Expls made by you, most liked:'),
+  worstByYou: template('Expls made by you, least liked:'),
+  likedByYou: template(
+    'Expls liked by you but made by others, starting with latest like:',
+  ),
+  empty: template('Oops, nothing to show!'),
+  mostLiked: template('👍 Most liked'),
+  leastLiked: template('👎 Least liked'),
+  goBack: template('⬅️ Go back'),
+  reviewAbove: template('Review above expls'),
+  prev: template('Previous'),
+  next: template('Next'),
+  madeByMe: template('Made by me'),
+  likedByMe: template('Liked by me'),
+  whichBasis: template('On which basis would you like to browse your expls?'),
+  clickToRemove: template(
+    'If you click expl below, that expl will be displayed with a prompt to remove it.',
+  ),
+  exploreMore: template('If you want to explore more, click a button below.'),
+  stats: template(
+    'You have added <b>{0}</b> expls, and all in all you have generated total karma of <b>{1}</b> 🎉.',
+  ),
+  bestSoFar: template('Your most popular expl so far has been <b>{0}</b>.'),
+  removalAssurance: template(
+    'Do want to remove this expl ("${key}")? This action can not be undone.',
+  ),
+  deletePermanently: template('Yes, delete it permanently!'),
+  cancel: template('Cancel'),
+  listBeginning: template('You are at beginning of the list'),
+  listEnd: template('You have reached the end of the list'),
+};

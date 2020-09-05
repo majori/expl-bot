@@ -12,15 +12,15 @@ const EXPLS_IN_PAGE = 5;
 function getListTitle(page: string) {
   switch (page) {
     case 'latest':
-      return 'Expls made by you, starting with latest:';
+      return messages.me.latestByYou();
     case 'oldest':
-      return 'Expls made by you, starting with oldest:';
+      return messages.me.oldestByYou();
     case 'best':
-      return 'Expls made by you, most liked:';
+      return messages.me.bestByYou();
     case 'worst':
-      return 'Expls made by you, least liked:';
+      return messages.me.worstByYou();
     case 'likes':
-      return 'Expls liked by you but made by others, starting with latest like:';
+      return messages.me.likedByYou();
     default:
       return '';
   }
@@ -55,7 +55,7 @@ function explsListItem(
 
 function explsList(list: any[], page: string, offset: number = 0) {
   if (list.length < 1) {
-    return 'Oops, nothing to show!';
+    return messages.me.empty();
   }
 
   const title = getListTitle(page);
@@ -76,7 +76,10 @@ async function createKeyboard(
   switch (page) {
     case 'selfmade':
       return [
-        [button('👍 Most liked', 'best'), button('👎 Least liked', 'worst')],
+        [
+          button(messages.me.mostLiked(), 'best'),
+          button(messages.me.leastLiked(), 'worst'),
+        ],
         /*
           WIP
           [button('Latest', 'latest'), button('Oldest', 'oldest')], 
@@ -87,12 +90,12 @@ async function createKeyboard(
     case 'best':
     case 'latest':
     case 'oldest':
-      return [[button('⬅️ Go back', 'selfmade')]];
+      return [[button(messages.me.goBack(), 'selfmade')]];
 
     case 'worst':
       return [
-        [button('Review above expls', 'review')],
-        [button('⬅️ Go back', 'selfmade')],
+        [button(messages.me.reviewAbove(), 'review')],
+        [button(messages.me.goBack(), 'selfmade')],
       ];
 
     case 'review':
@@ -104,13 +107,13 @@ async function createKeyboard(
       const mappedExpls = worstExpls.map(({ key }) => [
         button(key, ['review', key]),
       ]);
-      return [...mappedExpls, [button('⬅️ Go back', 'worst')]];
+      return [...mappedExpls, [button(messages.me.goBack(), 'worst')]];
 
     case 'likes':
       const likedExpls = await db.getExlpsLikedByUser(user);
 
       if (likedExpls.length <= EXPLS_IN_PAGE) {
-        return [[button('⬅️ Go back', 'home')]];
+        return [[button(messages.me.goBack(), 'home')]];
       }
 
       const prevOffset = `${offset - EXPLS_IN_PAGE}`;
@@ -118,15 +121,18 @@ async function createKeyboard(
 
       return [
         [
-          button('Previous', ['likes', prevOffset]),
-          button('Next', ['likes', nextOffset]),
+          button(messages.me.prev(), ['likes', prevOffset]),
+          button(messages.me.next(), ['likes', nextOffset]),
         ],
-        [button('⬅️ Go back', 'home')],
+        [button(messages.me.goBack(), 'home')],
       ];
 
     default:
       return [
-        [button('Made by me', 'selfmade'), button('Liked by me', 'likes')],
+        [
+          button(messages.me.madeByMe(), 'selfmade'),
+          button(messages.me.likedByMe(), 'likes'),
+        ],
       ];
   }
 }
@@ -134,7 +140,7 @@ async function createKeyboard(
 async function meText(user: number, page: string = 'home', offset?: number) {
   switch (page) {
     case 'selfmade':
-      return 'On which basis would you like to browse your expls?';
+      return messages.me.whichBasis();
 
     case 'likes':
       const likedExpls = await db.getExlpsLikedByUser(
@@ -146,7 +152,7 @@ async function meText(user: number, page: string = 'home', offset?: number) {
       return explsList(likedExpls, page);
 
     case 'review':
-      return 'If you click expl below, that expl will be displayed with a prompt to remove it.';
+      return messages.me.clickToRemove();
 
     case 'best':
     case 'worst':
@@ -156,7 +162,7 @@ async function meText(user: number, page: string = 'home', offset?: number) {
 
     case 'home':
     default:
-      return 'If you want to explore more, click a button below.';
+      return messages.me.exploreMore();
   }
 }
 
@@ -165,14 +171,10 @@ async function statsText(user: number) {
   const karma = await db.getUserKarma(user);
   const best = await db.getExlpsMadeByUser(user, 'best', 1);
 
-  const statTexts = [
-    `You have added <b>${amount}</b> expls, and all in all you have generated total karma of <b>${karma}</b> 🎉.`,
-  ];
+  const statTexts = [messages.me.stats(amount, karma)];
 
   if (!_.isEmpty(best)) {
-    statTexts.push(
-      `Your most popular expl so far has been <b>${best[0].key}</b>.`,
-    );
+    statTexts.push(messages.me.bestSoFar(best[0].key));
   }
 
   return statTexts.join('\n\n');
@@ -213,14 +215,14 @@ async function reviewKey(ctx: Context, key: string) {
 
   const msg = await sendExpl(ctx, key, expl);
 
-  const text = `Do want to remove this expl ("${key}")? This action can not be undone.`;
+  const text = messages.me.removalAssurance(key);
 
   const replyTo = msg!.message_id;
   await ctx.telegram.sendMessage(+ctx.from!.id, text, {
     reply_markup: {
       inline_keyboard: [
-        [button('Yes, delete it permanently!', ['remove', key])],
-        [button('Cancel', 'removeReview')],
+        [button(messages.me.deletePermanently(), ['remove', key])],
+        [button(messages.me.cancel(), 'removeReview')],
       ],
     },
     reply_to_message_id: replyTo,
@@ -240,13 +242,13 @@ export async function meNavigate(ctx: Context) {
     const offset = meta ? +meta : 0;
 
     if (offset < 0) {
-      return ctx.answerCbQuery('You are at beginning of the list');
+      return ctx.answerCbQuery(messages.me.listBeginning());
     }
 
     const likedExpls = await db.getExlpsLikedByUser(ctx.from!.id);
 
     if (offset >= likedExpls.length) {
-      return ctx.answerCbQuery('You have reached the end of the list');
+      return ctx.answerCbQuery(messages.me.listEnd());
     }
 
     ctx.session.meOffset = offset;
