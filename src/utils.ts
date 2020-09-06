@@ -61,7 +61,21 @@ export async function escapeMarkdown(msg: string) {
     .replace(/\_/g, '\\_')
     .replace(/\*/g, '\\*')
     .replace(/\[/g, '\\[')
-    .replace(/\`/g, '\\`');
+    .replace(/\]/g, '\\]')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
+    .replace(/\~/g, '\\~')
+    .replace(/\`/g, '\\`')
+    .replace(/\>/g, '\\>')
+    .replace(/\#/g, '\\#')
+    .replace(/\+/g, '\\+')
+    .replace(/\-/g, '\\-')
+    .replace(/\=/g, '\\=')
+    .replace(/\|/g, '\\|')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+    .replace(/\./g, '\\.')
+    .replace(/\!/g, '\\!');
 }
 
 export function formatDate(date: string) {
