@@ -20,7 +20,7 @@ export async function resolveRexpl(ctx: Context) {
     return ctx.reply(messages.resolve.notExpl());
   }
 
-  const key = await escapeMarkdown(expl.key);
+  const key = escapeMarkdown(expl.key);
   const date = formatDate(expl.created_at);
 
   const keyboard = await reactionsKeyboard(expl.id);
