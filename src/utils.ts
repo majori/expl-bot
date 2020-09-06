@@ -64,7 +64,7 @@ export async function escapeMarkdown(msg: string) {
     .replace(/\`/g, '\\`');
 }
 
-export async function formatDate(date: string) {
+export function formatDate(date: string) {
   const d = new Date(date);
   const dd = d.getDate();
   const mm = 1 + d.getMonth();

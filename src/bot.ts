@@ -38,13 +38,13 @@ export default async (bot: Telegraf<Context>) => {
 
   const commandHandlers: [string, RegExp, (ctx: Context) => Promise<any>][] = [
     ['/expl', /^(\?\? ).*$/, commands.expl],
-    ['/rexpl', /^(\?\!).*$/, commands.rexpl],
+    ['/rexpl', /^(\?\!)(| .*)$/, commands.rexpl],
     ['/add', /^(\!add ).*$/, commands.add],
     ['/remove', /^(\!rm ).*$/, commands.remove],
     ['/list', /^(\!ls ).*$/, commands.list],
-    ['/resolve', /^(\!rs).*$/, commands.resolve],
-    ['/quiz', /^(\!qz).*$/, commands.resolve],
-    ['/karma', /^(\!k).*$/, commands.karma],
+    ['/resolve', /^(\!rs)(| .*)$/, commands.resolve],
+    ['/quiz', /^(\!qz)(| .*)$/, commands.resolve],
+    ['/me', /^(\!me)(| .*)$/, commands.me],
   ];
 
   for (const handler of commandHandlers) {
@@ -55,6 +55,7 @@ export default async (bot: Telegraf<Context>) => {
   bot.on('inline_query', events.inlineQuery);
   bot.on('poll_answer', events.pollAnswer);
   bot.action(/^reaction/, events.reaction);
+  bot.action(/^medata/, events.me);
 
   return bot;
 };

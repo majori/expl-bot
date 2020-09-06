@@ -60,6 +60,8 @@ export const help = constant(`
   - Get expls which key is like given search term
 /quiz or !qz
   - Guess which one of the keys belongs to the given expl.
+/me or !me
+  - Get info of your expls and likes.
 /help or !h
   - Prints this info
 `);
@@ -76,6 +78,39 @@ export const quiz = {
   ),
 };
 
-export const karma = {
-  display: template('Your karma: {0}'),
+export const me = {
+  latestByYou: constant('Expls made by you, starting with latest:'),
+  oldestByYou: constant('Expls made by you, starting with oldest:'),
+  bestByYou: constant('Expls made by you, most liked:'),
+  worstByYou: constant('Expls made by you, least liked:'),
+  likedByYou: constant(
+    'Expls liked by you but made by others, starting with latest like:',
+  ),
+  empty: constant('Oops, nothing to show!'),
+  mostLiked: constant('👍 Most liked'),
+  leastLiked: constant('👎 Least liked'),
+  goBack: constant('⬅️ Go back'),
+  reviewAbove: constant('Review above expls'),
+  prev: constant('Previous'),
+  next: constant('Next'),
+  madeByMe: constant('Made by me'),
+  likedByMe: constant('Liked by me'),
+  whichBasis: constant('On which basis would you like to browse your expls?'),
+  clickToRemove: constant(
+    'If you click expl below, that expl will be displayed with a prompt to remove it.',
+  ),
+  exploreMore: constant('If you want to explore more, click a button below.'),
+  hello: template('Hello {0}\\!'),
+  helloStranger: constant('Hello stranger\\!'),
+  stats: template(
+    'You have added *{0}* expls, and all in all you have generated total karma of *{1}* 🎉\\.',
+  ),
+  bestSoFar: template('Your most popular expl so far has been *{0}*\\.'),
+  removalAssurance: template(
+    'Do want to remove this expl ("{0}")? This action can not be undone.',
+  ),
+  deletePermanently: constant('Yes, delete it permanently!'),
+  cancel: constant('Cancel'),
+  listBeginning: constant('You are at beginning of the list'),
+  listEnd: constant('You have reached the end of the list'),
 };
