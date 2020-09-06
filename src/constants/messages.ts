@@ -78,10 +78,6 @@ export const quiz = {
   ),
 };
 
-export const karma = {
-  display: template('Your karma: {0}'),
-};
-
 export const me = {
   latestByYou: constant('Expls made by you, starting with latest:'),
   oldestByYou: constant('Expls made by you, starting with oldest:'),

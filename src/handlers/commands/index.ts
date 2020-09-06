@@ -5,7 +5,6 @@ import { removeExpl } from './remove';
 import { printHelp } from './help';
 import { resolveRexpl } from './resolve';
 import { startQuiz } from './quiz';
-import { getKarma } from './karma';
 import { meStart } from '../events/me';
 
 export default {
@@ -17,6 +16,5 @@ export default {
   help: printHelp,
   resolve: resolveRexpl,
   quiz: startQuiz,
-  karma: getKarma,
   me: meStart,
 };
