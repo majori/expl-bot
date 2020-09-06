@@ -8,18 +8,24 @@ export const RESULT_LIMIT = 15;
 
 export async function handleInlineQuery(ctx: Context) {
   const query = ctx.inlineQuery!.query;
-
-  const expls = await (_.isEmpty(query)
-    ? db.searchRexpls(ctx.from!.id)
-    : db.searchExpls(ctx.from!.id, query, RESULT_LIMIT, true));
-  const results = _.map(expls, (expl) => getInlineResult(expl));
-
-  return ctx.answerInlineQuery(results as any, {
-    switch_pm_text: _.isEmpty(query) ? 'Bot commands' : undefined,
-    switch_pm_parameter: _.isEmpty(query) ? 'commands' : undefined,
+  const queryOpt = {
     is_personal: true,
     cache_time: config.env.prod ? undefined : 0, // Cache only in production
-  });
+  };
+
+  if (_.isEmpty(query)) {
+    return ctx.answerInlineQuery([], {
+      switch_pm_text: 'Bot commands',
+      switch_pm_parameter: 'commands',
+      ...queryOpt,
+    });
+  }
+
+  const expls = await db.searchExpls(ctx.from!.id, query, RESULT_LIMIT, true);
+
+  const results = _.map(expls, (expl) => getInlineResult(expl));
+
+  return ctx.answerInlineQuery(results as any, queryOpt);
 }
 
 const getInlineResult = (

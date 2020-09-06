@@ -139,16 +139,6 @@ export const searchExpls: SearchExpls = async (
   return query;
 };
 
-export async function searchRexpls(
-  user: number,
-): Promise<Array<Partial<Table.Expl>>> {
-  return getExplsForUser(user)
-    .whereNotNull('tg_contents.photo_id')
-    .orWhereNotNull('tg_contents.sticker_id')
-    .orWhereNotNull('tg_contents.video_id')
-    .orderBy('created_at', 'desc');
-}
-
 export async function addUserToChat(user: number, chat: number) {
   try {
     await knex('auth').insert({
