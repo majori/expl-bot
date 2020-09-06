@@ -6,7 +6,6 @@ import * as config from './config';
 const logger = winston.createLogger({
   level: config.logging.level,
   format: winston.format.simple(),
-  defaultMeta: { service: 'user-service' },
   transports: [new winston.transports.Console()],
 });
 

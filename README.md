@@ -1,6 +1,6 @@
 # expl-bot
 
-[![Build Status](https://travis-ci.org/majori/expl-bot.svg?branch=development)](https://travis-ci.org/majori/expl-bot)
+![CI](https://github.com/majori/expl-bot/workflows/CI/badge.svg)
 
 # Development
 
@@ -27,7 +27,7 @@ docker run \
   -e "TG_TOKEN=$TG_TOKEN" \
   -p 6000:6000 \
   -d \
-  majori/expl-bot
+  ghrc.io/majori/expl-bot
 ```
 
 - Run migrations with `docker exec expl-bot npm run migrate`

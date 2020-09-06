@@ -464,126 +464,136 @@ describe('Commands', () => {
     });
   });
 
-  describe('/karma', async () => {
-    it('responds even if user has no karma', async () => {
-      const ctx = message('/karma');
-      await commands.karma(ctx);
-      expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
-    });
-
-    it('calculates karma points from stats correctly', async () => {
-      const stats = {
-        likes: 5,
-        dislikes: 4,
-        echos: 40,
-      };
-
-      await knex('karma').insert({
-        user_id: USER_ID,
-        ...stats,
-      });
-
-      const points =
-        db.KarmaMultipliers.likes * stats.likes +
-        db.KarmaMultipliers.dislikes * stats.dislikes +
-        db.KarmaMultipliers.echos * stats.echos;
-
-      const ctx = message('/karma');
-      await commands.karma(ctx);
-      expect(ctx.reply.lastCall.args[0]).to.equal(
-        messages.karma.display(points),
-      );
-    });
-
-    describe("doesn't modify karma on actions to own expls", async () => {
-      const EXPL: Partial<Table.Expl> = {
-        id: 1,
-        key: 'expl_0',
-        value: 'value',
-        user_id: USER_ID,
-      };
-      const FROM = { chat: -1, user: USER_ID };
-
-      it('like', async () => {
-        await knex('expls').insert(EXPL);
-        await db.addReaction(FROM, EXPL.id!, '👍');
-
-        const ctx = message('/karma');
-        await commands.karma(ctx);
-        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
-      });
-
-      it('dislike', async () => {
-        await knex('expls').insert(EXPL);
-        await db.addReaction(FROM, EXPL.id!, '👎');
-
-        const ctx = message('/karma');
-        await commands.karma(ctx);
-        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
-      });
-
-      it('echo', async () => {
-        await knex('expls').insert(EXPL);
-        db.addEcho(EXPL as any, FROM, false, 1);
-
-        const ctx = message('/karma');
-        await commands.karma(ctx);
-        expect(ctx.reply.lastCall.args[0]).to.equal(messages.karma.display(0));
-      });
-    });
-
-    describe("modifies karma if someone else reacts to user's expl", async () => {
-      const EXPL: Partial<Table.Expl> = {
-        id: 1,
-        key: 'expl_0',
-        value: 'value',
-        user_id: USER_ID,
-      };
-
-      const FROM = { chat: -1, user: 223456789 };
-
-      it('like', async () => {
-        await knex('expls').insert(EXPL);
-        await db.addReaction(FROM, EXPL.id!, '👍');
-
-        const ctx = message('/karma');
-        await commands.karma(ctx);
-
-        const karma = await db.getUserKarma(USER_ID);
-
-        expect(karma).to.not.equal(0);
-        expect(ctx.reply.lastCall.args[0]).to.equal(
-          messages.karma.display(karma),
+  describe('/me', async () => {
+    describe('karma', async () => {
+      it('responds even if user has no karma', async () => {
+        const ctx = message('/me');
+        await commands.me(ctx);
+        expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+          messages.me.stats(0, 0),
         );
       });
 
-      it('dislike', async () => {
-        await knex('expls').insert(EXPL);
-        await db.addReaction(FROM, EXPL.id!, '👎');
+      it('calculates karma points from stats correctly', async () => {
+        const stats = {
+          likes: 5,
+          dislikes: 4,
+          echos: 40,
+        };
 
-        const ctx = message('/karma');
-        await commands.karma(ctx);
+        await knex('karma').insert({
+          user_id: USER_ID,
+          ...stats,
+        });
 
-        const karma = await db.getUserKarma(USER_ID);
+        const points =
+          db.KarmaMultipliers.likes * stats.likes +
+          db.KarmaMultipliers.dislikes * stats.dislikes +
+          db.KarmaMultipliers.echos * stats.echos;
 
-        expect(karma).to.not.equal(0);
-        expect(ctx.reply.lastCall.args[0]).to.equal(
-          messages.karma.display(karma),
+        const ctx = message('/me');
+        await commands.me(ctx);
+        expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+          messages.me.stats(0, points),
         );
       });
 
-      it('echo', async () => {
-        await knex('expls').insert(EXPL);
-        await db.addEcho(EXPL as any, FROM, false, 1);
+      describe("doesn't modify karma on actions to own expls", async () => {
+        const EXPL: Partial<Table.Expl> = {
+          id: 1,
+          key: 'expl_0',
+          value: 'value',
+          user_id: USER_ID,
+        };
+        const FROM = { chat: -1, user: USER_ID };
 
-        const ctx = message('/karma');
-        await commands.karma(ctx);
+        it('like', async () => {
+          await knex('expls').insert(EXPL);
+          await db.addReaction(FROM, EXPL.id!, '👍');
 
-        const karma = await db.getUserKarma(USER_ID);
-        expect(karma).to.not.equal(0);
-        expect(ctx.reply.lastCall.args[0]).to.equal(
-          messages.karma.display(karma),
-        );
+          const ctx = message('/me');
+          await commands.me(ctx);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, 0),
+          );
+        });
+
+        it('dislike', async () => {
+          await knex('expls').insert(EXPL);
+          await db.addReaction(FROM, EXPL.id!, '👎');
+
+          const ctx = message('/me');
+          await commands.me(ctx);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, 0),
+          );
+        });
+
+        it('echo', async () => {
+          await knex('expls').insert(EXPL);
+          db.addEcho(EXPL as any, FROM, false, 1);
+
+          const ctx = message('/me');
+          await commands.me(ctx);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, 0),
+          );
+        });
+      });
+
+      describe("modifies karma if someone else reacts to user's expl", async () => {
+        const EXPL: Partial<Table.Expl> = {
+          id: 1,
+          key: 'expl_0',
+          value: 'value',
+          user_id: USER_ID,
+        };
+
+        const FROM = { chat: -1, user: 223456789 };
+
+        it('like', async () => {
+          await knex('expls').insert(EXPL);
+          await db.addReaction(FROM, EXPL.id!, '👍');
+
+          const ctx = message('/me');
+          await commands.me(ctx);
+
+          const karma = await db.getUserKarma(USER_ID);
+
+          expect(karma).to.not.equal(0);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, karma),
+          );
+        });
+
+        it('dislike', async () => {
+          await knex('expls').insert(EXPL);
+          await db.addReaction(FROM, EXPL.id!, '👎');
+
+          const ctx = message('/me');
+          await commands.me(ctx);
+
+          const karma = await db.getUserKarma(USER_ID);
+
+          expect(karma).to.not.equal(0);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, karma),
+          );
+        });
+
+        it('echo', async () => {
+          await knex('expls').insert(EXPL);
+          await db.addEcho(EXPL as any, FROM, false, 1);
+
+          const ctx = message('/me');
+          await commands.me(ctx);
+
+          const karma = await db.getUserKarma(USER_ID);
+          expect(karma).to.not.equal(0);
+          expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
+            messages.me.stats(1, karma),
+          );
+        });
       });
     });
   });

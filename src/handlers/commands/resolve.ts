@@ -21,7 +21,7 @@ export async function resolveRexpl(ctx: Context) {
   }
 
   const key = await escapeMarkdown(expl.key);
-  const date = await formatDate(expl.created_at);
+  const date = formatDate(expl.created_at);
 
   const keyboard = await reactionsKeyboard(expl.id);
 
