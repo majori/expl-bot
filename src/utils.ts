@@ -56,7 +56,15 @@ export async function sendExpl(
   }
 }
 
-export async function escapeMarkdown(msg: string) {
+export function escapeMarkdown(msg: string) {
+  return msg
+    .replace(/\_/g, '\\_')
+    .replace(/\*/g, '\\*')
+    .replace(/\`/g, '\\`')
+    .replace(/\[/g, '\\[');
+}
+
+export function escapeMarkdownV2(msg: string) {
   return msg
     .replace(/\_/g, '\\_')
     .replace(/\*/g, '\\*')

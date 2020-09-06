@@ -6,7 +6,7 @@ import logger from '../../logger';
 import * as messages from '../../constants/messages';
 import { sendExpl } from '../../utils';
 import { User } from 'telegraf/typings/telegram-types';
-import { escapeMarkdown } from '../../utils';
+import { escapeMarkdownV2 } from '../../utils';
 
 const DATA_SEPARATOR = '|';
 const EXPLS_IN_PAGE = 5;
@@ -185,7 +185,7 @@ export async function statsText(user: User) {
   const statTexts = [[helloText, messages.me.stats(amount, karma)].join(' ')];
 
   if (!_.isEmpty(best)) {
-    statTexts.push(messages.me.bestSoFar(escapeMarkdown(best[0].key)));
+    statTexts.push(messages.me.bestSoFar(escapeMarkdownV2(best[0].key)));
   }
 
   return statTexts.join('\n\n');
