@@ -139,7 +139,11 @@ async function createKeyboard(
   }
 }
 
-async function meText(user: number, page: string = 'home', offset?: number) {
+export async function meText(
+  user: number,
+  page: string = 'home',
+  offset?: number,
+) {
   switch (page) {
     case 'selfmade':
       return messages.me.whichBasis();
@@ -168,7 +172,7 @@ async function meText(user: number, page: string = 'home', offset?: number) {
   }
 }
 
-async function statsText(user: User) {
+export async function statsText(user: User) {
   const amount = await db.getExlpCountByUser(user.id);
   const karma = await db.getUserKarma(user.id);
   const best = await db.getExlpsMadeByUser(user.id, 'best', 1);
@@ -194,22 +198,6 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
   );
 
   return { inline_keyboard: keyboard };
-}
-
-export async function meStart(ctx: Context) {
-  const keyboard = await meKeyboard(ctx);
-  const texts = {
-    navigate: await meText(ctx.from!.id, 'home'),
-    stats: await statsText(ctx.from!),
-  };
-
-  await ctx.telegram.sendMessage(ctx.from!.id, texts.stats, {
-    parse_mode: 'MarkdownV2',
-  });
-
-  await ctx.telegram.sendMessage(ctx.from!.id, texts.navigate, {
-    reply_markup: keyboard,
-  });
 }
 
 async function reviewKey(ctx: Context, key: string) {

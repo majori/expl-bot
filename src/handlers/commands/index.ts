@@ -5,7 +5,7 @@ import { removeExpl } from './remove';
 import { printHelp } from './help';
 import { resolveRexpl } from './resolve';
 import { startQuiz } from './quiz';
-import { meStart } from '../events/me';
+import { startMe } from './me';
 
 export default {
   add: createExpl,
@@ -16,5 +16,5 @@ export default {
   help: printHelp,
   resolve: resolveRexpl,
   quiz: startQuiz,
-  me: meStart,
+  me: startMe,
 };
