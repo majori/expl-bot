@@ -9,30 +9,6 @@ describe('Inline query', () => {
   beforeEach(clearDb);
   after(migrateAllDown);
 
-  it('suggests rexpls if query is empty', async () => {
-    const EXPL_COUNT = 10;
-    const contentIds = await knex('tg_contents')
-      .returning('content_id')
-      .insert(
-        _.times(EXPL_COUNT, (i) => ({
-          photo_id: i * 100,
-          chat_id: i * 100 + 1,
-        })),
-      );
-
-    await knex('expls').insert(
-      _.times(EXPL_COUNT, (i) => ({
-        user_id: USER_ID,
-        key: `key_${i}`,
-        tg_content: contentIds[i],
-      })),
-    );
-
-    const ctx = inlineQuery('');
-    await handleInlineQuery(ctx);
-    expect(ctx.answerInlineQuery.args[0][0]).to.have.length(EXPL_COUNT);
-  });
-
   it('searches expls if query contains text', async () => {
     const EXPL_COUNT = _.clamp(5, RESULT_LIMIT);
 
