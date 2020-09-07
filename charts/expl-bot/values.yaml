@@ -1,5 +1,6 @@
 image:
-  repository: ghcr.io/majori/expl-bot
+  registry: ghcr.io
+  repository: majori/expl-bot
   tag: latest
   pullPolicy: IfNotPresent
 

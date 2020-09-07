@@ -34,7 +34,7 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.start(commands.help);
   bot.help(commands.help);
-  bot.hears(/^(\!h)/, commands.help);
+  bot.hears(/^(\!h)(| .*)$/, commands.help);
 
   const commandHandlers: [string, RegExp, (ctx: Context) => Promise<any>][] = [
     ['/expl', /^(\?\? ).*$/, commands.expl],
