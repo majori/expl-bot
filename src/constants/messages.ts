@@ -106,6 +106,9 @@ export const me = {
     'You have added *{0}* expls, and all in all you have generated total karma of *{1}* 🎉\\.',
   ),
   bestSoFar: template('Your most popular expl so far has been *{0}*\\.'),
+  quizAnswers: template(
+    'You have answered *{0}* quizzes, with success rate of *{1}*% 👏\\.',
+  ),
   removalAssurance: template(
     'Do want to remove this expl ("{0}")? This action can not be undone.',
   ),

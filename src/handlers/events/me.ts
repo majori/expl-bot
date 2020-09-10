@@ -177,6 +177,7 @@ export async function statsText(user: User) {
   const amount = await db.getExlpCountByUser(user.id);
   const karma = await db.getUserKarma(user.id);
   const best = await db.getExlpsMadeByUser(user.id, 'best', 1);
+  const answers = await db.getQuizAnswersByUser(user.id);
 
   const helloText = _.isEmpty(user.username)
     ? messages.me.helloStranger()
@@ -186,6 +187,11 @@ export async function statsText(user: User) {
 
   if (!_.isEmpty(best)) {
     statTexts.push(messages.me.bestSoFar(escapeMarkdownV2(best[0].key)));
+  }
+
+  if (answers.total > 0) {
+    const succesRate = 100 * _.round(answers.right / answers.total, 2);
+    statTexts.push(messages.me.quizAnswers(answers.total, succesRate));
   }
 
   return statTexts.join('\n\n');
