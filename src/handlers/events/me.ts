@@ -183,7 +183,11 @@ export async function statsText(user: User) {
     ? messages.me.helloStranger()
     : messages.me.hello(user.username);
 
-  const statTexts = [[helloText, messages.me.stats(amount, karma)].join(' ')];
+  const karmaEscaped = escapeMarkdownV2(karma.toString());
+
+  const statTexts = [
+    [helloText, messages.me.stats(amount, karmaEscaped)].join(' '),
+  ];
 
   if (!_.isEmpty(best)) {
     statTexts.push(messages.me.bestSoFar(escapeMarkdownV2(best[0].key)));
@@ -208,7 +212,7 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
 }
 
 async function reviewKey(ctx: Context, key: string) {
-  const expl = await db.getExpl(ctx.from!.id, key);
+  const expl = await db.getOwnExpl(ctx.from!.id, key);
 
   if (!expl) {
     return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
