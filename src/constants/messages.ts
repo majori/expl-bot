@@ -70,6 +70,7 @@ export const reaction = {
   added: template('Added "{0}"'),
   removed: template('Removed your previous "{0}"'),
   creatorHasRemoved: constant('Expl creator has removed this expl'),
+  confirmRemoval: constant('❗️ already added, click again to remove'),
 };
 
 export const quiz = {

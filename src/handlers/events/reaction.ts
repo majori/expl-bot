@@ -35,6 +35,12 @@ export async function toggleReaction(ctx: Context) {
   } catch (err) {
     switch (err.message) {
       case 'already_exists':
+        if (ctx.session.reactionToBeDeleted !== +id) {
+          ctx.session.reactionToBeDeleted = +id;
+          setTimeout(() => (ctx.session.reactionToBeDeleted = null), 4000);
+          return ctx.answerCbQuery(messages.reaction.confirmRemoval());
+        }
+
         await db.deleteReaction(ctx.from!.id, +id, reaction);
         ctx.answerCbQuery(messages.reaction.removed(reaction));
         break;
