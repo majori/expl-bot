@@ -458,3 +458,16 @@ export async function getQuizAnswersByUser(user: number) {
 
   return { right, wrong, total: wrong + right };
 }
+
+export async function getOwnExpl(user: number, key: string) {
+  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
+    user,
+  )
+    .andWhere({ 'expls.key': _.toLower(key), 'expls.user_id': user })
+    .groupBy('id', 'content_id');
+
+  if (_.isEmpty(results)) {
+    return;
+  }
+  return createNestedExpl(_.first(results)!);
+}

@@ -212,7 +212,7 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
 }
 
 async function reviewKey(ctx: Context, key: string) {
-  const expl = await db.getExpl(ctx.from!.id, key);
+  const expl = await db.getOwnExpl(ctx.from!.id, key);
 
   if (!expl) {
     return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
