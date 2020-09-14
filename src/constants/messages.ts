@@ -70,6 +70,7 @@ export const reaction = {
   added: template('Added "{0}"'),
   removed: template('Removed your previous "{0}"'),
   creatorHasRemoved: constant('Expl creator has removed this expl'),
+  confirmRemoval: constant('❗️ already added, click again to remove'),
 };
 
 export const quiz = {
@@ -106,6 +107,9 @@ export const me = {
     'You have added *{0}* expls, and all in all you have generated total karma of *{1}* 🎉\\.',
   ),
   bestSoFar: template('Your most popular expl so far has been *{0}*\\.'),
+  quizAnswers: template(
+    'You have answered *{0}* quizzes, with success rate of *{1}*% 👏\\.',
+  ),
   removalAssurance: template(
     'Do want to remove this expl ("{0}")? This action can not be undone.',
   ),

@@ -439,3 +439,22 @@ export async function getExlpCountByUser(user: number) {
 
   return count;
 }
+
+export async function getQuizAnswersByUser(user: number) {
+  const queryWhereCorrect = knex
+    .from('quiz_answers')
+    .count()
+    .where({ user_id: user })
+    .andWhere({ was_correct: true });
+
+  const queryWhereIncorrect = knex
+    .from('quiz_answers')
+    .count()
+    .where({ user_id: user })
+    .andWhere({ was_correct: false });
+
+  const wrong: number = +_.get(await queryWhereIncorrect, [0, 'count'], 0);
+  const right: number = +_.get(await queryWhereCorrect, [0, 'count'], 0);
+
+  return { right, wrong, total: wrong + right };
+}

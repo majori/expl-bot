@@ -204,6 +204,7 @@ describe('Commands', () => {
       const ctx3 = callbackQuery(keyboard[0][0].callback_data);
       await events.reaction(ctx3);
       await events.reaction(ctx3);
+      await events.reaction(ctx3);
 
       const ctx4 = callbackQuery(keyboard[0][1].callback_data);
       await events.reaction(ctx4);
@@ -220,7 +221,7 @@ describe('Commands', () => {
         'replyWithMarkdown.args[0][1].reply_markup.inline_keyboard',
       );
 
-      expect(keyboard2[0][0].text).to.contain('0'); // because we 'pressed' to first button twice
+      expect(keyboard2[0][0].text).to.contain('0'); // because we 'pressed' to first button three times
       expect(keyboard2[0][1].text).to.contain('1'); // ... and the second only once
     });
   });
