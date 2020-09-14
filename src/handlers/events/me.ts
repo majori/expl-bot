@@ -183,7 +183,11 @@ export async function statsText(user: User) {
     ? messages.me.helloStranger()
     : messages.me.hello(user.username);
 
-  const statTexts = [[helloText, messages.me.stats(amount, karma)].join(' ')];
+  const karmaEscaped = escapeMarkdownV2(karma.toString());
+
+  const statTexts = [
+    [helloText, messages.me.stats(amount, karmaEscaped)].join(' '),
+  ];
 
   if (!_.isEmpty(best)) {
     statTexts.push(messages.me.bestSoFar(escapeMarkdownV2(best[0].key)));

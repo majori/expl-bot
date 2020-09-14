@@ -9,6 +9,7 @@ import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
 import { Table } from '../src/types/database';
+import { escapeMarkdownV2 } from '../src/utils';
 
 describe('Commands', () => {
   beforeEach(clearDb);
@@ -560,10 +561,11 @@ describe('Commands', () => {
           await commands.me(ctx);
 
           const karma = await db.getUserKarma(USER_ID);
+          const karmaEscaped = escapeMarkdownV2(karma.toString());
 
           expect(karma).to.not.equal(0);
           expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
-            messages.me.stats(1, karma),
+            messages.me.stats(1, karmaEscaped),
           );
         });
 
@@ -575,10 +577,11 @@ describe('Commands', () => {
           await commands.me(ctx);
 
           const karma = await db.getUserKarma(USER_ID);
+          const karmaEscaped = escapeMarkdownV2(karma.toString());
 
           expect(karma).to.not.equal(0);
           expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
-            messages.me.stats(1, karma),
+            messages.me.stats(1, karmaEscaped),
           );
         });
 
@@ -590,9 +593,11 @@ describe('Commands', () => {
           await commands.me(ctx);
 
           const karma = await db.getUserKarma(USER_ID);
+          const karmaEscaped = escapeMarkdownV2(karma.toString());
+
           expect(karma).to.not.equal(0);
           expect(ctx.telegram.sendMessage.firstCall.args[1]).to.include(
-            messages.me.stats(1, karma),
+            messages.me.stats(1, karmaEscaped),
           );
         });
       });
