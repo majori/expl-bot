@@ -17,6 +17,7 @@ export const add = {
   invalidSyntax: template(
     'Try `{0} [key] [value]` or reply to any message with `{0} [key]`',
   ),
+  isBot: constant('Can not add content from other bots!'),
 };
 
 export const list = {

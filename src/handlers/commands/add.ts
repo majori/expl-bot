@@ -36,6 +36,12 @@ export async function createExpl(ctx: Context) {
       chat: ctx.message!.chat.id,
     };
 
+    if (replyTo.from && replyTo.from.is_bot) {
+      if (ctx.me !== replyTo.from.username) {
+        return ctx.reply(messages.add.isBot());
+      }
+    }
+
     if (replyTo.photo) {
       expl.telegram.photo = replyTo.photo[0].file_id;
     } else if (replyTo.audio) {
