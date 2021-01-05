@@ -119,3 +119,8 @@ export const me = {
   listBeginning: constant('You are at beginning of the list'),
   listEnd: constant('You have reached the end of the list'),
 };
+
+export const viral = {
+  notEnoughData: constant('Not enough data.'),
+  lead: constant('The hottest expls right now 🔥:'),
+};
