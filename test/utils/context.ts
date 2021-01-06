@@ -18,7 +18,9 @@ const baseContext = (state?: any) => {
     editMessageReplyMarkup: sinon.fake(),
     telegram: {
       sendMessage: sinon.fake(),
-      forwardMessage: sinon.fake(),
+      forwardMessage: sinon.fake.returns({
+        message_id: 1235,
+      }),
       webkhookReply: sinon.fake(),
     },
   };
