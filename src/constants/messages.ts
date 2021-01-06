@@ -63,6 +63,8 @@ export const help = constant(`
   - Guess which one of the keys belongs to the given expl.
 /me or !me
   - Get info of your expls and likes.
+/viral or !vrl
+  - Get most viral expls.
 /help or !h
   - Prints this info
 `);
