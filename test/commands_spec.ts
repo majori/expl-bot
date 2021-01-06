@@ -6,7 +6,7 @@ import events from '../src/handlers/events';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/handlers/commands/list';
 import { AMOUNT_OF_EXPL_OPTIONS } from '../src/handlers/commands/quiz';
 import * as messages from '../src/constants/messages';
-import { message, callbackQuery, USER_ID } from './utils/context';
+import { message, callbackQuery, USER_ID, GROUP_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
 import { Table } from '../src/types/database';
 import { escapeMarkdownV2 } from '../src/utils';
@@ -601,6 +601,52 @@ describe('Commands', () => {
           );
         });
       });
+    });
+  });
+
+  describe('/viral', () => {
+    it('reply when not enough data', async () => {
+      const ctx = message('/viral', true);
+      await commands.viral(ctx);
+
+      expect(ctx.reply.lastArg).to.equal(messages.viral.notEnoughData());
+    });
+
+    it('list recent most liked expls', async () => {
+      const COUNT = 4;
+      const EXTRALIKEDKEY = 2;
+
+      await knex('expls').insert(
+        _.times(COUNT, (i) => ({
+          key: `key_${i}`,
+          value: 'value',
+          user_id: USER_ID,
+        })),
+      );
+
+      const expls = await knex('expls');
+
+      for (const expl of expls) {
+        await knex('reactions').insert({
+          user_id: USER_ID,
+          expl_id: expl.id,
+          chat_id: GROUP_ID,
+          reaction: '👍',
+        });
+      }
+
+      // add extra like for one expl
+      await knex('reactions').insert({
+        user_id: 999999,
+        expl_id: expls[EXTRALIKEDKEY].id,
+        chat_id: GROUP_ID,
+        reaction: '👍',
+      });
+
+      const ctx = message('/viral', true);
+      await commands.viral(ctx);
+
+      expect(ctx.reply.lastArg).to.contain(`1. ${expls[EXTRALIKEDKEY].key}`);
     });
   });
 });

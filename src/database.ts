@@ -471,3 +471,34 @@ export async function getOwnExpl(user: number, key: string) {
   }
   return createNestedExpl(_.first(results)!);
 }
+
+export async function getMostViral(
+  user: number,
+  chat: number,
+  limit: number = 5,
+  offset: number = 0,
+) {
+  const query = getExplsForUser(user);
+
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const where =
+    user === chat ? { reaction: '👍' } : { reaction: '👍', chat_id: chat };
+
+  const results = knex
+    .select('key')
+    .count()
+    .from('reactions')
+    .leftJoin('expls', 'reactions.expl_id', 'expls.id')
+    .where(where)
+    .andWhere('reactions.created_at', '>=', oneWeekAgo)
+    .whereIn('expl_id', query.select('id'))
+    .groupBy('expl_id', 'key', 'expls.created_at')
+    .orderBy('count', 'desc')
+    .orderBy('expls.created_at', 'desc')
+    .limit(limit)
+    .offset(offset);
+
+  return await results;
+}

@@ -63,6 +63,8 @@ export const help = constant(`
   - Guess which one of the keys belongs to the given expl.
 /me or !me
   - Get info of your expls and likes.
+/viral or !vrl
+  - Get most viral expls.
 /help or !h
   - Prints this info
 `);
@@ -118,4 +120,10 @@ export const me = {
   cancel: constant('Cancel'),
   listBeginning: constant('You are at beginning of the list'),
   listEnd: constant('You have reached the end of the list'),
+};
+
+export const viral = {
+  notEnoughData: constant('Not enough data.'),
+  lead: constant('The hottest expls right now 🔥:'),
+  leadPrivate: constant('The hottest expls from all over your chats:'),
 };
