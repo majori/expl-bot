@@ -123,4 +123,5 @@ export const me = {
 export const viral = {
   notEnoughData: constant('Not enough data.'),
   lead: constant('The hottest expls right now 🔥:'),
+  leadPrivate: constant('The hottest expls from all over your chats:'),
 };

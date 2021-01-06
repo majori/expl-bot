@@ -474,6 +474,7 @@ export async function getOwnExpl(user: number, key: string) {
 
 export async function getMostViral(
   user: number,
+  chat: number,
   limit: number = 5,
   offset: number = 0,
 ) {
@@ -482,12 +483,15 @@ export async function getMostViral(
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
+  const where =
+    user === chat ? { reaction: '👍' } : { reaction: '👍', chat_id: chat };
+
   const results = knex
     .select('key')
     .count()
     .from('reactions')
     .leftJoin('expls', 'reactions.expl_id', 'expls.id')
-    .where({ reaction: '👍' })
+    .where(where)
     .andWhere('reactions.created_at', '>=', oneWeekAgo)
     .whereIn('expl_id', query.select('id'))
     .groupBy('expl_id', 'key', 'expls.created_at')
