@@ -270,6 +270,20 @@ export async function getResolve(
   if (_.isEmpty(results)) {
     return;
   }
+
+  const query = knex
+    .from('echo_history')
+    .select('id')
+    .where('echo_message_id', echo)
+    .andWhere('chat_id', from.chat);
+
+  const echoHistoryId: number = +_.get(await query, [0, 'id']);
+
+  await knex('resolve_history').insert({
+    user_id: from.user,
+    echo_id: echoHistoryId,
+  });
+
   return createNestedExpl(_.first(results)!);
 }
 
