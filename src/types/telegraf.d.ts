@@ -1,9 +1,11 @@
-import * as Telegraf from 'telegraf';
+import type { Context as C } from 'telegraf';
 
-export interface Context extends Telegraf.Context {
-  session: {
-    joined: boolean;
-    meOffset: number;
-    reactionToBeDeleted: number | null;
-  };
+export interface SessionData {
+  joined: boolean;
+  meOffset: number;
+  reactionToBeDeleted: number | null;
+}
+
+export interface Context extends C {
+  session?: SessionData;
 }

@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import type { Message } from 'typegram';
 import * as messages from '../../constants/messages';
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
@@ -9,7 +10,9 @@ export const AMOUNT_OF_EXPL_OPTIONS = 3;
 export const CHANCE_TO_OMIT_CORRECT_KEY = 33; // %
 
 export async function startQuiz(ctx: Context) {
-  const wasReply = Boolean(ctx.message!.reply_to_message);
+  const message = ctx.message as Message.TextMessage;
+
+  const wasReply = Boolean(message.reply_to_message);
 
   let correctExpl: Table.Expl | undefined;
   let replyTo: number;
@@ -17,9 +20,9 @@ export async function startQuiz(ctx: Context) {
   if (wasReply) {
     correctExpl = await db.getResolve(
       { user: ctx.from!.id, chat: ctx.chat!.id },
-      ctx.message!.reply_to_message!.message_id,
+      message.reply_to_message!.message_id,
     );
-    replyTo = ctx.message!.reply_to_message!.message_id;
+    replyTo = message.reply_to_message!.message_id;
     if (!correctExpl) {
       return ctx.reply(messages.resolve.notExpl());
     }

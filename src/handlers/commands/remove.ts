@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
+import type { Message } from 'typegram';
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
 import * as messages from '../../constants/messages';
 
 export async function removeExpl(ctx: Context) {
-  const words = ctx.message!.text!.split(' ');
+  const message = ctx.message as Message.TextMessage;
+  const words = message.text.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.remove.invalidSyntax(_.first(words)));
