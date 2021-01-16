@@ -205,7 +205,7 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
   const keyboard = await createKeyboard(
     ctx.from!.id,
     page,
-    ctx.session!.meOffset,
+    ctx.session?.meOffset,
   );
 
   return { inline_keyboard: keyboard };
@@ -259,7 +259,8 @@ export async function meNavigate(ctx: Context) {
       return ctx.answerCbQuery(messages.me.listEnd());
     }
 
-    ctx.session!.meOffset = offset;
+    ctx.session ??= {};
+    ctx.session.meOffset = offset;
   }
 
   const keyboard = await meKeyboard(ctx, page);
@@ -289,7 +290,7 @@ export async function meNavigate(ctx: Context) {
     return;
   }
 
-  const text = await meText(ctx.from!.id, page, ctx.session!.meOffset);
+  const text = await meText(ctx.from!.id, page, ctx.session?.meOffset);
 
   try {
     await ctx.editMessageText(text, { reply_markup: keyboard });
