@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
+import type { CallbackQuery, User, Message } from 'typegram';
 import * as db from '../../database';
 import { formatDate } from '../../utils';
 import type { Context } from '../../types/telegraf';
 import logger from '../../logger';
 import * as messages from '../../constants/messages';
 import { sendExpl } from '../../utils';
-import { User } from 'telegraf/typings/telegram-types';
 import { escapeMarkdownV2 } from '../../utils';
 
 const DATA_SEPARATOR = '|';
@@ -205,7 +205,7 @@ export async function meKeyboard(ctx: Context, page: string = 'home') {
   const keyboard = await createKeyboard(
     ctx.from!.id,
     page,
-    ctx.session.meOffset,
+    ctx.session!.meOffset,
   );
 
   return { inline_keyboard: keyboard };
@@ -237,11 +237,14 @@ async function reviewKey(ctx: Context, key: string) {
 }
 
 export async function meNavigate(ctx: Context) {
-  if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
+  const cbQuery = ctx.callbackQuery as
+    | CallbackQuery.DataCallbackQuery
+    | undefined;
+  if (!cbQuery || !cbQuery.data) {
     return;
   }
 
-  const [, page, meta] = ctx.callbackQuery.data.split(DATA_SEPARATOR);
+  const [, page, meta] = cbQuery.data.split(DATA_SEPARATOR);
 
   if (page === 'likes') {
     const offset = meta ? +meta : 0;
@@ -256,7 +259,7 @@ export async function meNavigate(ctx: Context) {
       return ctx.answerCbQuery(messages.me.listEnd());
     }
 
-    ctx.session.meOffset = offset;
+    ctx.session!.meOffset = offset;
   }
 
   const keyboard = await meKeyboard(ctx, page);
@@ -269,7 +272,9 @@ export async function meNavigate(ctx: Context) {
 
   if (page === 'removeReview' || page === 'remove') {
     ctx.deleteMessage();
-    ctx.deleteMessage(ctx.callbackQuery.message?.reply_to_message?.message_id);
+    ctx.deleteMessage(
+      (cbQuery.message as Message.TextMessage)?.reply_to_message?.message_id,
+    );
 
     if (page === 'remove' && !_.isEmpty(meta)) {
       const count = await db.deleteExpl(ctx.from!.id, meta);
@@ -284,7 +289,7 @@ export async function meNavigate(ctx: Context) {
     return;
   }
 
-  const text = await meText(ctx.from!.id, page, ctx.session.meOffset);
+  const text = await meText(ctx.from!.id, page, ctx.session!.meOffset);
 
   try {
     await ctx.editMessageText(text, { reply_markup: keyboard });

@@ -1,13 +1,16 @@
 import * as config from './config';
 import createBot from './bot';
-import Telegraf from 'telegraf';
+import { Telegraf } from 'telegraf';
 import logger from './logger';
 import { knex } from './database';
 import * as express from 'express';
+import type { Context } from './types/telegraf';
 
 async function start() {
   const bot = await createBot(
-    new Telegraf(config.tg.token!, { telegram: { webhookReply: false } }),
+    new Telegraf<Context>(config.tg.token!, {
+      telegram: { webhookReply: false },
+    }),
   );
   const server = express();
 
@@ -18,10 +21,10 @@ async function start() {
     await bot.telegram.setWebhook(url);
     logger.info(`Webhook set to ${url}`);
   } else {
-    await bot.telegram.deleteWebhook();
-    bot.startPolling();
     logger.info('Polling started for updates');
   }
+
+  await bot.launch();
 
   server.get('/health', async (req, res) => {
     try {

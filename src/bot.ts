@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as session from 'telegraf/session';
+import { session } from 'telegraf';
 import logger from './logger';
 import commands from './handlers/commands';
 import events from './handlers/events';
@@ -8,9 +8,6 @@ import type { Telegraf } from 'telegraf';
 import type { Context } from './types/telegraf';
 
 export default async (bot: Telegraf<Context>) => {
-  const info = await bot.telegram.getMe();
-  bot.options.username = info.username;
-
   bot.use((ctx, next) => {
     logger.debug('Message received', ctx.from);
     next();
@@ -23,10 +20,10 @@ export default async (bot: Telegraf<Context>) => {
       ctx.from &&
       ctx.chat &&
       ctx.chat.type !== 'private' &&
-      !ctx.session.joined
+      !ctx.session!.joined
     ) {
       await db.addUserToChat(ctx.from!.id, ctx.chat!.id);
-      ctx.session.joined = true;
+      ctx.session!.joined = true;
     }
 
     next();

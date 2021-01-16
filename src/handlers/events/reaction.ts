@@ -1,3 +1,4 @@
+import type { CallbackQuery } from 'typegram';
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
 import logger from '../../logger';
@@ -19,11 +20,14 @@ export async function reactionsKeyboard(id: number) {
 }
 
 export async function toggleReaction(ctx: Context) {
-  if (!ctx.callbackQuery || !ctx.callbackQuery.data) {
+  const cbQuery = ctx.callbackQuery as
+    | CallbackQuery.DataCallbackQuery
+    | undefined;
+  if (!cbQuery || !cbQuery.data) {
     return;
   }
 
-  const [type, id, reaction] = ctx.callbackQuery.data.split('|');
+  const [type, id, reaction] = cbQuery.data.split('|');
 
   try {
     await db.addReaction(
@@ -35,9 +39,9 @@ export async function toggleReaction(ctx: Context) {
   } catch (err) {
     switch (err.message) {
       case 'already_exists':
-        if (ctx.session.reactionToBeDeleted !== +id) {
-          ctx.session.reactionToBeDeleted = +id;
-          setTimeout(() => (ctx.session.reactionToBeDeleted = null), 4000);
+        if (ctx.session!.reactionToBeDeleted !== +id) {
+          ctx.session!.reactionToBeDeleted = +id;
+          setTimeout(() => (ctx.session!.reactionToBeDeleted = null), 4000);
           return ctx.answerCbQuery(messages.reaction.confirmRemoval());
         }
 
@@ -46,7 +50,7 @@ export async function toggleReaction(ctx: Context) {
         break;
 
       case 'expl_removed':
-        await ctx.editMessageReplyMarkup();
+        await ctx.editMessageReplyMarkup(undefined);
         return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
 
       default:

@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
+import type { Message } from 'typegram';
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
 import * as messages from '../../constants/messages';
 import { sendExpl } from '../../utils';
 
 export async function getExpl(ctx: Context) {
-  const words = ctx.message!.text!.split(' ');
+  const message = ctx.message as Message.TextMessage;
+  const words = message.text.split(' ');
 
   if (words.length < 2 || _.isEmpty(words[1])) {
     return ctx.replyWithMarkdown(messages.get.invalidSyntax(_.first(words)));

@@ -20,7 +20,7 @@ jobs:
   # Run tests.
   test:
     runs-on: ubuntu-latest
-    container: node:12
+    container: node:14
     defaults:
       run:
         shell: bash
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
 
       - run: npm ci
 

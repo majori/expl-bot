@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import type { Message } from 'typegram';
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
 import type { Options } from '../../types/database';
@@ -8,7 +9,8 @@ import * as messages from '../../constants/messages';
 import { reactionsKeyboard } from '../events/reaction';
 
 export async function createExpl(ctx: Context) {
-  const words = ctx.message!.text!.split(' ');
+  const message = ctx.message as Message.TextMessage;
+  const words = message.text.split(' ');
 
   const errorMessage = messages.add.invalidSyntax(_.first(words));
 
@@ -22,18 +24,18 @@ export async function createExpl(ctx: Context) {
     key,
   };
 
-  const isExplWithValue = words.length > 2 && !ctx.message!.reply_to_message;
+  const isExplWithValue = words.length > 2 && !message.reply_to_message;
 
   // Expl value is normal text
   if (isExplWithValue) {
     expl.message = _(words).drop(2).join(' ');
 
     // Expl value is reply to other message
-  } else if (ctx.message!.reply_to_message) {
-    const replyTo: any = ctx.message!.reply_to_message!;
+  } else if (message.reply_to_message) {
+    const replyTo: any = message.reply_to_message!;
     expl.telegram = {
       message: replyTo.message_id,
-      chat: ctx.message!.chat.id,
+      chat: message.chat.id,
     };
 
     if (replyTo.from && replyTo.from.is_bot) {
