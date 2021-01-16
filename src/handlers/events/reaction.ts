@@ -39,8 +39,9 @@ export async function toggleReaction(ctx: Context) {
   } catch (err) {
     switch (err.message) {
       case 'already_exists':
-        if (ctx.session!.reactionToBeDeleted !== +id) {
-          ctx.session!.reactionToBeDeleted = +id;
+        if (ctx.session?.reactionToBeDeleted !== +id) {
+          ctx.session ??= {};
+          ctx.session.reactionToBeDeleted = +id;
           setTimeout(() => (ctx.session!.reactionToBeDeleted = null), 4000);
           return ctx.answerCbQuery(messages.reaction.confirmRemoval());
         }

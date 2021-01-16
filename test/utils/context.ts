@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 const baseContext = (state?: any) => {
   return {
     state,
-    session: { joined: true },
+    session: {},
     reply: sinon.fake.returns({
       message_id: 1235,
     }),
