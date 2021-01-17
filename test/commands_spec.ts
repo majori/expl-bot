@@ -39,6 +39,36 @@ describe('Commands', () => {
       expect(ctx.reply.lastArg).to.equal(expl.value);
     });
 
+    it('users can see each other expls only if they share a group', async () => {
+      const KEY = 'key';
+      const VALUE = 'value';
+      const OTHER_USER_ID = 987654321;
+      await knex('expls').insert({
+        key: KEY,
+        value: VALUE,
+        user_id: OTHER_USER_ID,
+      });
+
+      let ctx = message(`/expl ${KEY}`);
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
+
+      await knex('auth').insert([
+        {
+          user_id: USER_ID,
+          chat_id: -1,
+        },
+        {
+          user_id: OTHER_USER_ID,
+          chat_id: -1,
+        },
+      ]);
+
+      ctx = message(`/expl ${KEY}`);
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(VALUE);
+    });
+
     describe('Telegram content', () => {
       it('gets expl with message', async () => {
         const KEY = 'key';
