@@ -39,6 +39,37 @@ describe('Commands', () => {
       expect(ctx.reply.lastArg).to.equal(expl.value);
     });
 
+    it('users can see each other expls only if they share a group', async () => {
+      const KEY = 'key';
+      const VALUE = 'value';
+      const OTHER_USER_ID = 987654321;
+      const GROUP_ID = -1;
+      await knex('expls').insert({
+        key: KEY,
+        value: VALUE,
+        user_id: OTHER_USER_ID,
+      });
+
+      let ctx = message(`/expl ${KEY}`);
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
+
+      await knex('auth').insert([
+        {
+          user_id: USER_ID,
+          chat_id: GROUP_ID,
+        },
+        {
+          user_id: OTHER_USER_ID,
+          chat_id: GROUP_ID,
+        },
+      ]);
+
+      ctx = message(`/expl ${KEY}`);
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(VALUE);
+    });
+
     describe('Telegram content', () => {
       it('gets expl with message', async () => {
         const KEY = 'key';
@@ -84,10 +115,10 @@ describe('Commands', () => {
         })),
       );
 
-      const expls = _.times(4, (num) => ({
+      const expls = _.times(4, (i) => ({
         key: KEY,
-        value: num.toString(),
-        user_id: users[num],
+        value: i.toString(),
+        user_id: users[i],
       }));
 
       // Insert each expl individually so they have different created_at timestamps
@@ -101,6 +132,44 @@ describe('Commands', () => {
 
         expect(ctx.reply.lastArg).to.equal(index.toString());
       }
+    });
+
+    it('should cycle all expls with the same key starting from the one with the earliest echo', async () => {
+      const KEY = 'key';
+      const AMOUNT = 10;
+
+      await knex('auth').insert([
+        ..._.times(AMOUNT, (i) => ({
+          user_id: i,
+          chat_id: -1,
+        })),
+        {
+          user_id: USER_ID,
+          chat_id: -1,
+        },
+      ]);
+
+      await knex('expls').insert(
+        _.times(AMOUNT, (i) => ({
+          key: KEY,
+          value: i.toString(),
+          user_id: i,
+        })),
+      );
+
+      const ctx = message(`/expl ${KEY}`);
+
+      const responses = [];
+      for (let round = 0; round < AMOUNT; round++) {
+        await commands.expl(ctx);
+        responses.push(ctx.reply.lastArg);
+      }
+
+      expect(_.uniq(responses).length).to.equal(responses.length);
+
+      // Full round has completed, next one should be the same as the first one
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(responses[0]);
     });
 
     it('updates echo history after sending a expl', async () => {

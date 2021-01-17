@@ -15,9 +15,8 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.use(session());
   bot.use(async (ctx, next) => {
-    // Autojoin user to the group if not joined already
     if (ctx.from && ctx.chat?.type !== 'private') {
-      await db.addUserToChat(ctx.from!.id, ctx.chat!.id);
+      await db.addUserToChat(ctx.from.id, ctx.chat!.id);
     }
 
     next();
