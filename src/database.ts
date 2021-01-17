@@ -75,21 +75,48 @@ export async function createExpl(options: Options.Expl) {
 }
 
 export async function getExpl(user: number, key: string, offset?: number) {
-  const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
-    user,
-  )
+  const explQuery = getExplsForUser(user)
     .andWhere({ 'expls.key': _.toLower(key) })
     .orderBy('created_at', 'asc')
     .groupBy('id', 'content_id');
 
-  if (_.isEmpty(results)) {
-    return null;
-  }
+  let selected: Table.Expl & Table.TgContents;
+  if (offset && offset > 0) {
+    const expls = await explQuery;
+    if (_.isEmpty(expls)) {
+      return null;
+    }
+    selected = expls[_.clamp(offset - 1, 0, _.size(expls) - 1)];
+  } else {
+    const lastEchoedExpl = await knex
+      .with('available_expls', explQuery)
+      .with(
+        'last_echoed_expls',
+        knex
+          .from('echo_history')
+          .select('expl_id')
+          .max('echoed_at AS last_echo')
+          .whereIn('expl_id', knex.select('id').from('available_expls'))
+          .groupBy('expl_id'),
+      )
+      .select('expl_id AS id', 'last_echo')
+      .from('last_echoed_expls')
+      // Append expls which has no echos
+      .union((qb) => {
+        qb.select('id AS expl_id')
+          .select(knex.raw('null as "last_echo"'))
+          .from('available_expls')
+          .whereNotIn('id', knex.select('expl_id').from('last_echoed_expls'));
+      })
+      .orderByRaw('last_echo ASC NULLS FIRST')
+      .first();
 
-  const selected =
-    offset && offset > 0
-      ? results[_.clamp(offset - 1, 0, _.size(results) - 1)]
-      : _.sample(results)!;
+    if (!lastEchoedExpl) {
+      return null;
+    }
+
+    selected = await explQuery.where('id', lastEchoedExpl.id).first();
+  }
 
   return createNestedExpl(selected);
 }

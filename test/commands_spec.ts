@@ -133,6 +133,44 @@ describe('Commands', () => {
       }
     });
 
+    it('should cycle all expls with the same key starting from the one with the earliest echo', async () => {
+      const KEY = 'key';
+      const AMOUNT = 10;
+
+      await knex('auth').insert([
+        ..._.times(AMOUNT, (i) => ({
+          user_id: i,
+          chat_id: -1,
+        })),
+        {
+          user_id: USER_ID,
+          chat_id: -1,
+        },
+      ]);
+
+      await knex('expls').insert(
+        _.times(AMOUNT, (i) => ({
+          key: KEY,
+          value: i,
+          user_id: i,
+        })),
+      );
+
+      const ctx = message(`/expl ${KEY}`);
+
+      const responses = [];
+      for (let round = 0; round < AMOUNT; round++) {
+        await commands.expl(ctx);
+        responses.push(ctx.reply.lastArg);
+      }
+
+      expect(_.uniq(responses).length).to.equal(responses.length);
+
+      // Full round has completed, next one should be the same as the first one
+      await commands.expl(ctx);
+      expect(ctx.reply.lastArg).to.equal(responses[0]);
+    });
+
     it('updates echo history after sending a expl', async () => {
       const KEY = 'key';
 
