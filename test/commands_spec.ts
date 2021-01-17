@@ -115,10 +115,10 @@ describe('Commands', () => {
         })),
       );
 
-      const expls = _.times(4, (num) => ({
+      const expls = _.times(4, (i) => ({
         key: KEY,
-        value: num.toString(),
-        user_id: users[num],
+        value: i.toString(),
+        user_id: users[i],
       }));
 
       // Insert each expl individually so they have different created_at timestamps
@@ -152,7 +152,7 @@ describe('Commands', () => {
       await knex('expls').insert(
         _.times(AMOUNT, (i) => ({
           key: KEY,
-          value: i,
+          value: i.toString(),
           user_id: i,
         })),
       );
