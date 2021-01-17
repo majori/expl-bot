@@ -43,6 +43,7 @@ describe('Commands', () => {
       const KEY = 'key';
       const VALUE = 'value';
       const OTHER_USER_ID = 987654321;
+      const GROUP_ID = -1;
       await knex('expls').insert({
         key: KEY,
         value: VALUE,
@@ -56,11 +57,11 @@ describe('Commands', () => {
       await knex('auth').insert([
         {
           user_id: USER_ID,
-          chat_id: -1,
+          chat_id: GROUP_ID,
         },
         {
           user_id: OTHER_USER_ID,
-          chat_id: -1,
+          chat_id: GROUP_ID,
         },
       ]);
 
