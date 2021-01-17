@@ -86,36 +86,37 @@ export async function getExpl(user: number, key: string, offset?: number) {
     if (_.isEmpty(expls)) {
       return null;
     }
-    selected = expls[_.clamp(offset - 1, 0, _.size(expls) - 1)];
+    const index = _.clamp(offset - 1, 0, _.size(expls) - 1);
+    selected = expls[index];
   } else {
-    const lastEchoedExpl = await knex
+    const explWithOldestEcho = await knex
       .with('available_expls', explQuery)
       .with(
-        'last_echoed_expls',
+        'latest_echos',
         knex
           .from('echo_history')
           .select('expl_id')
-          .max('echoed_at AS last_echo')
+          .max('echoed_at AS timestamp')
           .whereIn('expl_id', knex.select('id').from('available_expls'))
           .groupBy('expl_id'),
       )
-      .select('expl_id AS id', 'last_echo')
-      .from('last_echoed_expls')
+      .select('expl_id AS id', 'timestamp')
+      .from('latest_echos')
       // Append expls which has no echos
       .union((qb) => {
         qb.select('id AS expl_id')
-          .select(knex.raw('null as "last_echo"'))
+          .select(knex.raw('null as "timestamp"'))
           .from('available_expls')
-          .whereNotIn('id', knex.select('expl_id').from('last_echoed_expls'));
+          .whereNotIn('id', knex.select('expl_id').from('latest_echos'));
       })
-      .orderByRaw('last_echo ASC NULLS FIRST')
+      .orderByRaw('timestamp ASC NULLS FIRST')
       .first();
 
-    if (!lastEchoedExpl) {
+    if (!explWithOldestEcho) {
       return null;
     }
 
-    selected = await explQuery.where('id', lastEchoedExpl.id).first();
+    selected = await explQuery.where('id', explWithOldestEcho.id).first();
   }
 
   return createNestedExpl(selected);
