@@ -15,7 +15,7 @@ export default async (bot: Telegraf<Context>) => {
 
   bot.use(session());
   bot.use(async (ctx, next) => {
-    if (ctx.from && ctx.chat?.type !== 'private') {
+    if (ctx.from?.id && ctx.chat?.id && ctx.chat?.type !== 'private') {
       await db.addUserToChat(ctx.from.id, ctx.chat!.id);
     }
 
