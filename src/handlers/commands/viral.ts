@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
+
 import * as db from '../../database';
-import type { Context } from '../../types/telegraf';
 import * as messages from '../../constants/messages';
+import type { Context } from '../../types/telegraf';
 
 export async function getMostViral(ctx: Context) {
   const items = await db.getMostViral(ctx.from!.id, ctx.chat!.id);

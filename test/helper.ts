@@ -1,6 +1,7 @@
 import * as sinon from 'sinon';
 import * as Telegraf from 'telegraf';
 import * as Knex from 'knex';
+
 import createBot from '../src/bot';
 import * as config from '../src/config';
 

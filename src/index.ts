@@ -1,9 +1,10 @@
+import { Telegraf } from 'telegraf';
+import * as express from 'express';
+
 import * as config from './config';
 import createBot from './bot';
-import { Telegraf } from 'telegraf';
 import logger from './logger';
 import { knex } from './database';
-import * as express from 'express';
 import type { Context } from './types/telegraf';
 
 async function start() {

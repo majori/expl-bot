@@ -2,12 +2,15 @@
 import * as template from 'string-template/compile';
 import { constant } from 'lodash';
 
-export const errors = {
+type MessageFunc = (...array: any[]) => string;
+type MessageMap = { [name: string]: MessageFunc };
+
+export const errors: MessageMap = {
   notFound: template('Expl "{0}" not found.'),
   unknownError: constant('Unknown error occurred :/'),
 };
 
-export const add = {
+export const add: MessageMap = {
   successful: template('Expl "{0}" created!'),
   successfulWithDisclaimer: template(
     'Expl "{0}" created! (If you want to use multiple words in a key, use _ between words)',
@@ -20,7 +23,7 @@ export const add = {
   isBot: constant('Can not add content from other bots!'),
 };
 
-export const list = {
+export const list: MessageMap = {
   invalidSyntax: template('Try `{0} [key]`'),
   notFound: template('No expls found with key like "{0}".'),
   tooMany: template(
@@ -28,12 +31,12 @@ export const list = {
   ),
 };
 
-export const remove = {
+export const remove: MessageMap = {
   successful: template('Expl "{0}" removed.'),
   invalidSyntax: template('Try `{0} [key]`'),
 };
 
-export const get = {
+export const get: MessageMap = {
   forbidden: constant(
     'Expl cannot be shown since the user or the chat has blocked the bot 😢',
   ),
@@ -41,12 +44,12 @@ export const get = {
   noExpls: constant("Can't find any expl for you :/"),
 };
 
-export const resolve = {
+export const resolve: MessageMap = {
   notExpl: constant('Replied message was not an expl'),
   noReply: constant('Reply to an expl to find out its key'),
 };
 
-export const help = constant(`
+export const help: MessageFunc = constant(`
 /expl or ?? \`[key]\`
   - Get a expl with the given key
 /rexpl or ?!
@@ -69,20 +72,20 @@ export const help = constant(`
   - Prints this info
 `);
 
-export const reaction = {
+export const reaction: MessageMap = {
   added: template('Added "{0}"'),
   removed: template('Removed your previous "{0}"'),
   creatorHasRemoved: constant('Expl creator has removed this expl'),
   confirmRemoval: constant('❗️ already added, click again to remove'),
 };
 
-export const quiz = {
+export const quiz: MessageMap = {
   notEnoughOptions: constant(
     'There needs to be atleast one more expls to create a quiz',
   ),
 };
 
-export const me = {
+export const me: MessageMap = {
   latestByYou: constant('Expls made by you, starting with latest:'),
   oldestByYou: constant('Expls made by you, starting with oldest:'),
   bestByYou: constant('Expls made by you, most liked:'),
@@ -122,7 +125,7 @@ export const me = {
   listEnd: constant('You have reached the end of the list'),
 };
 
-export const viral = {
+export const viral: MessageMap = {
   notEnoughData: constant('Not enough data.'),
   lead: constant('The hottest expls right now 🔥:'),
   leadPrivate: constant('The hottest expls from all over your chats:'),

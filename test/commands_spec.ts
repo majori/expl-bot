@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import * as _ from 'lodash';
+
 import * as db from '../src/database';
+import * as messages from '../src/constants/messages';
 import commands from '../src/handlers/commands';
 import events from '../src/handlers/events';
 import { MAX_COUNT as MAX_LIST_COUNT } from '../src/handlers/commands/list';
 import { AMOUNT_OF_EXPL_OPTIONS } from '../src/handlers/commands/quiz';
-import * as messages from '../src/constants/messages';
 import { message, callbackQuery, USER_ID, GROUP_ID } from './utils/context';
 import { knex, clearDb, migrateAllDown } from './helper';
 import { Table } from '../src/types/database';

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import type { CallbackQuery, User, Message } from 'typegram';
+
 import * as db from '../../database';
 import { formatDate } from '../../utils';
 import type { Context } from '../../types/telegraf';
