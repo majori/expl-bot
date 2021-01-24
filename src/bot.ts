@@ -20,7 +20,7 @@ export default async (bot: Telegraf<Context>) => {
       await db.addUserToChat(ctx.from.id, ctx.chat!.id);
     }
 
-    next();
+    await next();
   });
 
   bot.start(commands.help);
