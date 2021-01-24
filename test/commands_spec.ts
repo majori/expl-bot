@@ -55,7 +55,7 @@ describe('Commands', () => {
       await commands.expl(ctx);
       expect(ctx.reply.lastArg).to.equal(messages.errors.notFound(KEY));
 
-      await knex('auth').insert([
+      await knex('sessions').insert([
         {
           user_id: USER_ID,
           chat_id: GROUP_ID,
@@ -109,7 +109,7 @@ describe('Commands', () => {
       const users = [USER_ID, 223456789, 323456789, 423456789];
 
       // Make user to be in the same group
-      await knex('auth').insert(
+      await knex('sessions').insert(
         _.map(users, (user) => ({
           user_id: user,
           chat_id: -123456789,
@@ -139,7 +139,7 @@ describe('Commands', () => {
       const KEY = 'key';
       const AMOUNT = 10;
 
-      await knex('auth').insert([
+      await knex('sessions').insert([
         ..._.times(AMOUNT, (i) => ({
           user_id: i,
           chat_id: -1,
@@ -421,7 +421,7 @@ describe('Commands', () => {
         })),
       );
 
-      await knex('auth').insert(
+      await knex('sessions').insert(
         _.flatten([
           _.times(COUNT, (i) => ({
             user_id: i,

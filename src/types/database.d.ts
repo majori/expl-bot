@@ -20,10 +20,9 @@ export namespace Table {
     video_id?: string;
   }
 
-  export interface Auth {
-    id: number;
-    tg_user_id: number;
-    tg_group_id: number;
+  export interface Sessions {
+    user_id: number;
+    chat_id: number;
   }
 }
 

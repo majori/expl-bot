@@ -170,14 +170,14 @@ export const searchExpls: SearchExpls = async (
 
 export async function addUserToChat(user: number, chat: number) {
   try {
-    await knex('auth').insert({
+    await knex('sessions').insert({
       user_id: user,
       chat_id: chat,
     });
     logger.debug('User added to chat', { user, chat });
     return true;
   } catch (err) {
-    if (err.constraint === 'auth_user_id_chat_id_unique') {
+    if (err.constraint === 'sessions_pkey') {
       logger.debug('User already in chat', { user, chat });
       return false;
     }
@@ -206,7 +206,7 @@ export async function deleteUser(user: number) {
         .where('user_id', user)
         .del();
 
-      const chatCount = await knex('auth')
+      const chatCount = await knex('sessions')
         .transacting(trx)
         .where('user_id', user)
         .del();
@@ -230,10 +230,10 @@ function getExplsForUser(user: number) {
     .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
     .where(function () {
       this.whereIn('user_id', function () {
-        this.from('auth')
+        this.from('sessions')
           .select('user_id')
           .whereIn('chat_id', function () {
-            this.from('auth').select('chat_id').where({ user_id: user });
+            this.from('sessions').select('chat_id').where({ user_id: user });
           });
       }).orWhere('user_id', user);
     });
