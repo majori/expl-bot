@@ -1,4 +1,5 @@
 import type { CallbackQuery } from 'typegram';
+
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
 import logger from '../../logger';

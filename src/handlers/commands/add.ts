@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 import type { Message } from 'typegram';
+
 import * as db from '../../database';
-import type { Context } from '../../types/telegraf';
-import type { Options } from '../../types/database';
 import logger from '../../logger';
 import * as messages from '../../constants/messages';
-
 import { reactionsKeyboard } from '../events/reaction';
+import type { Context } from '../../types/telegraf';
+import type { Options } from '../../types/database';
 
 export async function createExpl(ctx: Context) {
   const message = ctx.message as Message.TextMessage;

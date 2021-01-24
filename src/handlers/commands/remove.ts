@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import type { Message } from 'typegram';
+
 import * as db from '../../database';
-import type { Context } from '../../types/telegraf';
 import * as messages from '../../constants/messages';
+import type { Context } from '../../types/telegraf';
 
 export async function removeExpl(ctx: Context) {
   const message = ctx.message as Message.TextMessage;

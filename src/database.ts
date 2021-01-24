@@ -1,5 +1,6 @@
 import * as Knex from 'knex';
 import * as _ from 'lodash';
+
 import * as config from './config';
 import { Table, Options } from './types/database';
 import logger from './logger';

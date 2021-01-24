@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import type { Message } from 'typegram';
+
 import * as messages from '../../constants/messages';
 import * as db from '../../database';
+import { sendExpl } from '../../utils';
 import type { Context } from '../../types/telegraf';
 import type { Table } from '../../types/database';
-import { sendExpl } from '../../utils';
 
 export const AMOUNT_OF_EXPL_OPTIONS = 3;
 export const CHANCE_TO_OMIT_CORRECT_KEY = 33; // %

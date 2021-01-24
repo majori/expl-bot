@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import { session } from 'telegraf';
+import type { Telegraf } from 'telegraf';
+
 import logger from './logger';
 import commands from './handlers/commands';
 import events from './handlers/events';
 import * as db from './database';
-import type { Telegraf } from 'telegraf';
 import type { Context } from './types/telegraf';
 
 export default async (bot: Telegraf<Context>) => {
@@ -19,7 +20,7 @@ export default async (bot: Telegraf<Context>) => {
       await db.addUserToChat(ctx.from.id, ctx.chat!.id);
     }
 
-    next();
+    await next();
   });
 
   bot.start(commands.help);

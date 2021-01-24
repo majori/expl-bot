@@ -1,6 +1,6 @@
-import * as path from 'path';
 import * as _ from 'lodash';
 import * as winston from 'winston';
+
 import * as config from './config';
 
 const logger = winston.createLogger({

@@ -1,10 +1,11 @@
 import * as _ from 'lodash';
 import type { Message } from 'typegram';
+
 import * as db from '../../database';
-import type { Context } from '../../types/telegraf';
 import { escapeMarkdown, formatDate } from '../../utils';
 import { reactionsKeyboard } from '../events/reaction';
 import * as messages from '../../constants/messages';
+import type { Context } from '../../types/telegraf';
 
 export async function resolveRexpl(ctx: Context) {
   const message = ctx.message as Message.TextMessage;

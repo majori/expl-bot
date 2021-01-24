@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import type { Message } from 'typegram';
+
 import * as db from '../../database';
-import type { Context } from '../../types/telegraf';
 import * as messages from '../../constants/messages';
 import { inlineSearchKeyboard } from '../../utils';
+import type { Context } from '../../types/telegraf';
 
 export const MAX_COUNT = 100;
 
