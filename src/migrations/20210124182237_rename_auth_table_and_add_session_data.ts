@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.renameTable('auth', 'sessions');
   await knex.schema.alterTable('sessions', (t) => {
     t.primary(['user_id', 'chat_id']);
-    t.json('session');
+    t.json('session').defaultTo('{}');
   });
 }
 
