@@ -24,7 +24,7 @@ export async function toggleReaction(ctx: Context) {
   const cbQuery = ctx.callbackQuery as
     | CallbackQuery.DataCallbackQuery
     | undefined;
-  if (!cbQuery || !cbQuery.data) {
+  if (!cbQuery?.data) {
     return;
   }
 
@@ -40,20 +40,28 @@ export async function toggleReaction(ctx: Context) {
   } catch (err) {
     switch (err.message) {
       case 'already_exists':
-        if (ctx.session?.reactionToBeDeleted !== +id) {
-          ctx.session ??= {};
-          ctx.session.reactionToBeDeleted = +id;
-          setTimeout(() => (ctx.session!.reactionToBeDeleted = null), 4000);
-          return ctx.answerCbQuery(messages.reaction.confirmRemoval());
+        if (
+          ctx.session.reactionToBeDeleted &&
+          ctx.session.reactionToBeDeleted.id == +id &&
+          Date.now() - ctx.session.reactionToBeDeleted.timestamp <= 4e3
+        ) {
+          delete ctx.session.reactionToBeDeleted;
+          await db.deleteReaction(ctx.from!.id, +id, reaction);
+          ctx.answerCbQuery(messages.reaction.removed(reaction));
+          break;
+        } else {
+          ctx.session.reactionToBeDeleted = {
+            id: +id,
+            timestamp: Date.now(),
+          };
+          await ctx.answerCbQuery(messages.reaction.confirmRemoval());
+          return;
         }
-
-        await db.deleteReaction(ctx.from!.id, +id, reaction);
-        ctx.answerCbQuery(messages.reaction.removed(reaction));
-        break;
 
       case 'expl_removed':
         await ctx.editMessageReplyMarkup(undefined);
-        return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
+        await ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
+        return;
 
       default:
         throw err;
