@@ -168,24 +168,6 @@ export const searchExpls: SearchExpls = async (
   return query;
 };
 
-export async function addUserToChat(user: number, chat: number) {
-  try {
-    await knex('sessions').insert({
-      user_id: user,
-      chat_id: chat,
-    });
-    logger.debug('User added to chat', { user, chat });
-    return true;
-  } catch (err) {
-    if (err.constraint === 'sessions_pkey') {
-      logger.debug('User already in chat', { user, chat });
-      return false;
-    }
-    logger.error(err);
-    throw err;
-  }
-}
-
 export async function deleteExpl(user: number, key: string) {
   const query = knex('expls').where({ user_id: user, key });
 

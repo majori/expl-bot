@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { session } from 'telegraf';
 import type { Telegraf } from 'telegraf';
 
 import logger from './logger';
 import commands from './handlers/commands';
 import events from './handlers/events';
+import { session } from './session';
 import * as db from './database';
 import type { Context } from './types/telegraf';
 
@@ -14,14 +14,7 @@ export default async (bot: Telegraf<Context>) => {
     next();
   });
 
-  bot.use(session());
-  bot.use(async (ctx, next) => {
-    if (ctx.from?.id && ctx.chat?.id && ctx.chat?.type !== 'private') {
-      await db.addUserToChat(ctx.from.id, ctx.chat!.id);
-    }
-
-    await next();
-  });
+  bot.use(session);
 
   bot.start(commands.help);
   bot.help(commands.help);
