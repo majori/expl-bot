@@ -32,7 +32,7 @@ export async function toggleReaction(ctx: Context) {
 
   try {
     await db.addReaction(
-      { user: ctx.from!.id, chat: ctx.chat!.id },
+      { user: ctx.callbackQuery!.from.id, chat: ctx.chat!.id },
       +id,
       reaction,
     );
@@ -47,7 +47,7 @@ export async function toggleReaction(ctx: Context) {
           return ctx.answerCbQuery(messages.reaction.confirmRemoval());
         }
 
-        await db.deleteReaction(ctx.from!.id, +id, reaction);
+        await db.deleteReaction(ctx.callbackQuery!.from.id, +id, reaction);
         ctx.answerCbQuery(messages.reaction.removed(reaction));
         break;
 

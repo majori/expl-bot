@@ -86,8 +86,8 @@ export function inlineQuery(query?: string): any {
 export function callbackQuery(data: string): any {
   return {
     ...baseContext(),
-    callbackQuery: { data },
-    from: { id: USER_ID },
+    callbackQuery: { data, from: { id: USER_ID } },
+    from: { id: 0 },
     chat: { id: GROUP_ID },
   };
 }
