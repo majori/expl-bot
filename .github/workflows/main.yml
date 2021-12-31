@@ -20,7 +20,7 @@ jobs:
   # Run tests.
   test:
     runs-on: ubuntu-latest
-    container: node:14
+    container: node:16
     defaults:
       run:
         shell: bash
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'
 
       - run: npm ci
 
@@ -52,40 +52,25 @@ jobs:
 
       - run: npm install -g zx
 
-      - run: |
-          await $`cat package.json | grep name`
-
-          let branch = await $`git branch --show-current`
-
-          await Promise.all([
-            $`sleep 1; echo 1`,
-            $`sleep 2; echo 2`,
-            $`sleep 3; echo 3`,
-          ])
-
-          let name = 'foo bar'
-          await $`mkdir /tmp/${name}`
-        shell: zx {0}
-
       - name: Generate Telegram message
         if: ${{ always() }}
         id: telegram_message
         run: |
-          if [ $STATUS == "success" ]
-          then
-            MESSAGE=✅
-          else
-            MESSAGE=❌
-          fi
+          const message = []
 
-          MESSAGE="$MESSAGE \"${{ github.event.head_commit.message }}\""
-          MESSAGE="$MESSAGE ([#$( echo "${{ github.sha }}" | head -c 7)](https://github.com/${{ github.repository	 }}/commit/${{ github.sha }}))"
-          MESSAGE="$MESSAGE @ \`${GITHUB_REF#refs/heads/}\`"
-          MESSAGE="$MESSAGE by *${{ github.actor }}*"
+          const jobStatus = '${{ job.status }}'
+          const commitMessage = '${{ github.event.head_commit.message }}'
+          const sha = '${{ github.sha }}'.substring(0,7)
 
-          echo "::set-output name=message::$MESSAGE"
-        env:
-          STATUS: ${{ job.status }}
+          message.push(jobStatus == 'success' ? '✅' : '❌')
+          message.push(`"${commitMessage}"`)
+          message.push(`([\#${sha}](https://github.com/${process.env.GITHUB_REPOSITORY}/commit/${sha}))`)
+          message.push(`@ \`${process.env.GITHUB_REF.replace("refs/heads/", "")}\``)
+          message.push(`by *${process.env.GITHUB_ACTOR}*`)
+
+          const output = `::set-output name=message::${message.join(' ')}`
+          await $`echo ${output}`
+        shell: zx {0}
 
       - name: Send notification
         if: ${{ always() }}
