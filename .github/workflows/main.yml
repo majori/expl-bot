@@ -50,6 +50,23 @@ jobs:
         env:
           PG_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/postgres
 
+      - run: npm install -g zx
+
+      - run: |
+          await $`cat package.json | grep name`
+
+          let branch = await $`git branch --show-current`
+
+          await Promise.all([
+            $`sleep 1; echo 1`,
+            $`sleep 2; echo 2`,
+            $`sleep 3; echo 3`,
+          ])
+
+          let name = 'foo bar'
+          await $`mkdir /tmp/${name}`
+        shell: zx {0}
+
       - name: Generate Telegram message
         if: ${{ always() }}
         id: telegram_message
