@@ -78,8 +78,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: ${{ steps.telegram_message.outputs.message }}
           format: markdown
-        env:
-          PLUGIN_WEBPAGE_PREVIEW: false
+          disable_web_page_preview: true
 
   build_and_push:
     needs: test
