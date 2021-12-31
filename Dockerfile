@@ -8,7 +8,7 @@ RUN mkdir -p /home/node/app/node_modules \
 
 WORKDIR /home/node/app
 
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 
 USER node
 
