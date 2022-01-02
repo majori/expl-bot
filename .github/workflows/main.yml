@@ -60,11 +60,11 @@ jobs:
 
           const jobStatus = '${{ job.status }}'
           const commitMessage = '${{ github.event.head_commit.message }}'
-          const sha = '${{ github.sha }}'.substring(0,7)
+          const sha = '${{ github.sha }}'
 
           message.push(jobStatus == 'success' ? '✅' : '❌')
           message.push(`"${commitMessage}"`)
-          message.push(`([\#${sha}](https://github.com/${process.env.GITHUB_REPOSITORY}/commit/${sha}))`)
+          message.push(`([\#${sha.substring(0,7)}](https://github.com/${process.env.GITHUB_REPOSITORY}/commit/${sha}))`)
           message.push(`@ \`${process.env.GITHUB_REF.replace("refs/heads/", "")}\``)
           message.push(`by *${process.env.GITHUB_ACTOR}*`)
 
