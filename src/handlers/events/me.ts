@@ -202,12 +202,12 @@ export async function statsText(user: User) {
   return statTexts.join('\n\n');
 }
 
-export async function meKeyboard(user: number, page: string = 'home', offset?: number) {
-  const keyboard = await createKeyboard(
-    user,
-    page,
-    offset,
-  );
+export async function meKeyboard(
+  user: number,
+  page: string = 'home',
+  offset?: number,
+) {
+  const keyboard = await createKeyboard(user, page, offset);
 
   return { inline_keyboard: keyboard };
 }
