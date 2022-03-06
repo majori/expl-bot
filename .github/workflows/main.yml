@@ -58,9 +58,9 @@ jobs:
         run: |
           const message = []
 
-          const jobStatus = '${{ job.status }}'
-          const commitMessage = '${{ github.event.head_commit.message }}'
-          const sha = '${{ github.sha }}'
+          const jobStatus = `${{ job.status }}`
+          const commitMessage = `${{ github.event.head_commit.message }}`
+          const sha = `${{ github.sha }}`
 
           message.push(jobStatus == 'success' ? '✅' : '❌')
           message.push(`"${commitMessage}"`)
