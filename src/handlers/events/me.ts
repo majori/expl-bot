@@ -202,18 +202,18 @@ export async function statsText(user: User) {
   return statTexts.join('\n\n');
 }
 
-export async function meKeyboard(ctx: Context, page: string = 'home') {
-  const keyboard = await createKeyboard(
-    ctx.from!.id,
-    page,
-    ctx.session?.meOffset,
-  );
+export async function meKeyboard(
+  user: number,
+  page: string = 'home',
+  offset?: number,
+) {
+  const keyboard = await createKeyboard(user, page, offset);
 
   return { inline_keyboard: keyboard };
 }
 
-async function reviewKey(ctx: Context, key: string) {
-  const expl = await db.getOwnExpl(ctx.from!.id, key);
+async function reviewKey(ctx: Context, user: number, key: string) {
+  const expl = await db.getOwnExpl(user, key);
 
   if (!expl) {
     return ctx.answerCbQuery(messages.reaction.creatorHasRemoved());
@@ -224,7 +224,7 @@ async function reviewKey(ctx: Context, key: string) {
   const text = messages.me.removalAssurance(key);
 
   const replyTo = msg!.message_id;
-  await ctx.telegram.sendMessage(ctx.from!.id, text, {
+  await ctx.telegram.sendMessage(user, text, {
     reply_markup: {
       inline_keyboard: [
         [button(messages.me.deletePermanently(), ['remove', key])],
@@ -245,6 +245,8 @@ export async function meNavigate(ctx: Context) {
     return;
   }
 
+  const user = cbQuery.from.id;
+
   const [, page, meta] = cbQuery.data.split(DATA_SEPARATOR);
 
   if (page === 'likes') {
@@ -254,7 +256,7 @@ export async function meNavigate(ctx: Context) {
       return ctx.answerCbQuery(messages.me.listBeginning());
     }
 
-    const likedExpls = await db.getExlpsLikedByUser(ctx.from!.id);
+    const likedExpls = await db.getExlpsLikedByUser(user);
 
     if (offset >= likedExpls.length && likedExpls.length > 0) {
       return ctx.answerCbQuery(messages.me.listEnd());
@@ -264,10 +266,10 @@ export async function meNavigate(ctx: Context) {
     ctx.session.meOffset = offset;
   }
 
-  const keyboard = await meKeyboard(ctx, page);
+  const keyboard = await meKeyboard(user, page, ctx.session?.meOffset);
 
   if (page === 'review' && !_.isEmpty(meta)) {
-    await reviewKey(ctx, meta);
+    await reviewKey(ctx, user, meta);
 
     return;
   }
@@ -279,7 +281,7 @@ export async function meNavigate(ctx: Context) {
     );
 
     if (page === 'remove' && !_.isEmpty(meta)) {
-      const count = await db.deleteExpl(ctx.from!.id, meta);
+      const count = await db.deleteExpl(user, meta);
 
       return count > 0
         ? ctx.reply(messages.remove.successful(meta))
@@ -291,7 +293,7 @@ export async function meNavigate(ctx: Context) {
     return;
   }
 
-  const text = await meText(ctx.from!.id, page, ctx.session?.meOffset);
+  const text = await meText(user, page, ctx.session?.meOffset);
 
   try {
     await ctx.editMessageText(text, { reply_markup: keyboard });

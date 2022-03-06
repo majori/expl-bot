@@ -1,26 +1,20 @@
-FROM node:14-alpine
+FROM node:16 AS build
 
-ENV NODE_ENV production
-ENV NPM_CONFIG_PRODUCTION false
+COPY . /app
+WORKDIR /app
 
-RUN mkdir -p /home/node/app/node_modules \
-  && chown -R node:node /home/node/app
-
-WORKDIR /home/node/app
-
-COPY package*.json ./
-
-USER node
-
-RUN npm install
-
-COPY --chown=node:node . .
-
+RUN npm ci
 RUN npm run build
 
 RUN npm prune --production
 RUN npm cache clean --force
 
-EXPOSE 6000
+FROM gcr.io/distroless/nodejs:16
 
-CMD [ "npm", "start" ]
+ENV NODE_ENV production
+
+COPY --from=build /app /app
+WORKDIR /app
+
+EXPOSE 6000
+CMD [ "build/index.js" ]
