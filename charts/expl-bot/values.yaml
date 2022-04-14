@@ -19,6 +19,7 @@ postgres:
   passwordSecret:
     name:
     key:
+  requireSsl: true
 
 replicaCount: 1
 
