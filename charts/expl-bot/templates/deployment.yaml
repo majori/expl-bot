@@ -23,7 +23,7 @@ spec:
       initContainers:
         - name: migration
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["npm", "run", "migrate"]
+          command: ["/nodejs/bin/node", "node_modules/.bin/knex", "--cwd", "build", "migrate:latest"]
           env:
             - name: PG_HOST
               value: {{ .Values.postgres.host }}
