@@ -16,11 +16,18 @@ async function start() {
   const server = express();
 
   if (config.tg.webhook) {
-    const path = `/bot${config.tg.token}`;
+    const token = config.tg.token!;
+    const path = `/bot${token}`;
     const url = `${config.tg.webhook}${path}`;
+
     server.use(bot.webhookCallback(path));
     await bot.telegram.setWebhook(url);
-    logger.info(`Webhook set to ${url}`);
+
+    const sanitizedUrl = url.replace(
+      token.slice(3, -3),
+      '*'.repeat(token.length - 6),
+    );
+    logger.info(`Webhook set to ${sanitizedUrl}`);
   } else {
     logger.info('Polling started for updates');
   }
