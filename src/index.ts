@@ -43,6 +43,11 @@ async function start() {
     }
   });
 
+  // Respond "forbidden" on all non-defined routes
+  server.use((req, res) => {
+    res.status(403).send();
+  });
+
   server.listen(config.server.port, () => {
     logger.info(`Server listening on port ${config.server.port}`);
   });
