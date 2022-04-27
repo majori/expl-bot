@@ -23,7 +23,7 @@ spec:
       initContainers:
         - name: migration
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["npm", "run", "migrate"]
+          command: ["/nodejs/bin/node", "node_modules/.bin/knex", "--cwd", "build", "migrate:latest"]
           env:
             - name: PG_HOST
               value: {{ .Values.postgres.host }}
@@ -39,6 +39,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.postgres.passwordSecret.name }}
                   key: {{ .Values.postgres.passwordSecret.key }}
+            {{- if .Values.postgres.requireSsl }}
+            - name: PGSSLMODE
+              value: require
+            {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -75,6 +79,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.postgres.passwordSecret.name }}
                   key: {{ .Values.postgres.passwordSecret.key }}
+            {{- if .Values.postgres.requireSsl }}
+            - name: PGSSLMODE
+              value: require
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /health
