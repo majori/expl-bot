@@ -29,10 +29,9 @@ async function start() {
     );
     logger.info(`Webhook set to ${sanitizedUrl}`);
   } else {
+    await bot.launch();
     logger.info('Polling started for updates');
   }
-
-  await bot.launch();
 
   server.get('/health', async (req, res) => {
     try {
