@@ -96,6 +96,13 @@ export function formatDate(date: string) {
   return [dd, mm, yyyy].join('.');
 }
 
+export function formatYear(date: string) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+
+  return year;
+}
+
 export async function inlineSearchKeyboard(searchTerm: string) {
   return {
     reply_markup: {

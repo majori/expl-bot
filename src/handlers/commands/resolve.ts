@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import type { Message } from 'typegram';
 
 import * as db from '../../database';
-import { escapeMarkdown, formatDate } from '../../utils';
+import { escapeMarkdown, formatYear } from '../../utils';
 import { reactionsKeyboard } from '../events/reaction';
 import * as messages from '../../constants/messages';
 import type { Context } from '../../types/telegraf';
@@ -25,11 +25,18 @@ export async function resolveRexpl(ctx: Context) {
   }
 
   const key = escapeMarkdown(expl.key);
-  const date = formatDate(expl.created_at);
+  const year = formatYear(expl.created_at);
+
+  const chatMember = await ctx.getChatMember(expl.user_id);
+  const explCreator = chatMember?.user.username;
+
+  const reply = explCreator
+    ? `${key}, _${explCreator.replace(/_/, '\\_')} ${year}_`
+    : `${key}, _${year}_`;
 
   const keyboard = await reactionsKeyboard(expl.id);
 
-  await ctx.replyWithMarkdown(`${key}, _${date}_`, {
+  await ctx.replyWithMarkdown(reply, {
     reply_markup: keyboard,
   });
 }

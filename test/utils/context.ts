@@ -16,6 +16,11 @@ const baseContext = (state?: any) => {
     answerInlineQuery: sinon.fake(),
     answerCbQuery: sinon.fake(),
     editMessageReplyMarkup: sinon.fake(),
+    getChatMember: sinon.fake.returns({
+      user: {
+        username: 'testuser',
+      },
+    }),
     telegram: {
       sendMessage: sinon.fake(),
       forwardMessage: sinon.fake.returns({
