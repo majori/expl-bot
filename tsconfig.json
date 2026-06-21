@@ -2,9 +2,14 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
+    "esModuleInterop": true,
+    "rootDir": "./src",
     "outDir": "./build",
     "strict": true,
-    "baseUrl": "./src"
+    "types": ["node", "mocha"],
+    "baseUrl": "./src",
+    "useUnknownInCatchVariables": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/"]
 }

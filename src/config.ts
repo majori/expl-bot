@@ -1,4 +1,4 @@
-import type { Config as KnexConfig } from 'knex';
+import type { Knex } from 'knex';
 
 export const env = {
   prod: process.env.NODE_ENV === 'production',
@@ -19,7 +19,7 @@ export const logging = {
   level: (process.env.LOG_LEVEL || 'info') as string,
 };
 
-const defaultDbConfig: KnexConfig = {
+const defaultDbConfig: Knex.Config = {
   client: 'pg',
   connection: process.env.PG_CONNECTION_STRING || {
     host: process.env.PG_HOST,
@@ -38,7 +38,7 @@ const defaultDbConfig: KnexConfig = {
   },
 };
 
-export const db: { [env: string]: KnexConfig } = {
+export const db: { [env: string]: Knex.Config } = {
   production: {
     ...defaultDbConfig,
     migrations: {

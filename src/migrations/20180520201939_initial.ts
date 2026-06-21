@@ -1,7 +1,7 @@
-import * as Knex from 'knex';
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<any> {
-  await knex.schema.createTable('tg_contents', (t) => {
+  await knex.schema.createTable('tg_contents', (t: Knex.CreateTableBuilder) => {
     t.increments('content_id').primary();
     t.integer('message_id');
     t.bigInteger('chat_id');
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<any> {
     CHECK (message_id IS NULL OR (message_id IS NOT NULL AND chat_id is NOT NULL))
   `);
 
-  await knex.schema.createTable('expls', (t) => {
+  await knex.schema.createTable('expls', (t: Knex.CreateTableBuilder) => {
     t.increments('id').primary();
     t.timestamp('created_at').defaultTo(knex.fn.now());
 
@@ -47,7 +47,7 @@ export async function up(knex: Knex): Promise<any> {
     CHECK ((value IS NOT NULL AND tg_content is NULL) OR (tg_content IS NOT NULL AND value is NULL))
   `);
 
-  await knex.schema.createTable('auth', (t) => {
+  await knex.schema.createTable('auth', (t: Knex.CreateTableBuilder) => {
     t.increments('id').primary();
     t.integer('user_id').notNullable();
     t.bigInteger('chat_id').notNullable();

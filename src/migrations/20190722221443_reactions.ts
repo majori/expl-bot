@@ -1,7 +1,7 @@
-import * as Knex from 'knex';
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<any> {
-  await knex.schema.createTable('reactions', (t) => {
+  await knex.schema.createTable('reactions', (t: Knex.CreateTableBuilder) => {
     t.increments('id').primary();
     t.timestamp('created_at').defaultTo(knex.fn.now());
     t.integer('expl_id')

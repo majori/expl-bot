@@ -1,4 +1,4 @@
-import type { CallbackQuery } from 'typegram';
+import type { CallbackQuery } from '@telegraf/types';
 
 import * as db from '../../database';
 import type { Context } from '../../types/telegraf';
@@ -21,9 +21,7 @@ export async function reactionsKeyboard(id: number) {
 }
 
 export async function toggleReaction(ctx: Context) {
-  const cbQuery = ctx.callbackQuery as
-    | CallbackQuery.DataCallbackQuery
-    | undefined;
+  const cbQuery = ctx.callbackQuery as CallbackQuery.DataQuery | undefined;
   if (!cbQuery || !cbQuery.data) {
     return;
   }

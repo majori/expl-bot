@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import type { CallbackQuery, User, Message } from 'typegram';
+import _ from 'lodash';
+import type { CallbackQuery, User, Message } from '@telegraf/types';
 
 import * as db from '../../database';
 import { formatDate } from '../../utils';
@@ -231,16 +231,14 @@ async function reviewKey(ctx: Context, user: number, key: string) {
         [button(messages.me.cancel(), 'removeReview')],
       ],
     },
-    reply_to_message_id: replyTo,
+    reply_parameters: { message_id: replyTo },
   });
 
   ctx.answerCbQuery();
 }
 
 export async function meNavigate(ctx: Context) {
-  const cbQuery = ctx.callbackQuery as
-    | CallbackQuery.DataCallbackQuery
-    | undefined;
+  const cbQuery = ctx.callbackQuery as CallbackQuery.DataQuery | undefined;
   if (!cbQuery || !cbQuery.data) {
     return;
   }

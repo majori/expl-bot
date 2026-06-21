@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import type { Message } from 'typegram';
+import _ from 'lodash';
+import type { Message } from '@telegraf/types';
 
 import * as db from '../../database';
 import logger from '../../logger';

@@ -1,4 +1,4 @@
-FROM node:16 AS build
+FROM node:24-bookworm-slim AS build
 
 COPY . /app
 WORKDIR /app
@@ -9,9 +9,9 @@ RUN npm run build
 RUN npm prune --production
 RUN npm cache clean --force
 
-FROM gcr.io/distroless/nodejs:16
+FROM gcr.io/distroless/nodejs24-debian13
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 COPY --from=build /app /app
 WORKDIR /app

@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { session } from 'telegraf';
 import type { Telegraf } from 'telegraf';
 

@@ -1,4 +1,4 @@
-import type { Update } from 'typegram';
+import type { Update } from '@telegraf/types';
 
 import * as db from '../../database';
 import { Context } from '../../types/telegraf';
@@ -10,6 +10,10 @@ export async function handlePollAnswer(ctx: Context) {
   const quiz = await db.knex('quizzes').where({ id: answer.poll_id }).first();
 
   if (!quiz) {
+    return;
+  }
+
+  if (!answer.user) {
     return;
   }
 

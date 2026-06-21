@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import * as db from '../../database';
 import * as config from '../../config';
@@ -16,8 +16,10 @@ export async function handleInlineQuery(ctx: Context) {
 
   if (_.isEmpty(query)) {
     return ctx.answerInlineQuery([], {
-      switch_pm_text: 'Bot commands',
-      switch_pm_parameter: 'commands',
+      button: {
+        text: 'Bot commands',
+        start_parameter: 'commands',
+      },
       ...queryOpt,
     });
   }

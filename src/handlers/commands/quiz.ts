@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import type { Message } from 'typegram';
+import _ from 'lodash';
+import type { Message } from '@telegraf/types';
 
 import * as messages from '../../constants/messages';
 import * as db from '../../database';
@@ -73,7 +73,7 @@ export async function startQuiz(ctx: Context) {
     options,
     {
       correct_option_id: correctOptionId,
-      reply_to_message_id: replyTo,
+      reply_parameters: { message_id: replyTo },
       is_anonymous: false,
     },
   );

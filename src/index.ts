@@ -1,5 +1,5 @@
 import { Telegraf } from 'telegraf';
-import * as express from 'express';
+import express from 'express';
 
 import * as config from './config';
 import createBot from './bot';
@@ -34,7 +34,7 @@ async function start() {
 
   await bot.launch();
 
-  server.get('/health', async (req, res) => {
+  server.get('/health', async (_req, res) => {
     try {
       await knex.raw('SELECT 1');
       res.send('ok');
@@ -44,7 +44,7 @@ async function start() {
   });
 
   // Respond "forbidden" on all non-defined routes
-  server.use((req, res) => {
+  server.use((_req, res) => {
     res.status(403).send();
   });
 

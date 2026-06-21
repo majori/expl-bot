@@ -1,5 +1,5 @@
-import * as Knex from 'knex';
-import * as _ from 'lodash';
+import knexFactory, { type Knex } from 'knex';
+import _ from 'lodash';
 
 import * as config from './config';
 import { Table, Options } from './types/database';
@@ -18,7 +18,7 @@ export enum KarmaMultipliers {
   echos = 2,
 }
 
-export const knex = Knex(
+export const knex = knexFactory(
   config.env.prod ? config.db.production : config.db.development,
 );
 
@@ -28,7 +28,9 @@ const enum PostgresErrorCodes {
 }
 
 export async function createExpl(options: Options.Expl) {
-  const expl: Partial<Table.Expl> = {
+  const expl: Partial<Omit<Table.Expl, 'tg_content'>> & {
+    tg_content?: number;
+  } = {
     user_id: options.userId,
     key: _.toLower(options.key),
   };
@@ -40,28 +42,29 @@ export async function createExpl(options: Options.Expl) {
     expl.value = options.message;
   }
 
-  let tgContent: Partial<Table.TgContents>;
+  let tgContent: Partial<Table.TgContents> | undefined;
   if (!_.isEmpty(options.telegram)) {
     tgContent = _.mapKeys(options.telegram, (value, key) => `${key}_id`);
   }
 
   try {
-    await knex.transaction(async (trx) => {
+    await knex.transaction(async (trx: Knex.Transaction) => {
       if (tgContent) {
-        const ids = await knex('tg_contents')
+        const ids = (await knex('tg_contents')
           .transacting(trx)
           .insert(tgContent)
-          .returning('content_id');
-        expl.tg_content = _.first(ids);
+          .returning('content_id')) as Array<number | { content_id: number }>;
+        const firstId = _.first(ids);
+        expl.tg_content =
+          typeof firstId === 'number' ? firstId : firstId?.content_id;
       }
 
-      await knex('expls')
+      const ids = (await knex('expls')
         .transacting(trx)
         .insert(expl)
-        .returning('id')
-        .then(([id]) => {
-          expl.id = id;
-        });
+        .returning('id')) as Array<number | { id: number }>;
+      const firstId = _.first(ids);
+      expl.id = typeof firstId === 'number' ? firstId : firstId?.id;
     });
   } catch (err) {
     if (err.code === PostgresErrorCodes.uniqueViolation) {
@@ -228,11 +231,11 @@ function getExplsForUser(user: number) {
   const query = knex
     .from('expls')
     .leftJoin('tg_contents', 'expls.tg_content', 'tg_contents.content_id')
-    .where(function () {
-      this.whereIn('user_id', function () {
+    .where(function (this: Knex.QueryBuilder) {
+      this.whereIn('user_id', function (this: Knex.QueryBuilder) {
         this.from('auth')
           .select('user_id')
-          .whereIn('chat_id', function () {
+          .whereIn('chat_id', function (this: Knex.QueryBuilder) {
             this.from('auth').select('chat_id').where({ user_id: user });
           });
       }).orWhere('user_id', user);
@@ -287,8 +290,8 @@ export async function getResolve(
 ) {
   const results: Array<Table.Expl & Table.TgContents> = await getExplsForUser(
     from.user,
-  ).where(function () {
-    this.whereIn('id', function () {
+  ).where(function (this: Knex.QueryBuilder) {
+    this.whereIn('id', function (this: Knex.QueryBuilder) {
       this.from('echo_history')
         .select('expl_id')
         .where('echo_message_id', echo)

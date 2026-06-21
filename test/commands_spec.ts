@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import * as db from '../src/database';
 import * as messages from '../src/constants/messages';
@@ -82,10 +82,14 @@ describe('Commands', () => {
         const contentIds = await knex('tg_contents')
           .insert(content)
           .returning('content_id');
+        const firstContentId = _.first(contentIds);
 
         await knex('expls').insert({
           key: KEY,
-          tg_content: _.first(contentIds),
+          tg_content:
+            typeof firstContentId === 'number'
+              ? firstContentId
+              : firstContentId?.content_id,
           user_id: USER_ID,
         });
 

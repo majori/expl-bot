@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { handleInlineQuery } from '../src/handlers/events/inline-query';
 import { RESULT_LIMIT } from '../src/handlers/events/inline-query';

@@ -1,5 +1,5 @@
 // tslint:disable max-line-length
-import * as template from 'string-template/compile';
+import template from 'string-template/compile';
 import { constant } from 'lodash';
 
 type MessageFunc = (...array: any[]) => string;

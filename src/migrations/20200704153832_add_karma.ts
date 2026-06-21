@@ -1,8 +1,8 @@
-import * as Knex from 'knex';
-import * as _ from 'lodash';
+import type { Knex } from 'knex';
+import _ from 'lodash';
 
 export async function up(knex: Knex): Promise<any> {
-  await knex.schema.createTable('karma', (t) => {
+  await knex.schema.createTable('karma', (t: Knex.CreateTableBuilder) => {
     t.string('user_id').primary();
     t.integer('likes').unsigned().defaultTo(0);
     t.integer('dislikes').unsigned().defaultTo(0);
@@ -41,7 +41,11 @@ export async function up(knex: Knex): Promise<any> {
     {} as any,
   );
 
-  await knex('karma').insert(_.toArray(karma));
+  const rows = _.toArray(karma);
+
+  if (!_.isEmpty(rows)) {
+    await knex('karma').insert(rows);
+  }
 }
 
 export async function down(knex: Knex): Promise<any> {
